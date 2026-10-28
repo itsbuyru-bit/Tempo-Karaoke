@@ -330,7 +330,6 @@ public sealed partial class MainPage : Page
                     .Select(group => group.First())
                     .OrderBy(item => item.Artist, StringComparer.CurrentCultureIgnoreCase)
                     .ThenBy(item => item.Title, StringComparer.CurrentCultureIgnoreCase)
-                    .Take(500)
                     .ToList();
             });
 
