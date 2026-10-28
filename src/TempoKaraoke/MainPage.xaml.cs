@@ -144,7 +144,7 @@ public sealed partial class MainPage : Page
 
         if (NavView.MenuItems.Count > 0 && NavView.MenuItems[0] is NavigationViewItem firstItem)
         {
-            firstItem.Margin = new Thickness(0, open ? 0 : 56, 0, 0);
+            firstItem.Margin = new Thickness(0, open ? 0 : 48, 0, 0);
         }
     }
 

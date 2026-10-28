@@ -104,13 +104,13 @@
             <NavigationView.PaneHeader>
                 <AutoSuggestBox
                     x:Name="SearchBox"
-                    Margin="8,64,8,8"
+                    Margin="8,50,8,6"
                     PlaceholderText="Поиск"
                     QueryIcon="Find"
                     TextChanged="SearchBox_TextChanged" />
             </NavigationView.PaneHeader>
 
-            <Grid Padding="0,56,0,0">
+            <Grid Padding="0,44,0,0">
         <!--  Главная  -->
         <Grid
             x:Name="HomeView"
@@ -121,7 +121,7 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
-            <Grid Padding="20,0,20,8">
+            <Grid Padding="20,0,20,2">
                 <TextBlock
                     Text="Главная"
                     FontSize="40"
@@ -842,7 +842,7 @@
         <Border
             x:Name="AppTitleBarDragRegion"
             Grid.Row="0"
-            Height="56"
+            Height="48"
             HorizontalAlignment="Stretch"
             VerticalAlignment="Top"
             Background="Transparent" />
@@ -852,7 +852,7 @@
             x:Name="AppHeader"
             Grid.Row="0"
             Width="320"
-            Height="56"
+            Height="48"
             HorizontalAlignment="Left"
             VerticalAlignment="Top">
             <Border x:Name="AppHeaderDragArea" Background="Transparent" />
