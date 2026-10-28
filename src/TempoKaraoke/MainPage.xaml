@@ -15,6 +15,26 @@
         <KeyboardAccelerator Key="Escape" Invoked="EscapeAccelerator_Invoked" />
     </Page.KeyboardAccelerators>
 
+    <Page.Resources>
+        <Style x:Key="IconButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="CornerRadius" Value="20" />
+            <Setter Property="MinWidth" Value="40" />
+            <Setter Property="MinHeight" Value="40" />
+            <Setter Property="Padding" Value="8" />
+        </Style>
+        <Style x:Key="IconToggleButtonStyle" TargetType="ToggleButton">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="CornerRadius" Value="20" />
+            <Setter Property="MinWidth" Value="40" />
+            <Setter Property="MinHeight" Value="40" />
+            <Setter Property="Padding" Value="8" />
+        </Style>
+        <SolidColorBrush x:Key="CardStrokeColorDefaultBrush" Color="Transparent" />
+    </Page.Resources>
+
     <Grid
         x:Name="RootLayout"
         Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
@@ -27,6 +47,7 @@
             x:Name="NavView"
             Grid.Row="0"
             IsBackButtonVisible="Collapsed"
+            IsPaneToggleButtonVisible="False"
             IsSettingsVisible="False"
             IsPaneOpen="True"
             OpenPaneLength="320"
@@ -52,7 +73,7 @@
                         <SymbolIcon Symbol="List" />
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
-                <NavigationViewItem Content="Плейлисты" Tag="playlists">
+                <NavigationViewItem x:Name="PlaylistsNavItem" Content="Плейлисты" Tag="playlists">
                     <NavigationViewItem.Icon>
                         <SymbolIcon Symbol="Audio" />
                     </NavigationViewItem.Icon>
@@ -69,13 +90,13 @@
             <NavigationView.PaneHeader>
                 <AutoSuggestBox
                     x:Name="SearchBox"
-                    Margin="8,8,8,8"
+                    Margin="8,64,8,8"
                     PlaceholderText="Поиск"
                     QueryIcon="Find"
                     TextChanged="SearchBox_TextChanged" />
             </NavigationView.PaneHeader>
 
-            <Grid>
+            <Grid Padding="0,56,0,0">
         <!--  Главная  -->
         <Grid
             x:Name="HomeView"
@@ -211,10 +232,9 @@
             <!--  Библиотека  -->
             <Border
                 x:Name="LibraryPanel"
-                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                BorderThickness="1"
-                CornerRadius="8">
+                Background="Transparent"
+                BorderThickness="0"
+                CornerRadius="0">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -433,10 +453,9 @@
                 Grid.Column="0"
                 Visibility="Collapsed">
                 <Border
-                    Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                    BorderThickness="1"
-                    CornerRadius="8">
+                    Background="Transparent"
+                    BorderThickness="0"
+                    CornerRadius="0">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
@@ -579,40 +598,43 @@
                 Grid.Column="0"
                 Visibility="Collapsed">
                 <StackPanel
-                    Padding="16,8,16,16"
-                    Spacing="16">
+                    Padding="24,16,24,24"
+                    Spacing="12">
                     <TextBlock Text="Параметры" Style="{StaticResource TitleTextBlockStyle}" />
 
                     <TextBlock Text="Библиотеки" Style="{StaticResource BodyStrongTextBlockStyle}" />
-                    <Border
-                        Padding="16"
-                        Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                        BorderThickness="1"
-                        CornerRadius="8">
-                        <StackPanel Spacing="10">
-                            <Grid ColumnSpacing="12">
+
+                    <Expander
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Stretch"
+                        Background="{ThemeResource LayerFillColorDefaultBrush}"
+                        BorderThickness="0"
+                        CornerRadius="8"
+                        IsExpanded="False">
+                        <Expander.Header>
+                            <Grid MinHeight="56" ColumnSpacing="12">
                                 <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
-                                <StackPanel Spacing="2">
-                                    <TextBlock Text="Пути к библиотеке видео" Style="{StaticResource BodyStrongTextBlockStyle}" />
-                                    <TextBlock
-                                        Text="Индексируются только видеофайлы."
-                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                        Style="{StaticResource CaptionTextBlockStyle}" />
-                                </StackPanel>
+                                <FontIcon FontSize="20" Glyph="&#xE8B7;" />
+                                <TextBlock
+                                    Grid.Column="1"
+                                    VerticalAlignment="Center"
+                                    Text="Пути к библиотеке видео"
+                                    Style="{StaticResource BodyStrongTextBlockStyle}" />
                                 <Button
                                     x:Name="AddVideoFolderButton"
-                                    Grid.Column="1"
+                                    Grid.Column="2"
                                     Click="AddVideoFolder_Click"
                                     Content="Добавить папку" />
                             </Grid>
-
+                        </Expander.Header>
+                        <StackPanel Spacing="10" Padding="0,8,0,0">
                             <ListView
                                 x:Name="VideoRootsList"
-                                MaxHeight="160"
+                                MaxHeight="180"
                                 ItemsSource="{x:Bind VideoRoots, Mode=OneWay}"
                                 SelectionMode="None">
                                 <ListView.ItemTemplate>
@@ -637,26 +659,41 @@
                                     </DataTemplate>
                                 </ListView.ItemTemplate>
                             </ListView>
-
                             <TextBlock
-                                Text="Музыка не индексируется: проект работает только с видео."
+                                Text="Индексируются только видеофайлы. Музыка не индексируется."
                                 Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                 Style="{StaticResource CaptionTextBlockStyle}" />
                         </StackPanel>
-                    </Border>
+                    </Expander>
 
-                    <Border
-                        Padding="16"
-                        Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                        BorderThickness="1"
-                        CornerRadius="8">
-                        <StackPanel Spacing="8">
-                            <TextBlock Text="Обновить библиотеки" Style="{StaticResource BodyStrongTextBlockStyle}" />
-                            <Button
-                                x:Name="RefreshLibrariesButton"
-                                Click="RefreshLibraries_Click"
-                                Content="Обновить" />
+                    <Expander
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Stretch"
+                        Background="{ThemeResource LayerFillColorDefaultBrush}"
+                        BorderThickness="0"
+                        CornerRadius="8"
+                        IsExpanded="False">
+                        <Expander.Header>
+                            <Grid MinHeight="56" ColumnSpacing="12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <FontIcon FontSize="20" Glyph="&#xE72C;" />
+                                <TextBlock
+                                    Grid.Column="1"
+                                    VerticalAlignment="Center"
+                                    Text="Обновить библиотеки"
+                                    Style="{StaticResource BodyStrongTextBlockStyle}" />
+                                <Button
+                                    x:Name="RefreshLibrariesButton"
+                                    Grid.Column="2"
+                                    Click="RefreshLibraries_Click"
+                                    Content="Обновить" />
+                            </Grid>
+                        </Expander.Header>
+                        <StackPanel Spacing="8" Padding="0,8,0,0">
                             <TextBlock
                                 Text="Если вы видите не все файлы, повторите индексацию."
                                 Foreground="{ThemeResource TextFillColorSecondaryBrush}"
@@ -665,26 +702,66 @@
                                 Click="OpenIndexingSettings_Click"
                                 Content="Управление параметрами индексирования системы" />
                         </StackPanel>
-                    </Border>
+                    </Expander>
 
-                    <TextBlock Text="Персонализация" Style="{StaticResource BodyStrongTextBlockStyle}" />
-                    <Border
-                        Padding="16"
-                        Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                        BorderThickness="1"
-                        CornerRadius="8">
-                        <StackPanel Spacing="12">
-                            <TextBlock Text="Тема приложения" Style="{StaticResource BodyStrongTextBlockStyle}" />
-                            <ComboBox
-                                x:Name="ThemeComboBox"
-                                SelectionChanged="ThemeComboBox_SelectionChanged">
-                                <ComboBoxItem Content="Использовать параметры системы" Tag="system" />
-                                <ComboBoxItem Content="Светлая" Tag="light" />
-                                <ComboBoxItem Content="Тёмная" Tag="dark" />
-                            </ComboBox>
+                    <TextBlock
+                        Margin="0,8,0,0"
+                        Text="Персонализация"
+                        Style="{StaticResource BodyStrongTextBlockStyle}" />
 
-                            <TextBlock Text="Контрастный цвет" Style="{StaticResource BodyStrongTextBlockStyle}" />
+                    <Expander
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Stretch"
+                        Background="{ThemeResource LayerFillColorDefaultBrush}"
+                        BorderThickness="0"
+                        CornerRadius="8"
+                        IsExpanded="False">
+                        <Expander.Header>
+                            <Grid MinHeight="56" ColumnSpacing="12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <FontIcon FontSize="20" Glyph="&#xE790;" />
+                                <TextBlock
+                                    Grid.Column="1"
+                                    VerticalAlignment="Center"
+                                    Text="Тема приложения"
+                                    Style="{StaticResource BodyStrongTextBlockStyle}" />
+                            </Grid>
+                        </Expander.Header>
+                        <ComboBox
+                            x:Name="ThemeComboBox"
+                            Padding="0,8,0,0"
+                            SelectionChanged="ThemeComboBox_SelectionChanged">
+                            <ComboBoxItem Content="Использовать параметры системы" Tag="system" />
+                            <ComboBoxItem Content="Светлая" Tag="light" />
+                            <ComboBoxItem Content="Тёмная" Tag="dark" />
+                        </ComboBox>
+                    </Expander>
+
+                    <Expander
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Stretch"
+                        Background="{ThemeResource LayerFillColorDefaultBrush}"
+                        BorderThickness="0"
+                        CornerRadius="8"
+                        IsExpanded="False">
+                        <Expander.Header>
+                            <Grid MinHeight="56" ColumnSpacing="12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <FontIcon FontSize="20" Glyph="&#xE793;" />
+                                <TextBlock
+                                    Grid.Column="1"
+                                    VerticalAlignment="Center"
+                                    Text="Контрастный цвет"
+                                    Style="{StaticResource BodyStrongTextBlockStyle}" />
+                            </Grid>
+                        </Expander.Header>
+                        <StackPanel Spacing="8" Padding="0,8,0,0">
                             <ComboBox
                                 x:Name="AccentComboBox"
                                 SelectionChanged="AccentComboBox_SelectionChanged">
@@ -694,7 +771,31 @@
                                 Text="Пользовательские акценты — следующий этап."
                                 Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                 Style="{StaticResource CaptionTextBlockStyle}" />
+                        </StackPanel>
+                    </Expander>
 
+                    <Expander
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Stretch"
+                        Background="{ThemeResource LayerFillColorDefaultBrush}"
+                        BorderThickness="0"
+                        CornerRadius="8"
+                        IsExpanded="False">
+                        <Expander.Header>
+                            <Grid MinHeight="56" ColumnSpacing="12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <FontIcon FontSize="20" Glyph="&#xEB9F;" />
+                                <TextBlock
+                                    Grid.Column="1"
+                                    VerticalAlignment="Center"
+                                    Text="Обложки"
+                                    Style="{StaticResource BodyStrongTextBlockStyle}" />
+                            </Grid>
+                        </Expander.Header>
+                        <StackPanel Spacing="8" Padding="0,8,0,0">
                             <ToggleSwitch
                                 x:Name="ArtworkToggle"
                                 Header="Искать обложки в Интернете"
@@ -704,12 +805,66 @@
                                 Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                 Style="{StaticResource CaptionTextBlockStyle}" />
                         </StackPanel>
-                    </Border>
+                    </Expander>
                 </StackPanel>
             </ScrollViewer>
         </Grid>
             </Grid>
         </NavigationView>
+
+        <!--  Шапка: меню, назад, иконка и название  -->
+        <Grid
+            x:Name="AppHeader"
+            Grid.Row="0"
+            Width="320"
+            Height="56"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top">
+            <Border x:Name="AppHeaderDragArea" Background="Transparent" />
+            <StackPanel
+                Padding="8,0,8,0"
+                VerticalAlignment="Center"
+                Orientation="Horizontal"
+                Spacing="4">
+                <Button
+                    x:Name="HeaderMenuButton"
+                    AutomationProperties.AutomationId="HeaderMenuButton"
+                    Click="HeaderMenu_Click"
+                    Style="{StaticResource IconButtonStyle}"
+                    ToolTipService.ToolTip="Скрыть/показать меню">
+                    <FontIcon FontSize="18" Glyph="&#xE700;" />
+                </Button>
+                <Button
+                    x:Name="HeaderBackButton"
+                    AutomationProperties.AutomationId="HeaderBackButton"
+                    Click="HeaderBack_Click"
+                    Style="{StaticResource IconButtonStyle}"
+                    ToolTipService.ToolTip="Назад"
+                    Visibility="Collapsed">
+                    <FontIcon FontSize="18" Glyph="&#xE72B;" />
+                </Button>
+                <Border
+                    x:Name="HeaderIcon"
+                    Width="24"
+                    Height="24"
+                    Margin="4,0,0,0"
+                    Background="{ThemeResource AccentFillColorDefaultBrush}"
+                    CornerRadius="12">
+                    <FontIcon
+                        FontSize="11"
+                        Foreground="White"
+                        Glyph="&#xE768;" />
+                </Border>
+                <TextBlock
+                    x:Name="HeaderTitle"
+                    MaxWidth="190"
+                    VerticalAlignment="Center"
+                    Text="Tempo Karaoke"
+                    TextTrimming="CharacterEllipsis"
+                    TextWrapping="NoWrap"
+                    Style="{StaticResource BodyStrongTextBlockStyle}" />
+            </StackPanel>
+        </Grid>
 
         <!--  Транспорт  -->
         <Border
@@ -775,7 +930,16 @@
                             BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
                             BorderThickness="1"
                             CornerRadius="6">
-                            <vlc:VideoView x:Name="VideoView" Background="Black" />
+                            <Grid>
+                                <vlc:VideoView x:Name="VideoView" Background="Black" />
+                                <Border
+                                    x:Name="MiniPlayerOverlay"
+                                    Background="Transparent"
+                                    PointerEntered="MiniPlayer_PointerEntered"
+                                    PointerExited="MiniPlayer_PointerExited"
+                                    Tapped="MiniPlayer_Tapped"
+                                    ToolTipService.ToolTip="Открыть видео на всё окно" />
+                            </Grid>
                         </Border>
 
                         <StackPanel
@@ -807,12 +971,14 @@
                         <ToggleButton
                             x:Name="ShuffleButton"
                             Click="Shuffle_Click"
+                            Style="{StaticResource IconToggleButtonStyle}"
                             ToolTipService.ToolTip="Перемешать">
                             <FontIcon FontSize="18" Glyph="&#xE8B1;" />
                         </ToggleButton>
                         <Button
                             x:Name="PreviousButton"
                             Click="Previous_Click"
+                            Style="{StaticResource IconButtonStyle}"
                             ToolTipService.ToolTip="Предыдущая (Ctrl+←)">
                             <SymbolIcon Symbol="Previous" />
                         </Button>
@@ -830,12 +996,14 @@
                         <Button
                             x:Name="NextButton"
                             Click="Next_Click"
+                            Style="{StaticResource IconButtonStyle}"
                             ToolTipService.ToolTip="Следующая (Ctrl+→)">
                             <SymbolIcon Symbol="Next" />
                         </Button>
                         <ToggleButton
                             x:Name="RepeatButton"
                             Click="Repeat_Click"
+                            Style="{StaticResource IconToggleButtonStyle}"
                             ToolTipService.ToolTip="Повторять очередь">
                             <FontIcon FontSize="18" Glyph="&#xE8EE;" />
                         </ToggleButton>
@@ -849,11 +1017,13 @@
                         Spacing="2">
                         <Button
                             Click="MediaInfo_Click"
+                            Style="{StaticResource IconButtonStyle}"
                             ToolTipService.ToolTip="Информация о медиа">
                             <FontIcon FontSize="18" Glyph="&#xE946;" />
                         </Button>
                         <Button
                             x:Name="MuteButton"
+                            Style="{StaticResource IconButtonStyle}"
                             ToolTipService.ToolTip="Громкость">
                             <SymbolIcon x:Name="MuteIcon" Symbol="Volume" />
                             <Button.Flyout>
@@ -891,6 +1061,7 @@
                         <Button
                             x:Name="FullScreenButton"
                             Click="FullScreen_Click"
+                            Style="{StaticResource IconButtonStyle}"
                             ToolTipService.ToolTip="Полный экран (F11)">
                             <SymbolIcon Symbol="FullScreen" />
                         </Button>
@@ -898,11 +1069,13 @@
                             x:Name="DetachButton"
                             Click="Detach_Click"
                             IsEnabled="False"
+                            Style="{StaticResource IconButtonStyle}"
                             ToolTipService.ToolTip="Открепить видео">
                             <FontIcon FontSize="18" Glyph="&#xE8A6;" />
                         </Button>
                         <Button
                             x:Name="MoreButton"
+                            Style="{StaticResource IconButtonStyle}"
                             ToolTipService.ToolTip="Ещё">
                             <FontIcon FontSize="18" Glyph="&#xE712;" />
                             <Button.Flyout>
@@ -930,19 +1103,24 @@
             BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
             BorderThickness="0,1,0,0"
             Visibility="Collapsed">
-            <StackPanel
-                HorizontalAlignment="Center"
-                Orientation="Horizontal"
-                Spacing="12">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
                 <TextBlock
+                    x:Name="DetachedTitle"
                     VerticalAlignment="Center"
-                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                    Text="Видео в отдельном окне" />
+                    Style="{StaticResource BodyStrongTextBlockStyle}"
+                    Text="Видео в отдельном окне"
+                    TextTrimming="CharacterEllipsis"
+                    TextWrapping="NoWrap" />
                 <Button
+                    Grid.Column="1"
                     Click="ReturnVideo_Click"
                     Content="Вернуть видео"
                     Style="{StaticResource AccentButtonStyle}" />
-            </StackPanel>
+            </Grid>
         </Border>
     </Grid>
 </Page>

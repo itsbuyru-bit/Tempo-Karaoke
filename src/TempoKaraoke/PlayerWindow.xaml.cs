@@ -1,4 +1,5 @@
 using System;
+using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -89,6 +90,14 @@ public sealed partial class PlayerWindow : Window
 
     public bool IsPlaying =>
         _mediaPlayer.PlaybackSession?.PlaybackState == MediaPlaybackState.Playing;
+
+    public void Maximize()
+    {
+        if (AppWindow.Presenter is OverlappedPresenter presenter)
+        {
+            presenter.Maximize();
+        }
+    }
 
     public void Play(string path)
     {

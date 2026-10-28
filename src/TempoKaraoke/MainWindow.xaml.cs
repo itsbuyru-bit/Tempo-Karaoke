@@ -18,10 +18,17 @@ public sealed partial class MainWindow : Window
         InitializeComponent();
 
         ExtendsContentIntoTitleBar = true;
-        SetTitleBar(AppTitleBar);
 
         AppWindow.SetIcon("Assets/AppIcon.ico");
         AppWindow.Resize(new SizeInt32(1810, 1123));
+
+        RootFrame.Navigated += (_, args) =>
+        {
+            if (args.Content is MainPage page)
+            {
+                SetTitleBar(page.HeaderDragArea);
+            }
+        };
 
         // Navigate the root frame to the main page on startup.
         RootFrame.Navigate(typeof(MainPage));

@@ -39,12 +39,17 @@ public sealed partial class MainPage : Page
     private bool _isInitializingSettings;
     private bool _isRestoringQueue;
     private int _queueIndex = -1;
+    private readonly Stack<string> _navHistory = new();
+    private string? _currentTag;
+    private bool _isNavigatingBack;
 
     public ObservableCollection<MediaItem> Filtered { get; } = new();
 
     public ObservableCollection<MediaItem> Queue { get; } = new();
 
     public ObservableCollection<MediaItem> Recent { get; } = new();
+
+    public FrameworkElement HeaderDragArea => AppHeaderDragArea;
 
     public ObservableCollection<string> VideoRoots { get; } = new();
 
@@ -71,12 +76,25 @@ public sealed partial class MainPage : Page
         Queue.CollectionChanged += (_, _) => SaveQueue();
         RestoreRecent();
         Recent.CollectionChanged += (_, _) => UpdateRecentEmpty();
+        NavView.PaneOpened += (_, _) => UpdateHeader();
+        NavView.PaneClosed += (_, _) => UpdateHeader();
         ShowLibrary();
     }
 
     private void NavView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
     {
         var tag = args.SelectedItemContainer?.Tag as string ?? "library";
+
+        if (!_isNavigatingBack &&
+            _currentTag is not null &&
+            !string.Equals(_currentTag, tag, StringComparison.Ordinal))
+        {
+            _navHistory.Push(_currentTag);
+        }
+
+        _currentTag = tag;
+        UpdateHeader();
+
         switch (tag)
         {
             case "library":
@@ -95,6 +113,66 @@ public sealed partial class MainPage : Page
                 ShowSettings();
                 break;
         }
+    }
+
+    private void HeaderMenu_Click(object sender, RoutedEventArgs e)
+    {
+        NavView.IsPaneOpen = !NavView.IsPaneOpen;
+        UpdateHeader();
+    }
+
+    private void HeaderBack_Click(object sender, RoutedEventArgs e)
+    {
+        GoBack();
+    }
+
+    private void UpdateHeader()
+    {
+        if (AppHeader is null || HeaderIcon is null || HeaderTitle is null || HeaderBackButton is null)
+        {
+            return;
+        }
+
+        var open = NavView.IsPaneOpen;
+        AppHeader.Width = open ? 320 : 48;
+        HeaderIcon.Visibility = open ? Visibility.Visible : Visibility.Collapsed;
+        HeaderTitle.Visibility = open ? Visibility.Visible : Visibility.Collapsed;
+        HeaderBackButton.Visibility = open && _navHistory.Count > 0
+            ? Visibility.Visible
+            : Visibility.Collapsed;
+    }
+
+    private void GoBack()
+    {
+        if (_navHistory.Count == 0)
+        {
+            return;
+        }
+
+        var tag = _navHistory.Pop();
+        var item = ItemForTag(tag);
+        if (item is not null)
+        {
+            _isNavigatingBack = true;
+            NavView.SelectedItem = item;
+            _isNavigatingBack = false;
+        }
+
+        _currentTag = tag;
+        UpdateHeader();
+    }
+
+    private NavigationViewItem? ItemForTag(string tag)
+    {
+        return tag switch
+        {
+            "home" => HomeNavItem,
+            "library" => LibraryNavItem,
+            "queue" => QueueNavItem,
+            "playlists" => PlaylistsNavItem,
+            "settings" => SettingsNavItem,
+            _ => null,
+        };
     }
 
     private void ShowLibrary()
@@ -283,6 +361,8 @@ public sealed partial class MainPage : Page
     private void OnPageLoaded(object sender, RoutedEventArgs e)
     {
         _timer.Start();
+        App.Window.SetTitleBar(AppHeaderDragArea);
+        UpdateHeader();
         ApplyTheme(SettingsService.Theme);
         if (VolumeSlider is not null)
         {
@@ -1120,6 +1200,28 @@ public sealed partial class MainPage : Page
 
     private void Detach_Click(object sender, RoutedEventArgs e)
     {
+        DetachVideo(false);
+    }
+
+    private void MiniPlayer_Tapped(object sender, TappedRoutedEventArgs e)
+    {
+        DetachVideo(true);
+    }
+
+    private void MiniPlayer_PointerEntered(object sender, PointerRoutedEventArgs e)
+    {
+        MiniPlayerOverlay.Background = new Microsoft.UI.Xaml.Media.SolidColorBrush(
+            Windows.UI.Color.FromArgb(34, 255, 255, 255));
+    }
+
+    private void MiniPlayer_PointerExited(object sender, PointerRoutedEventArgs e)
+    {
+        MiniPlayerOverlay.Background = new Microsoft.UI.Xaml.Media.SolidColorBrush(
+            Windows.UI.Color.FromArgb(0, 0, 0, 0));
+    }
+
+    private void DetachVideo(bool maximize)
+    {
         if (_detached || _current is null)
         {
             return;
@@ -1134,6 +1236,7 @@ public sealed partial class MainPage : Page
 
         TransportBar.Visibility = Visibility.Collapsed;
         DetachedBar.Visibility = Visibility.Visible;
+        DetachedTitle.Text = _current.DisplayTitle;
 
         _playerWindow = new PlayerWindow(
             _current.Path,
@@ -1144,6 +1247,10 @@ public sealed partial class MainPage : Page
             PlayPrevious,
             ReturnFromDetached);
         _playerWindow.Activate();
+        if (maximize)
+        {
+            _playerWindow.Maximize();
+        }
         UpdateTransport();
     }
 
@@ -1192,6 +1299,11 @@ public sealed partial class MainPage : Page
 
     private void UpdateNowPlaying()
     {
+        if (DetachedTitle is not null && _current is not null)
+        {
+            DetachedTitle.Text = _current.DisplayTitle;
+        }
+
         if (_current is null)
         {
             BarTitle.Text = "Ничего не играет";
