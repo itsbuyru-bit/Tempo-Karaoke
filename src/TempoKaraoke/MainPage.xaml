@@ -719,7 +719,7 @@
             Background="{ThemeResource LayerFillColorDefaultBrush}"
             BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
             BorderThickness="0,1,0,0">
-            <Grid ColumnSpacing="12" RowSpacing="6">
+            <Grid ColumnSpacing="12" RowSpacing="8">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
@@ -727,11 +727,18 @@
 
                 <Grid Grid.Row="0" ColumnSpacing="8">
                     <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
+                    <TextBlock
+                        x:Name="CurrentTimeText"
+                        VerticalAlignment="Center"
+                        FontFamily="Consolas"
+                        Text="00:00" />
                     <Slider
                         x:Name="SeekSlider"
+                        Grid.Column="1"
                         VerticalAlignment="Center"
                         IsThumbToolTipEnabled="False"
                         Maximum="1"
@@ -742,56 +749,67 @@
                         StepFrequency="1000"
                         ValueChanged="SeekSlider_ValueChanged" />
                     <TextBlock
-                        x:Name="TimeText"
-                        Grid.Column="1"
+                        x:Name="TotalTimeText"
+                        Grid.Column="2"
                         VerticalAlignment="Center"
                         FontFamily="Consolas"
-                        Text="00:00 / 00:00" />
+                        Text="00:00" />
                 </Grid>
 
                 <Grid Grid.Row="1" ColumnSpacing="12">
                     <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="180" />
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
 
-                    <Border
-                        Width="160"
-                        Height="90"
-                        Background="Black"
-                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                        BorderThickness="1"
-                        CornerRadius="6">
-                        <vlc:VideoView x:Name="VideoView" Background="Black" />
-                    </Border>
-
                     <StackPanel
-                        Grid.Column="1"
+                        Grid.Column="0"
                         VerticalAlignment="Center"
-                        Spacing="2">
-                        <TextBlock
-                            x:Name="BarTitle"
-                            Style="{StaticResource BodyStrongTextBlockStyle}"
-                            Text="Ничего не играет"
-                            TextTrimming="CharacterEllipsis"
-                            TextWrapping="NoWrap" />
-                        <TextBlock
-                            x:Name="BarSubtitle"
-                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                            Style="{StaticResource CaptionTextBlockStyle}"
-                            Text="Выберите песню двойным кликом"
-                            TextTrimming="CharacterEllipsis"
-                            TextWrapping="NoWrap" />
+                        Orientation="Horizontal"
+                        Spacing="12">
+                        <Border
+                            Width="160"
+                            Height="90"
+                            Background="Black"
+                            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                            BorderThickness="1"
+                            CornerRadius="6">
+                            <vlc:VideoView x:Name="VideoView" Background="Black" />
+                        </Border>
+
+                        <StackPanel
+                            MaxWidth="320"
+                            VerticalAlignment="Center"
+                            Spacing="2">
+                            <TextBlock
+                                x:Name="BarTitle"
+                                Style="{StaticResource BodyStrongTextBlockStyle}"
+                                Text="Ничего не играет"
+                                TextTrimming="CharacterEllipsis"
+                                TextWrapping="NoWrap" />
+                            <TextBlock
+                                x:Name="BarSubtitle"
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                Style="{StaticResource CaptionTextBlockStyle}"
+                                Text="Выберите песню двойным кликом"
+                                TextTrimming="CharacterEllipsis"
+                                TextWrapping="NoWrap" />
+                        </StackPanel>
                     </StackPanel>
 
                     <StackPanel
-                        Grid.Column="2"
-                        HorizontalAlignment="Left"
+                        Grid.Column="1"
+                        HorizontalAlignment="Center"
                         VerticalAlignment="Center"
                         Orientation="Horizontal"
                         Spacing="2">
+                        <ToggleButton
+                            x:Name="ShuffleButton"
+                            Click="Shuffle_Click"
+                            ToolTipService.ToolTip="Перемешать">
+                            <FontIcon FontSize="18" Glyph="&#xE8B1;" />
+                        </ToggleButton>
                         <Button
                             x:Name="PreviousButton"
                             Click="Previous_Click"
@@ -799,33 +817,41 @@
                             <SymbolIcon Symbol="Previous" />
                         </Button>
                         <Button
-                            Click="SkipBack_Click"
-                            Content="−10"
-                            ToolTipService.ToolTip="Назад на 10 секунд" />
-                        <Button
                             x:Name="PlayPauseButton"
+                            Width="56"
+                            Height="56"
+                            Padding="0"
                             Click="PlayPause_Click"
+                            CornerRadius="28"
                             Style="{StaticResource AccentButtonStyle}"
                             ToolTipService.ToolTip="Играть/пауза (Space)">
                             <SymbolIcon x:Name="PlayPauseIcon" Symbol="Play" />
                         </Button>
-                        <Button
-                            Click="SkipForward_Click"
-                            Content="+30"
-                            ToolTipService.ToolTip="Вперёд на 30 секунд" />
                         <Button
                             x:Name="NextButton"
                             Click="Next_Click"
                             ToolTipService.ToolTip="Следующая (Ctrl+→)">
                             <SymbolIcon Symbol="Next" />
                         </Button>
+                        <ToggleButton
+                            x:Name="RepeatButton"
+                            Click="Repeat_Click"
+                            ToolTipService.ToolTip="Повторять очередь">
+                            <FontIcon FontSize="18" Glyph="&#xE8EE;" />
+                        </ToggleButton>
                     </StackPanel>
 
                     <StackPanel
-                        Grid.Column="3"
+                        Grid.Column="2"
+                        HorizontalAlignment="Right"
                         VerticalAlignment="Center"
                         Orientation="Horizontal"
-                        Spacing="4">
+                        Spacing="2">
+                        <Button
+                            Click="MediaInfo_Click"
+                            ToolTipService.ToolTip="Информация о медиа">
+                            <FontIcon FontSize="18" Glyph="&#xE946;" />
+                        </Button>
                         <Button
                             x:Name="MuteButton"
                             Click="Mute_Click"
@@ -840,23 +866,32 @@
                             Minimum="0"
                             ValueChanged="VolumeSlider_ValueChanged" />
                         <Button
-                            x:Name="StopButton"
-                            Click="Stop_Click"
-                            ToolTipService.ToolTip="Стоп">
-                            <SymbolIcon Symbol="Stop" />
+                            x:Name="FullScreenButton"
+                            Click="FullScreen_Click"
+                            ToolTipService.ToolTip="Полный экран (F11)">
+                            <SymbolIcon Symbol="FullScreen" />
                         </Button>
                         <Button
                             x:Name="DetachButton"
                             Click="Detach_Click"
                             IsEnabled="False"
                             ToolTipService.ToolTip="Открепить видео">
-                            <FontIcon Glyph="&#xE8A7;" />
+                            <FontIcon FontSize="18" Glyph="&#xE8A6;" />
                         </Button>
                         <Button
-                            x:Name="FullScreenButton"
-                            Click="FullScreen_Click"
-                            ToolTipService.ToolTip="Полный экран (F11)">
-                            <SymbolIcon Symbol="FullScreen" />
+                            x:Name="MoreButton"
+                            ToolTipService.ToolTip="Ещё">
+                            <FontIcon FontSize="18" Glyph="&#xE712;" />
+                            <Button.Flyout>
+                                <MenuFlyout>
+                                    <MenuFlyoutItem Click="SkipBack_Click" Text="−10 секунд" />
+                                    <MenuFlyoutItem Click="SkipForward_Click" Text="+30 секунд" />
+                                    <MenuFlyoutItem Click="Stop_Click" Text="Стоп" />
+                                    <MenuFlyoutSeparator />
+                                    <MenuFlyoutItem Click="MediaInfo_Click" Text="Информация о медиа" />
+                                    <MenuFlyoutItem Click="Detach_Click" Text="Открепить видео" />
+                                </MenuFlyout>
+                            </Button.Flyout>
                         </Button>
                     </StackPanel>
                 </Grid>

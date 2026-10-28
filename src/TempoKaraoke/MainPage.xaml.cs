@@ -32,6 +32,8 @@ public sealed partial class MainPage : Page
     private PlayerWindow? _playerWindow;
     private bool _detached;
     private bool _isSeeking;
+    private bool _shuffle;
+    private bool _repeat;
     private bool _suppressVolume;
     private bool _isPopulatingFolders;
     private bool _isInitializingSettings;
@@ -831,10 +833,26 @@ public sealed partial class MainPage : Page
     {
         if (Queue.Count > 0)
         {
-            var next = _queueIndex < 0 ? 0 : _queueIndex + 1;
-            if (next < Queue.Count)
+            if (_shuffle)
             {
+                var next = Queue.Count == 1 ? 0 : Random.Shared.Next(Queue.Count - 1);
+                if (_queueIndex >= 0 && next >= _queueIndex)
+                {
+                    next++;
+                }
+
                 PlayQueueIndex(next);
+                return;
+            }
+
+            var nextIndex = _queueIndex < 0 ? 0 : _queueIndex + 1;
+            if (nextIndex < Queue.Count)
+            {
+                PlayQueueIndex(nextIndex);
+            }
+            else if (_repeat)
+            {
+                PlayQueueIndex(0);
             }
             else
             {
@@ -915,6 +933,51 @@ public sealed partial class MainPage : Page
         PlayNext();
     }
 
+    private void Shuffle_Click(object sender, RoutedEventArgs e)
+    {
+        _shuffle = ShuffleButton.IsChecked == true;
+    }
+
+    private void Repeat_Click(object sender, RoutedEventArgs e)
+    {
+        _repeat = RepeatButton.IsChecked == true;
+    }
+
+    private async void MediaInfo_Click(object sender, RoutedEventArgs e)
+    {
+        if (_current is null)
+        {
+            BarSubtitle.Text = "Нет активного медиа";
+            return;
+        }
+
+        var text =
+            $"Название: {_current.DisplayTitle}\n" +
+            $"Исполнитель: {_current.Artist}\n" +
+            $"Папка: {_current.Folder}\n" +
+            $"Формат: {_current.Format}\n" +
+            $"Позиция: {FormatTime(_player.PositionMs)} / {FormatTime(_player.LengthMs)}\n\n" +
+            _current.Path;
+
+        var content = new TextBlock
+        {
+            Text = text,
+            TextWrapping = TextWrapping.Wrap,
+            IsTextSelectionEnabled = true,
+            MaxWidth = 560,
+        };
+
+        var dialog = new ContentDialog
+        {
+            Title = "Информация о медиа",
+            Content = content,
+            CloseButtonText = "Закрыть",
+            XamlRoot = XamlRoot,
+        };
+
+        await dialog.ShowAsync();
+    }
+
     private void SkipBack_Click(object sender, RoutedEventArgs e)
     {
         _player.Seek(_player.PositionMs - 10000);
@@ -948,7 +1011,8 @@ public sealed partial class MainPage : Page
     {
         if (_isSeeking)
         {
-            TimeText.Text = $"{FormatTime((long)e.NewValue)} / {FormatTime(_player.LengthMs)}";
+            CurrentTimeText.Text = FormatTime((long)e.NewValue);
+            TotalTimeText.Text = FormatTime(_player.LengthMs);
         }
     }
 
@@ -1136,7 +1200,8 @@ public sealed partial class MainPage : Page
             SeekSlider.Value = Math.Clamp(_player.PositionMs, 0, length);
         }
 
-        TimeText.Text = $"{FormatTime(_player.PositionMs)} / {FormatTime(_player.LengthMs)}";
+        CurrentTimeText.Text = FormatTime(_player.PositionMs);
+        TotalTimeText.Text = FormatTime(_player.LengthMs);
         PlayPauseIcon.Symbol = _player.IsPlaying ? Symbol.Pause : Symbol.Play;
         MuteIcon.Symbol = _player.Volume == 0 ? Symbol.Mute : Symbol.Volume;
 
