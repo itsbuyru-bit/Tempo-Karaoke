@@ -773,44 +773,20 @@
                                 Style="{StaticResource CaptionTextBlockStyle}" />
                         </StackPanel>
                     </Expander>
-
-                    <Expander
-                        HorizontalAlignment="Stretch"
-                        HorizontalContentAlignment="Stretch"
-                        Background="{ThemeResource LayerFillColorDefaultBrush}"
-                        BorderThickness="0"
-                        CornerRadius="8"
-                        IsExpanded="False">
-                        <Expander.Header>
-                            <Grid MinHeight="56" ColumnSpacing="12">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="*" />
-                                </Grid.ColumnDefinitions>
-                                <FontIcon FontSize="20" Glyph="&#xEB9F;" />
-                                <TextBlock
-                                    Grid.Column="1"
-                                    VerticalAlignment="Center"
-                                    Text="Обложки"
-                                    Style="{StaticResource BodyStrongTextBlockStyle}" />
-                            </Grid>
-                        </Expander.Header>
-                        <StackPanel Spacing="8" Padding="0,8,0,0">
-                            <ToggleSwitch
-                                x:Name="ArtworkToggle"
-                                Header="Искать обложки в Интернете"
-                                Toggled="ArtworkToggle_Toggled" />
-                            <TextBlock
-                                Text="Обложки появятся вместе с метаданными в следующем этапе."
-                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                Style="{StaticResource CaptionTextBlockStyle}" />
-                        </StackPanel>
-                    </Expander>
                 </StackPanel>
             </ScrollViewer>
         </Grid>
             </Grid>
         </NavigationView>
+
+        <!--  Общая область перетаскивания окна  -->
+        <Border
+            x:Name="AppTitleBarDragRegion"
+            Grid.Row="0"
+            Height="56"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Top"
+            Background="Transparent" />
 
         <!--  Шапка: меню, назад, иконка и название  -->
         <Grid
@@ -828,20 +804,32 @@
                 Spacing="4">
                 <Button
                     x:Name="HeaderMenuButton"
+                    Width="32"
+                    Height="32"
+                    Padding="6"
                     AutomationProperties.AutomationId="HeaderMenuButton"
                     Click="HeaderMenu_Click"
+                    CornerRadius="16"
+                    MinHeight="32"
+                    MinWidth="32"
                     Style="{StaticResource IconButtonStyle}"
                     ToolTipService.ToolTip="Скрыть/показать меню">
-                    <FontIcon FontSize="18" Glyph="&#xE700;" />
+                    <FontIcon FontSize="16" Glyph="&#xE700;" />
                 </Button>
                 <Button
                     x:Name="HeaderBackButton"
+                    Width="32"
+                    Height="32"
+                    Padding="6"
                     AutomationProperties.AutomationId="HeaderBackButton"
                     Click="HeaderBack_Click"
+                    CornerRadius="16"
+                    MinHeight="32"
+                    MinWidth="32"
                     Style="{StaticResource IconButtonStyle}"
                     ToolTipService.ToolTip="Назад"
                     Visibility="Collapsed">
-                    <FontIcon FontSize="18" Glyph="&#xE72B;" />
+                    <FontIcon FontSize="16" Glyph="&#xE72B;" />
                 </Button>
                 <Border
                     x:Name="HeaderIcon"
@@ -889,8 +877,9 @@
                     <TextBlock
                         x:Name="CurrentTimeText"
                         VerticalAlignment="Center"
-                        FontFamily="Consolas"
-                        Text="00:00" />
+                        FontFamily="Segoe UI"
+                        FontWeight="Normal"
+                        Text="0:00:00" />
                     <Slider
                         x:Name="SeekSlider"
                         Grid.Column="1"
@@ -907,8 +896,9 @@
                         x:Name="TotalTimeText"
                         Grid.Column="2"
                         VerticalAlignment="Center"
-                        FontFamily="Consolas"
-                        Text="00:00" />
+                        FontFamily="Segoe UI"
+                        FontWeight="Normal"
+                        Text="0:00:00" />
                 </Grid>
 
                 <Grid Grid.Row="1" ColumnSpacing="12">
@@ -918,11 +908,19 @@
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
 
-                    <StackPanel
+                    <Border
+                        x:Name="MiniPlayerCard"
                         Grid.Column="0"
-                        VerticalAlignment="Center"
-                        Orientation="Horizontal"
-                        Spacing="12">
+                        Padding="4"
+                        Background="Transparent"
+                        CornerRadius="8"
+                        PointerEntered="MiniPlayer_PointerEntered"
+                        PointerExited="MiniPlayer_PointerExited"
+                        Tapped="MiniPlayer_Tapped">
+                        <StackPanel
+                            VerticalAlignment="Center"
+                            Orientation="Horizontal"
+                            Spacing="12">
                         <Border
                             Width="160"
                             Height="90"
@@ -960,7 +958,8 @@
                                 TextTrimming="CharacterEllipsis"
                                 TextWrapping="NoWrap" />
                         </StackPanel>
-                    </StackPanel>
+                        </StackPanel>
+                    </Border>
 
                     <StackPanel
                         Grid.Column="1"

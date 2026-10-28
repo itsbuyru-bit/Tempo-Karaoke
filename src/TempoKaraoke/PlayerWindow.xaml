@@ -82,9 +82,10 @@
                     x:Name="TimeText"
                     Grid.Column="2"
                     VerticalAlignment="Center"
-                    FontFamily="Consolas"
+                    FontFamily="Segoe UI"
+                    FontWeight="Normal"
                     Foreground="White"
-                    Text="00:00 / 00:00" />
+                    Text="0:00:00 / 0:00:00" />
 
                 <StackPanel
                     Grid.Column="3"

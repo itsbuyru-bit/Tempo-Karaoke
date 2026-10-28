@@ -349,14 +349,12 @@ public sealed partial class PlayerWindow : Window
 
     private static string FormatTime(long milliseconds)
     {
-        if (milliseconds <= 0)
+        if (milliseconds < 0)
         {
-            return "00:00";
+            milliseconds = 0;
         }
 
         var span = TimeSpan.FromMilliseconds(milliseconds);
-        return span.TotalHours >= 1
-            ? $"{(int)span.TotalHours}:{span.Minutes:00}:{span.Seconds:00}"
-            : $"{span.Minutes:00}:{span.Seconds:00}";
+        return $"{(int)span.TotalHours}:{span.Minutes:00}:{span.Seconds:00}";
     }
 }

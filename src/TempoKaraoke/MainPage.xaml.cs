@@ -49,7 +49,7 @@ public sealed partial class MainPage : Page
 
     public ObservableCollection<MediaItem> Recent { get; } = new();
 
-    public FrameworkElement HeaderDragArea => AppHeaderDragArea;
+    public FrameworkElement HeaderDragArea => AppTitleBarDragRegion;
 
     public ObservableCollection<string> VideoRoots { get; } = new();
 
@@ -140,6 +140,11 @@ public sealed partial class MainPage : Page
         HeaderBackButton.Visibility = open && _navHistory.Count > 0
             ? Visibility.Visible
             : Visibility.Collapsed;
+
+        if (NavView.MenuItems.Count > 0 && NavView.MenuItems[0] is NavigationViewItem firstItem)
+        {
+            firstItem.Margin = new Thickness(0, open ? 0 : 56, 0, 0);
+        }
     }
 
     private void GoBack()
@@ -235,7 +240,6 @@ public sealed partial class MainPage : Page
             _ => 0,
         };
         AccentComboBox.SelectedIndex = 0;
-        ArtworkToggle.IsOn = SettingsService.FetchArtwork;
         _isInitializingSettings = false;
         ApplyTheme(SettingsService.Theme);
     }
@@ -348,20 +352,10 @@ public sealed partial class MainPage : Page
         SettingsService.Accent = accent;
     }
 
-    private void ArtworkToggle_Toggled(object sender, RoutedEventArgs e)
-    {
-        if (_isInitializingSettings)
-        {
-            return;
-        }
-
-        SettingsService.FetchArtwork = ArtworkToggle.IsOn;
-    }
-
     private void OnPageLoaded(object sender, RoutedEventArgs e)
     {
         _timer.Start();
-        App.Window.SetTitleBar(AppHeaderDragArea);
+        App.Window.SetTitleBar(AppTitleBarDragRegion);
         UpdateHeader();
         ApplyTheme(SettingsService.Theme);
         if (VolumeSlider is not null)
@@ -1210,13 +1204,13 @@ public sealed partial class MainPage : Page
 
     private void MiniPlayer_PointerEntered(object sender, PointerRoutedEventArgs e)
     {
-        MiniPlayerOverlay.Background = new Microsoft.UI.Xaml.Media.SolidColorBrush(
+        MiniPlayerCard.Background = new Microsoft.UI.Xaml.Media.SolidColorBrush(
             Windows.UI.Color.FromArgb(34, 255, 255, 255));
     }
 
     private void MiniPlayer_PointerExited(object sender, PointerRoutedEventArgs e)
     {
-        MiniPlayerOverlay.Background = new Microsoft.UI.Xaml.Media.SolidColorBrush(
+        MiniPlayerCard.Background = new Microsoft.UI.Xaml.Media.SolidColorBrush(
             Windows.UI.Color.FromArgb(0, 0, 0, 0));
     }
 
@@ -1358,14 +1352,12 @@ public sealed partial class MainPage : Page
 
     private static string FormatTime(long milliseconds)
     {
-        if (milliseconds <= 0)
+        if (milliseconds < 0)
         {
-            return "00:00";
+            milliseconds = 0;
         }
 
         var span = TimeSpan.FromMilliseconds(milliseconds);
-        return span.TotalHours >= 1
-            ? $"{(int)span.TotalHours}:{span.Minutes:00}:{span.Seconds:00}"
-            : $"{span.Minutes:00}:{span.Seconds:00}";
+        return $"{(int)span.TotalHours}:{span.Minutes:00}:{span.Seconds:00}";
     }
 }
