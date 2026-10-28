@@ -121,33 +121,27 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
-            <Grid Padding="20,16">
-                <StackPanel Spacing="2">
-                    <TextBlock Text="Главная" Style="{StaticResource TitleTextBlockStyle}" />
-                    <TextBlock
-                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                        Text="Недавние песни и быстрый доступ" />
-                </StackPanel>
+            <Grid Padding="20,0,20,8">
+                <TextBlock
+                    Text="Главная"
+                    FontSize="40"
+                    FontWeight="SemiBold" />
             </Grid>
 
-            <Grid Grid.Row="1" ColumnSpacing="12">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="2*" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-
+            <Grid Grid.Row="1">
                 <Border
-                    Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                    BorderThickness="1"
-                    CornerRadius="8">
-                    <Grid Padding="20,16" RowSpacing="12">
+                    Background="Transparent"
+                    BorderThickness="0"
+                    CornerRadius="0">
+                    <Grid Padding="20,4,20,0" RowSpacing="12">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
 
-                        <TextBlock Text="Недавние файлы" Style="{StaticResource BodyStrongTextBlockStyle}" />
+                        <TextBlock
+                            Text="Последние файлы мультимедиа"
+                            Style="{StaticResource SubtitleTextBlockStyle}" />
 
                         <Grid Grid.Row="1">
                             <ListView
@@ -203,33 +197,6 @@
                                 Text="Пока ничего не играло" />
                         </Grid>
                     </Grid>
-                </Border>
-
-                <Border
-                    Grid.Column="1"
-                    Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                    BorderThickness="1"
-                    CornerRadius="8">
-                    <StackPanel Padding="20,16" Spacing="10">
-                        <TextBlock Text="Быстрый доступ" Style="{StaticResource BodyStrongTextBlockStyle}" />
-                        <Button
-                            HorizontalAlignment="Stretch"
-                            Click="OpenLibrary_Click"
-                            Content="Открыть библиотеку" />
-                        <Button
-                            HorizontalAlignment="Stretch"
-                            Click="OpenQueue_Click"
-                            Content="Очередь" />
-                        <Button
-                            HorizontalAlignment="Stretch"
-                            Click="AddVideoFolder_Click"
-                            Content="Добавить папку" />
-                        <Button
-                            HorizontalAlignment="Stretch"
-                            Click="OpenSettings_Click"
-                            Content="Параметры" />
-                    </StackPanel>
                 </Border>
             </Grid>
         </Grid>
