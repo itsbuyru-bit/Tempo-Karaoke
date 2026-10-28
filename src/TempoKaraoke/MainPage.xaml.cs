@@ -490,6 +490,8 @@ public sealed partial class MainPage : Page
         var sort = (SortComboBox.SelectedItem as ComboBoxItem)?.Tag as string ?? "artist";
         result = sort switch
         {
+            "az" => result
+                .OrderBy(item => item.DisplayTitle, StringComparer.CurrentCultureIgnoreCase),
             "title" => result
                 .OrderBy(item => item.Title, StringComparer.CurrentCultureIgnoreCase)
                 .ThenBy(item => item.Artist, StringComparer.CurrentCultureIgnoreCase),
@@ -592,7 +594,8 @@ public sealed partial class MainPage : Page
 
     private void QueueList_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
     {
-        if (QueueList.SelectedItem is MediaItem item)
+        var item = QueueList.SelectedItem as MediaItem ?? SelectedQueueItems().FirstOrDefault();
+        if (item is not null)
         {
             PlayQueueItem(item);
         }
@@ -600,19 +603,169 @@ public sealed partial class MainPage : Page
 
     private void QueueList_KeyDown(object sender, KeyRoutedEventArgs e)
     {
-        if (e.Key == VirtualKey.Enter && QueueList.SelectedItem is MediaItem item)
+        var item = QueueList.SelectedItem as MediaItem ?? SelectedQueueItems().FirstOrDefault();
+        if (e.Key == VirtualKey.Enter && item is not null)
         {
             PlayQueueItem(item);
             e.Handled = true;
         }
     }
 
+    private void QueueList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        UpdateSelectionBar();
+    }
+
+    private List<MediaItem> SelectedQueueItems()
+    {
+        return QueueList.SelectedItems.OfType<MediaItem>().ToList();
+    }
+
+    private void UpdateSelectionBar()
+    {
+        if (SelectionBar is null || SelectionText is null || QueueActionsBar is null)
+        {
+            return;
+        }
+
+        var count = QueueList?.SelectedItems.Count ?? 0;
+        SelectionText.Text = count == 1 ? "Выбран 1 элемент" : $"Выбрано: {count}";
+        SelectionBar.Visibility = count > 0 ? Visibility.Visible : Visibility.Collapsed;
+        QueueActionsBar.Visibility = count > 0 ? Visibility.Collapsed : Visibility.Visible;
+    }
+
+    private void ClearSelection_Click(object sender, RoutedEventArgs e)
+    {
+        QueueList.SelectedItems.Clear();
+        UpdateSelectionBar();
+    }
+
+    private void PlaySelected_Click(object sender, RoutedEventArgs e)
+    {
+        var item = SelectedQueueItems().FirstOrDefault();
+        if (item is not null)
+        {
+            PlayQueueItem(item);
+        }
+    }
+
+    private void PlaySelectedNext_Click(object sender, RoutedEventArgs e)
+    {
+        var selected = SelectedQueueItems();
+        if (selected.Count == 0)
+        {
+            return;
+        }
+
+        var insert = Math.Clamp(_queueIndex + 1, 0, Queue.Count);
+        foreach (var item in selected)
+        {
+            Queue.Remove(item);
+        }
+
+        insert = Math.Min(insert, Queue.Count);
+        foreach (var item in selected)
+        {
+            Queue.Insert(insert++, item);
+        }
+
+        _queueIndex = _current is null ? -1 : Queue.IndexOf(_current);
+        UpdateQueueCount();
+        UpdateSelectionBar();
+    }
+
+    private void DeleteSelected_Click(object sender, RoutedEventArgs e)
+    {
+        var selected = SelectedQueueItems();
+        if (selected.Count == 0)
+        {
+            return;
+        }
+
+        foreach (var item in selected)
+        {
+            Queue.Remove(item);
+        }
+
+        _queueIndex = _current is null ? -1 : Queue.IndexOf(_current);
+        UpdateQueueCount();
+        UpdateSelectionBar();
+    }
+
+    private void MoveSelectedUp_Click(object sender, RoutedEventArgs e)
+    {
+        var item = SelectedQueueItems().FirstOrDefault();
+        if (item is null)
+        {
+            return;
+        }
+
+        var index = Queue.IndexOf(item);
+        if (index <= 0)
+        {
+            return;
+        }
+
+        Queue.Move(index, index - 1);
+        _queueIndex = _current is null ? -1 : Queue.IndexOf(_current);
+        UpdateSelectionBar();
+    }
+
+    private void MoveSelectedDown_Click(object sender, RoutedEventArgs e)
+    {
+        var item = SelectedQueueItems().FirstOrDefault();
+        if (item is null)
+        {
+            return;
+        }
+
+        var index = Queue.IndexOf(item);
+        if (index < 0 || index >= Queue.Count - 1)
+        {
+            return;
+        }
+
+        Queue.Move(index, index + 1);
+        _queueIndex = _current is null ? -1 : Queue.IndexOf(_current);
+        UpdateSelectionBar();
+    }
+
+    private async void SelectedProperties_Click(object sender, RoutedEventArgs e)
+    {
+        var item = SelectedQueueItems().FirstOrDefault();
+        if (item is null)
+        {
+            return;
+        }
+
+        var content = new TextBlock
+        {
+            Text = $"Название: {item.DisplayTitle}\n" +
+                   $"Папка: {item.Folder}\n" +
+                   $"Формат: {item.Format}\n" +
+                   $"Длительность: {item.DurationText}\n\n" +
+                   item.Path,
+            TextWrapping = TextWrapping.Wrap,
+            IsTextSelectionEnabled = true,
+            MaxWidth = 560,
+        };
+
+        var dialog = new ContentDialog
+        {
+            Title = "Свойства",
+            Content = content,
+            CloseButtonText = "Закрыть",
+            XamlRoot = XamlRoot,
+        };
+
+        await dialog.ShowAsync();
+    }
+
     private void AddToQueue_Click(object sender, RoutedEventArgs e)
     {
         if ((sender as FrameworkElement)?.Tag is MediaItem item)
         {
-            Queue.Add(item);
-            UpdateQueueCount();
+            AddToQueue(item);
         }
     }
 
@@ -751,9 +904,29 @@ public sealed partial class MainPage : Page
     {
         Queue.Add(item);
         UpdateQueueCount();
+        _ = LoadDurationAsync(item);
         if (QueueView.Visibility == Visibility.Visible)
         {
             QueueList.ScrollIntoView(item);
+        }
+    }
+
+    private static async Task LoadDurationAsync(MediaItem item)
+    {
+        if (IsRemote(item.Path))
+        {
+            return;
+        }
+
+        try
+        {
+            var file = await Windows.Storage.StorageFile.GetFileFromPathAsync(item.Path);
+            var properties = await file.Properties.GetVideoPropertiesAsync();
+            item.SetDuration((long)properties.Duration.TotalMilliseconds);
+        }
+        catch
+        {
+            // A missing file or unsupported metadata must not break the queue.
         }
     }
 
@@ -764,6 +937,7 @@ public sealed partial class MainPage : Page
         {
             var item = IsRemote(path) ? MediaItem.FromUrl(path) : MediaItem.FromPath(path);
             Queue.Add(item);
+            _ = LoadDurationAsync(item);
         }
         _isRestoringQueue = false;
         UpdateQueueCount();

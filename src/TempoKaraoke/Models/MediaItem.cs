@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel;
 using System.IO;
 
 namespace TempoKaraoke.Models;
@@ -7,8 +8,10 @@ namespace TempoKaraoke.Models;
 /// Одна видеозапись в библиотеке. Пока это облегчённая модель для каркаса:
 /// полноценный сканер и метаданные появятся на следующем шаге.
 /// </summary>
-public sealed class MediaItem
+public sealed class MediaItem : INotifyPropertyChanged
 {
+    private long _durationMs;
+
     public MediaItem(string path, string artist, string title, string folder)
     {
         Path = path;
@@ -16,6 +19,8 @@ public sealed class MediaItem
         Title = title;
         Folder = folder;
     }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
 
     public string Path { get; }
 
@@ -25,11 +30,39 @@ public sealed class MediaItem
 
     public string Folder { get; }
 
+    public long DurationMs => _durationMs;
+
     public string DisplayTitle => string.IsNullOrWhiteSpace(Artist) ? Title : $"{Artist} — {Title}";
 
     public string Format => System.IO.Path.GetExtension(Path).TrimStart('.').ToUpperInvariant();
 
     public string Subtitle => string.IsNullOrWhiteSpace(Folder) ? Format : $"{Folder} · {Format}";
+
+    public string DurationText
+    {
+        get
+        {
+            if (_durationMs <= 0)
+            {
+                return "--:--";
+            }
+
+            var span = TimeSpan.FromMilliseconds(_durationMs);
+            return $"{(int)span.TotalHours}:{span.Minutes:00}:{span.Seconds:00}";
+        }
+    }
+
+    public void SetDuration(long milliseconds)
+    {
+        if (milliseconds <= 0 || milliseconds == _durationMs)
+        {
+            return;
+        }
+
+        _durationMs = milliseconds;
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(DurationMs)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(DurationText)));
+    }
 
     public override string ToString() => DisplayTitle;
 

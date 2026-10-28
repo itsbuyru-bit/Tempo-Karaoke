@@ -33,6 +33,11 @@
             <Setter Property="Padding" Value="8" />
         </Style>
         <SolidColorBrush x:Key="CardStrokeColorDefaultBrush" Color="Transparent" />
+        <Style x:Key="CompactButtonStyle" TargetType="Button">
+            <Setter Property="Padding" Value="10,6" />
+            <Setter Property="MinHeight" Value="32" />
+            <Setter Property="FontSize" Value="13" />
+        </Style>
     </Page.Resources>
 
     <Grid
@@ -241,19 +246,18 @@
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
 
-                    <StackPanel Padding="20,16" Spacing="12">
-                        <Grid ColumnSpacing="8">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-
-                            <StackPanel Spacing="2">
+                    <TabView
+                        x:Name="LibraryTabs"
+                        Grid.Row="1"
+                        HorizontalContentAlignment="Stretch"
+                        IsAddTabButtonVisible="False"
+                        TabWidthMode="Equal"
+                        VerticalContentAlignment="Stretch">
+                        <TabView.TabStripHeader>
+                            <StackPanel Padding="20,0,0,0" Spacing="2" VerticalAlignment="Center">
                                 <TextBlock
-                                    Text="Библиотека видео"
-                                    Style="{StaticResource TitleTextBlockStyle}"
-                                    TextTrimming="CharacterEllipsis"
-                                    TextWrapping="NoWrap" />
+                                    Text="Видео"
+                                    Style="{StaticResource TitleTextBlockStyle}" />
                                 <TextBlock
                                     x:Name="StatusText"
                                     Foreground="{ThemeResource TextFillColorSecondaryBrush}"
@@ -262,10 +266,11 @@
                                     TextTrimming="CharacterEllipsis"
                                     TextWrapping="NoWrap" />
                             </StackPanel>
-
+                        </TabView.TabStripHeader>
+                        <TabView.TabStripFooter>
                             <StackPanel
-                                Grid.Column="1"
-                                VerticalAlignment="Top"
+                                Padding="0,0,20,0"
+                                VerticalAlignment="Center"
                                 Orientation="Horizontal"
                                 Spacing="8">
                                 <Button
@@ -277,55 +282,63 @@
                                 <Button
                                     Click="AddVideoFolder_Click"
                                     Content="Добавить папку" />
-                                <Button
-                                    Click="PlayAll_Click"
-                                    Content="Воспроизвести все" />
                             </StackPanel>
-                        </Grid>
-
-                        <StackPanel Orientation="Horizontal" Spacing="8">
-                            <ComboBox
-                                x:Name="FolderFilter"
-                                MinWidth="160"
-                                PlaceholderText="Все папки"
-                                SelectionChanged="FolderFilter_SelectionChanged" />
-                            <ComboBox
-                                x:Name="SortComboBox"
-                                MinWidth="150"
-                                SelectionChanged="SortComboBox_SelectionChanged">
-                                <ComboBoxItem Content="Исполнитель" Tag="artist" />
-                                <ComboBoxItem Content="Название" Tag="title" />
-                                <ComboBoxItem Content="Коллекция" Tag="folder" />
-                            </ComboBox>
-                            <TextBlock
-                                x:Name="CountText"
-                                VerticalAlignment="Center"
-                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                Text="0 песен" />
-                        </StackPanel>
-                    </StackPanel>
-
-                    <TabView
-                        x:Name="LibraryTabs"
-                        Grid.Row="1"
-                        HorizontalContentAlignment="Stretch"
-                        IsAddTabButtonVisible="False"
-                        TabWidthMode="Equal"
-                        VerticalContentAlignment="Stretch">
+                        </TabView.TabStripFooter>
                         <TabViewItem
                             HorizontalContentAlignment="Stretch"
                             IsClosable="False"
                             VerticalContentAlignment="Stretch"
                             Header="Все видео">
-                            <GridView
-                                x:Name="LibraryList"
-                                Padding="12,8,12,12"
-                                DoubleTapped="LibraryList_DoubleTapped"
-                                HorizontalAlignment="Stretch"
-                                IsItemClickEnabled="True"
-                                ItemsSource="{x:Bind Filtered, Mode=OneWay}"
-                                KeyDown="LibraryList_KeyDown"
-                                SelectionMode="Single">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+                                <Grid Grid.Row="0" Padding="20,4,20,8" ColumnSpacing="12">
+                                    <Button
+                                        HorizontalAlignment="Left"
+                                        Click="PlayAll_Click"
+                                        Content="▶ Воспроизвести все" />
+                                    <StackPanel
+                                        Grid.Column="1"
+                                        HorizontalAlignment="Right"
+                                        VerticalAlignment="Center"
+                                        Orientation="Horizontal"
+                                        Spacing="8">
+                                        <TextBlock
+                                            VerticalAlignment="Center"
+                                            Text="Сортировать по:" />
+                                        <ComboBox
+                                            x:Name="SortComboBox"
+                                            MinWidth="150"
+                                            SelectionChanged="SortComboBox_SelectionChanged">
+                                            <ComboBoxItem Content="А–Я" Tag="az" />
+                                            <ComboBoxItem Content="Исполнитель" Tag="artist" />
+                                            <ComboBoxItem Content="Коллекция" Tag="folder" />
+                                        </ComboBox>
+                                        <TextBlock
+                                            x:Name="CountText"
+                                            VerticalAlignment="Center"
+                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                            Text="0 песен" />
+                                        <ComboBox
+                                            x:Name="FolderFilter"
+                                            MinWidth="160"
+                                            PlaceholderText="Все папки"
+                                            SelectionChanged="FolderFilter_SelectionChanged"
+                                            Visibility="Collapsed" />
+                                    </StackPanel>
+                                </Grid>
+                                <GridView
+                                    x:Name="LibraryList"
+                                    Grid.Row="1"
+                                    Padding="12,8,12,12"
+                                    DoubleTapped="LibraryList_DoubleTapped"
+                                    HorizontalAlignment="Stretch"
+                                    IsItemClickEnabled="True"
+                                    ItemsSource="{x:Bind Filtered, Mode=OneWay}"
+                                    KeyDown="LibraryList_KeyDown"
+                                    SelectionMode="Single">
                                 <GridView.ItemsPanel>
                                     <ItemsPanelTemplate>
                                         <ItemsWrapGrid
@@ -412,6 +425,7 @@
                                     </DataTemplate>
                                 </GridView.ItemTemplate>
                             </GridView>
+                                </Grid>
                         </TabViewItem>
 
                         <TabViewItem
@@ -459,6 +473,7 @@
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
 
@@ -480,18 +495,6 @@
                                 VerticalAlignment="Center"
                                 Orientation="Horizontal"
                                 Spacing="8">
-                                <Button
-                                    Click="ClearQueue_Click"
-                                    ToolTipService.ToolTip="Очистить очередь">
-                                    <StackPanel Orientation="Horizontal" Spacing="6">
-                                        <SymbolIcon Symbol="Delete" />
-                                        <TextBlock Text="Очистить" />
-                                    </StackPanel>
-                                </Button>
-                                <Button
-                                    Content="Добавить в"
-                                    IsEnabled="False"
-                                    ToolTipService.ToolTip="Плейлисты — следующий этап" />
                                 <SplitButton
                                     Click="AddFilesSplitButton_Click"
                                     Content="Добавить файлы">
@@ -524,20 +527,97 @@
                             </StackPanel>
                         </Grid>
 
+                        <Grid Grid.Row="1" Padding="20,0,20,8">
+                            <StackPanel
+                                x:Name="QueueActionsBar"
+                                Orientation="Horizontal"
+                                Spacing="8">
+                                <Button
+                                    Click="ClearQueue_Click"
+                                    Style="{StaticResource CompactButtonStyle}"
+                                    ToolTipService.ToolTip="Очистить очередь">
+                                    <StackPanel Orientation="Horizontal" Spacing="6">
+                                        <SymbolIcon Symbol="Delete" />
+                                        <TextBlock Text="Очистить" />
+                                    </StackPanel>
+                                </Button>
+                                <Button
+                                    Content="Добавить в"
+                                    IsEnabled="False"
+                                    Style="{StaticResource CompactButtonStyle}"
+                                    ToolTipService.ToolTip="Плейлисты — следующий этап" />
+                            </StackPanel>
+
+                            <Border
+                                x:Name="SelectionBar"
+                                Padding="8"
+                                Background="{ThemeResource LayerFillColorDefaultBrush}"
+                                CornerRadius="8"
+                                Visibility="Collapsed">
+                                <StackPanel
+                                    VerticalAlignment="Center"
+                                    Orientation="Horizontal"
+                                    Spacing="8">
+                                    <TextBlock
+                                        x:Name="SelectionText"
+                                        VerticalAlignment="Center"
+                                        Style="{StaticResource BodyStrongTextBlockStyle}"
+                                        Text="Выбрано: 0" />
+                                    <Button
+                                        Click="ClearSelection_Click"
+                                        Content="Очистить"
+                                        Style="{StaticResource CompactButtonStyle}" />
+                                    <Button
+                                        Click="PlaySelected_Click"
+                                        Content="▶ Воспроизвести"
+                                        Style="{StaticResource CompactButtonStyle}" />
+                                    <Button
+                                        Click="PlaySelectedNext_Click"
+                                        Content="Воспроизвести следующим"
+                                        Style="{StaticResource CompactButtonStyle}" />
+                                    <Button
+                                        Content="Изменить с помощью Clipchamp"
+                                        IsEnabled="False"
+                                        Style="{StaticResource CompactButtonStyle}" />
+                                    <Button
+                                        Content="…"
+                                        Style="{StaticResource CompactButtonStyle}">
+                                        <Button.Flyout>
+                                            <MenuFlyout>
+                                                <MenuFlyoutItem
+                                                    Click="DeleteSelected_Click"
+                                                    Text="Удалить" />
+                                                <MenuFlyoutSeparator />
+                                                <MenuFlyoutItem
+                                                    Click="MoveSelectedUp_Click"
+                                                    Text="Вверх" />
+                                                <MenuFlyoutItem
+                                                    Click="MoveSelectedDown_Click"
+                                                    Text="Вниз" />
+                                                <MenuFlyoutSeparator />
+                                                <MenuFlyoutItem
+                                                    Click="SelectedProperties_Click"
+                                                    Text="Свойства" />
+                                            </MenuFlyout>
+                                        </Button.Flyout>
+                                    </Button>
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+
                         <ListView
                             x:Name="QueueList"
-                            Grid.Row="1"
-                            AllowDrop="True"
-                            CanDragItems="True"
-                            CanReorderItems="True"
+                            Grid.Row="2"
                             Padding="12,0,12,12"
                             DoubleTapped="QueueList_DoubleTapped"
                             IsItemClickEnabled="True"
+                            IsMultiSelectCheckBoxEnabled="True"
                             ItemsSource="{x:Bind Queue, Mode=OneWay}"
                             KeyDown="QueueList_KeyDown"
                             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                             ScrollViewer.HorizontalScrollMode="Disabled"
-                            SelectionMode="Single">
+                            SelectionChanged="QueueList_SelectionChanged"
+                            SelectionMode="Multiple">
                             <ListView.ItemContainerStyle>
                                 <Style TargetType="ListViewItem">
                                     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
@@ -546,7 +626,10 @@
                             </ListView.ItemContainerStyle>
                             <ListView.ItemTemplate>
                                 <DataTemplate x:DataType="models:MediaItem">
-                                    <Grid Padding="8,8" ColumnSpacing="12">
+                                    <Grid
+                                        MinHeight="48"
+                                        Padding="8,8"
+                                        ColumnSpacing="12">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*" />
                                             <ColumnDefinition Width="Auto" />
@@ -564,13 +647,13 @@
                                                 TextTrimming="CharacterEllipsis"
                                                 TextWrapping="NoWrap" />
                                         </StackPanel>
-                                        <Button
+                                        <TextBlock
                                             Grid.Column="1"
-                                            Click="RemoveFromQueue_Click"
-                                            Tag="{x:Bind}"
-                                            ToolTipService.ToolTip="Убрать из очереди">
-                                            <SymbolIcon Symbol="Remove" />
-                                        </Button>
+                                            VerticalAlignment="Center"
+                                            FontFamily="Segoe UI"
+                                            FontWeight="Normal"
+                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                            Text="{x:Bind DurationText, Mode=OneWay}" />
                                     </Grid>
                                 </DataTemplate>
                             </ListView.ItemTemplate>
