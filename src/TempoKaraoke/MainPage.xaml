@@ -854,17 +854,27 @@
                         </Button>
                         <Button
                             x:Name="MuteButton"
-                            Click="Mute_Click"
-                            ToolTipService.ToolTip="Звук">
+                            ToolTipService.ToolTip="Громкость">
                             <SymbolIcon x:Name="MuteIcon" Symbol="Volume" />
+                            <Button.Flyout>
+                                <Flyout Placement="Top">
+                                    <StackPanel Width="220" Spacing="8">
+                                        <TextBlock
+                                            Style="{StaticResource CaptionTextBlockStyle}"
+                                            Text="Громкость" />
+                                        <Slider
+                                            x:Name="VolumeSlider"
+                                            Maximum="100"
+                                            Minimum="0"
+                                            ValueChanged="VolumeSlider_ValueChanged" />
+                                        <Button
+                                            HorizontalAlignment="Stretch"
+                                            Click="Mute_Click"
+                                            Content="Без звука" />
+                                    </StackPanel>
+                                </Flyout>
+                            </Button.Flyout>
                         </Button>
-                        <Slider
-                            x:Name="VolumeSlider"
-                            Width="80"
-                            VerticalAlignment="Center"
-                            Maximum="100"
-                            Minimum="0"
-                            ValueChanged="VolumeSlider_ValueChanged" />
                         <Button
                             x:Name="FullScreenButton"
                             Click="FullScreen_Click"
