@@ -5,41 +5,398 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:models="using:TempoKaraoke.Models"
     xmlns:vlc="using:LibVLCSharp.Platforms.Windows"
-    mc:Ignorable="d">
+    mc:Ignorable="d"
+    KeyDown="Page_KeyDown">
 
-    <Grid>
+    <Page.KeyboardAccelerators>
+        <KeyboardAccelerator Key="F11" Invoked="FullScreenAccelerator_Invoked" />
+        <KeyboardAccelerator Key="Escape" Invoked="EscapeAccelerator_Invoked" />
+    </Page.KeyboardAccelerators>
+
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <StackPanel
-            Padding="12,8"
-            Orientation="Horizontal"
-            Spacing="8">
-            <Button x:Name="OpenButton" Click="Open_Click" Content="Открыть видео" />
-            <Button x:Name="SampleButton" Click="Sample_Click" Content="Sample из G:\Karaoke" />
-            <Button x:Name="PlayPauseButton" Click="PlayPause_Click" Content="Пауза" IsEnabled="False" />
-            <Button x:Name="StopButton" Click="Stop_Click" Content="Стоп" IsEnabled="False" />
+        <!--  Верхняя строка: поиск и фильтр  -->
+        <Grid Padding="20,14" ColumnSpacing="12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <AutoSuggestBox
+                x:Name="SearchBox"
+                PlaceholderText="Поиск: исполнитель, название или папка"
+                QueryIcon="Find"
+                TextChanged="SearchBox_TextChanged" />
+
+            <ComboBox
+                x:Name="FolderFilter"
+                Grid.Column="1"
+                MinWidth="200"
+                PlaceholderText="Все папки"
+                SelectionChanged="FolderFilter_SelectionChanged" />
+
             <TextBlock
-                x:Name="StatusText"
+                x:Name="CountText"
+                Grid.Column="2"
                 VerticalAlignment="Center"
                 Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                Text="Инициализация libvlc…" />
-        </StackPanel>
+                Text="0 песен" />
+        </Grid>
 
-        <vlc:VideoView
-            x:Name="VideoView"
+        <!--  Три зоны: библиотека, плеер, очередь  -->
+        <Grid
             Grid.Row="1"
-            Background="Black" />
+            Padding="20,0,20,12"
+            ColumnSpacing="12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1.6*" />
+                <ColumnDefinition x:Name="PlayerColumn" Width="2*" />
+                <ColumnDefinition Width="1.2*" />
+            </Grid.ColumnDefinitions>
 
-        <TextBlock
-            x:Name="TimeText"
+            <!--  Библиотека  -->
+            <Border
+                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                BorderThickness="1"
+                CornerRadius="8">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <Grid Padding="16,12" ColumnSpacing="8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Spacing="2">
+                            <TextBlock Text="Библиотека" Style="{StaticResource BodyStrongTextBlockStyle}" />
+                            <TextBlock
+                                x:Name="StatusText"
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                Style="{StaticResource CaptionTextBlockStyle}"
+                                Text="Читаю медиатеку…"
+                                TextTrimming="CharacterEllipsis" />
+                        </StackPanel>
+                        <Button
+                            x:Name="ScanButton"
+                            Grid.Column="1"
+                            Click="Scan_Click"
+                            ToolTipService.ToolTip="Обновить список">
+                            <SymbolIcon Symbol="Refresh" />
+                        </Button>
+                    </Grid>
+
+                    <ListView
+                        x:Name="LibraryList"
+                        Grid.Row="1"
+                        Padding="8,0,8,8"
+                        DoubleTapped="LibraryList_DoubleTapped"
+                        IsItemClickEnabled="True"
+                        ItemsSource="{x:Bind Filtered, Mode=OneWay}"
+                        KeyDown="LibraryList_KeyDown"
+                        ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                        ScrollViewer.HorizontalScrollMode="Disabled"
+                        SelectionMode="Single">
+                        <ListView.ItemContainerStyle>
+                            <Style TargetType="ListViewItem">
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                <Setter Property="Padding" Value="4" />
+                            </Style>
+                        </ListView.ItemContainerStyle>
+                        <ListView.ItemTemplate>
+                            <DataTemplate x:DataType="models:MediaItem">
+                                <Grid Padding="8,6" ColumnSpacing="8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Spacing="2">
+                                        <TextBlock
+                                            Text="{x:Bind DisplayTitle, Mode=OneTime}"
+                                            Style="{StaticResource BodyStrongTextBlockStyle}"
+                                            TextTrimming="CharacterEllipsis"
+                                            TextWrapping="NoWrap" />
+                                        <TextBlock
+                                            Text="{x:Bind Subtitle, Mode=OneTime}"
+                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                            Style="{StaticResource CaptionTextBlockStyle}"
+                                            TextTrimming="CharacterEllipsis"
+                                            TextWrapping="NoWrap" />
+                                    </StackPanel>
+                                    <Button
+                                        Grid.Column="1"
+                                        Click="AddToQueue_Click"
+                                        Tag="{x:Bind}"
+                                        ToolTipService.ToolTip="Добавить в очередь">
+                                        <SymbolIcon Symbol="Add" />
+                                    </Button>
+                                </Grid>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </Grid>
+            </Border>
+
+            <!--  Плеер  -->
+            <Border
+                x:Name="PlayerPanel"
+                Grid.Column="1"
+                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                BorderThickness="1"
+                CornerRadius="8">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <Grid Padding="16,12" ColumnSpacing="8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Spacing="2">
+                            <TextBlock
+                                x:Name="NowPlayingTitle"
+                                Style="{StaticResource SubtitleTextBlockStyle}"
+                                Text="Ничего не играет"
+                                TextTrimming="CharacterEllipsis" />
+                            <TextBlock
+                                x:Name="NowPlayingSubtitle"
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                Style="{StaticResource CaptionTextBlockStyle}"
+                                Text="Выберите песню двойным кликом"
+                                TextTrimming="CharacterEllipsis" />
+                        </StackPanel>
+                        <Button
+                            x:Name="DetachButton"
+                            Grid.Column="1"
+                            Click="Detach_Click"
+                            Content="Открепить видео"
+                            IsEnabled="False" />
+                    </Grid>
+
+                    <vlc:VideoView
+                        x:Name="VideoView"
+                        Grid.Row="1"
+                        Background="Black" />
+                </Grid>
+            </Border>
+
+            <!--  Очередь  -->
+            <Border
+                Grid.Column="2"
+                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                BorderThickness="1"
+                CornerRadius="8">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <Grid Padding="16,12" ColumnSpacing="8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Spacing="2">
+                            <TextBlock Text="Очередь" Style="{StaticResource BodyStrongTextBlockStyle}" />
+                            <TextBlock
+                                x:Name="QueueCountText"
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                Style="{StaticResource CaptionTextBlockStyle}"
+                                Text="0 песен" />
+                        </StackPanel>
+                        <Button
+                            Grid.Column="1"
+                            Click="ClearQueue_Click"
+                            ToolTipService.ToolTip="Очистить очередь">
+                            <SymbolIcon Symbol="Delete" />
+                        </Button>
+                    </Grid>
+
+                    <ListView
+                        x:Name="QueueList"
+                        Grid.Row="1"
+                        Padding="8,0,8,8"
+                        DoubleTapped="QueueList_DoubleTapped"
+                        IsItemClickEnabled="True"
+                        ItemsSource="{x:Bind Queue, Mode=OneWay}"
+                        KeyDown="QueueList_KeyDown"
+                        ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                        ScrollViewer.HorizontalScrollMode="Disabled"
+                        SelectionMode="Single">
+                        <ListView.ItemContainerStyle>
+                            <Style TargetType="ListViewItem">
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                <Setter Property="Padding" Value="4" />
+                            </Style>
+                        </ListView.ItemContainerStyle>
+                        <ListView.ItemTemplate>
+                            <DataTemplate x:DataType="models:MediaItem">
+                                <Grid Padding="8,6" ColumnSpacing="8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Spacing="2">
+                                        <TextBlock
+                                            Text="{x:Bind DisplayTitle, Mode=OneTime}"
+                                            Style="{StaticResource BodyStrongTextBlockStyle}"
+                                            TextTrimming="CharacterEllipsis"
+                                            TextWrapping="NoWrap" />
+                                        <TextBlock
+                                            Text="{x:Bind Subtitle, Mode=OneTime}"
+                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                            Style="{StaticResource CaptionTextBlockStyle}"
+                                            TextTrimming="CharacterEllipsis"
+                                            TextWrapping="NoWrap" />
+                                    </StackPanel>
+                                    <Button
+                                        Grid.Column="1"
+                                        Click="RemoveFromQueue_Click"
+                                        Tag="{x:Bind}"
+                                        ToolTipService.ToolTip="Убрать из очереди">
+                                        <SymbolIcon Symbol="Remove" />
+                                    </Button>
+                                </Grid>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!--  Транспорт  -->
+        <Border
+            x:Name="TransportBar"
             Grid.Row="2"
-            Padding="12,6"
-            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-            Text="00:00 / 00:00" />
+            Padding="20,10"
+            Background="{ThemeResource LayerFillColorDefaultBrush}"
+            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+            BorderThickness="0,1,0,0">
+            <Grid ColumnSpacing="12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Orientation="Horizontal" Spacing="4">
+                    <Button
+                        x:Name="PreviousButton"
+                        Click="Previous_Click"
+                        ToolTipService.ToolTip="Предыдущая (Ctrl+←)">
+                        <SymbolIcon Symbol="Previous" />
+                    </Button>
+                    <Button
+                        x:Name="PlayPauseButton"
+                        Click="PlayPause_Click"
+                        Style="{StaticResource AccentButtonStyle}"
+                        ToolTipService.ToolTip="Играть/пауза (Space)">
+                        <SymbolIcon x:Name="PlayPauseIcon" Symbol="Play" />
+                    </Button>
+                    <Button
+                        x:Name="StopButton"
+                        Click="Stop_Click"
+                        ToolTipService.ToolTip="Стоп">
+                        <SymbolIcon Symbol="Stop" />
+                    </Button>
+                    <Button
+                        x:Name="NextButton"
+                        Click="Next_Click"
+                        ToolTipService.ToolTip="Следующая (Ctrl+→)">
+                        <SymbolIcon Symbol="Next" />
+                    </Button>
+                </StackPanel>
+
+                <Slider
+                    x:Name="SeekSlider"
+                    Grid.Column="1"
+                    VerticalAlignment="Center"
+                    IsThumbToolTipEnabled="False"
+                    Maximum="1"
+                    Minimum="0"
+                    PointerCaptureLost="SeekSlider_PointerCaptureLost"
+                    PointerPressed="SeekSlider_PointerPressed"
+                    PointerReleased="SeekSlider_PointerReleased"
+                    StepFrequency="1000"
+                    ValueChanged="SeekSlider_ValueChanged" />
+
+                <TextBlock
+                    x:Name="TimeText"
+                    Grid.Column="2"
+                    VerticalAlignment="Center"
+                    FontFamily="Consolas"
+                    Text="00:00 / 00:00" />
+
+                <StackPanel
+                    Grid.Column="3"
+                    Orientation="Horizontal"
+                    Spacing="4">
+                    <Button
+                        x:Name="MuteButton"
+                        Click="Mute_Click"
+                        ToolTipService.ToolTip="Звук">
+                        <SymbolIcon x:Name="MuteIcon" Symbol="Volume" />
+                    </Button>
+                    <Slider
+                        x:Name="VolumeSlider"
+                        Width="110"
+                        VerticalAlignment="Center"
+                        Maximum="100"
+                        Minimum="0"
+                        ValueChanged="VolumeSlider_ValueChanged" />
+                </StackPanel>
+
+                <Button
+                    x:Name="FullScreenButton"
+                    Grid.Column="4"
+                    Click="FullScreen_Click"
+                    ToolTipService.ToolTip="Полный экран (F11)">
+                    <SymbolIcon Symbol="FullScreen" />
+                </Button>
+            </Grid>
+        </Border>
+
+        <!--  Строка, когда видео откреплено  -->
+        <Border
+            x:Name="DetachedBar"
+            Grid.Row="2"
+            Padding="20,10"
+            Background="{ThemeResource LayerFillColorDefaultBrush}"
+            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+            BorderThickness="0,1,0,0"
+            Visibility="Collapsed">
+            <StackPanel
+                HorizontalAlignment="Center"
+                Orientation="Horizontal"
+                Spacing="12">
+                <TextBlock
+                    VerticalAlignment="Center"
+                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                    Text="Видео в отдельном окне" />
+                <Button
+                    Click="ReturnVideo_Click"
+                    Content="Вернуть видео"
+                    Style="{StaticResource AccentButtonStyle}" />
+            </StackPanel>
+        </Border>
     </Grid>
 </Page>

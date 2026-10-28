@@ -1,257 +1,628 @@
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using LibVLCSharp.Shared;
 using LibVLCSharp.Platforms.Windows;
+using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Windows.Storage.Pickers;
+using Microsoft.UI.Xaml.Controls.Primitives;
+using Microsoft.UI.Xaml.Input;
+using TempoKaraoke.Models;
+using TempoKaraoke.Services;
+using Windows.System;
 
 namespace TempoKaraoke;
 
-/// <summary>
-/// Технический спайк: проверяет, что WinUI 3 + LibVLCSharp.WinUI играют реальные
-/// файлы из медиатеки. Это ещё не продуктовый UI.
-/// </summary>
 public sealed partial class MainPage : Page
 {
-    private LibVLC? _libVlc;
-    private MediaPlayer? _mediaPlayer;
-    private Media? _currentMedia;
-    private long _lengthMs;
-    private bool _initialized;
+    private static readonly HashSet<string> VideoExtensions = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ".mkv", ".mp4", ".avi", ".mov", ".webm", ".m4v", ".wmv",
+    };
+
+    private readonly List<MediaItem> _all = new();
+    private readonly PlayerService _player;
+    private readonly DispatcherTimer _timer;
+    private MediaItem? _current;
+    private string[]? _mainSwapOptions;
+    private PlayerWindow? _playerWindow;
+    private bool _detached;
+    private bool _isSeeking;
+    private bool _suppressVolume;
+    private bool _isPopulatingFolders;
+    private int _queueIndex = -1;
+
+    public ObservableCollection<MediaItem> Filtered { get; } = new();
+
+    public ObservableCollection<MediaItem> Queue { get; } = new();
 
     public MainPage()
     {
         InitializeComponent();
-        Unloaded += OnUnloaded;
+
+        _player = new PlayerService(Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread());
+        _player.StateChanged += (_, _) => UpdateTransport();
+        _player.EndReached += (_, _) => PlayNext();
+        _player.Failed += (_, message) => NowPlayingSubtitle.Text = message;
+
+        _timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(200) };
+        _timer.Tick += (_, _) => UpdateTransport();
+
         VideoView.Initialized += OnVideoViewInitialized;
+        Loaded += OnPageLoaded;
+        Unloaded += OnPageUnloaded;
+    }
+
+    private void OnPageLoaded(object sender, RoutedEventArgs e)
+    {
+        _timer.Start();
+        VolumeSlider.Value = _player.Volume;
+        UpdateTransport();
+        _ = LoadPreviewAsync();
+    }
+
+    private void OnPageUnloaded(object sender, RoutedEventArgs e)
+    {
+        _timer.Stop();
+        VideoView.Initialized -= OnVideoViewInitialized;
+        _playerWindow?.Close();
+        _player.Detach();
     }
 
     private void OnVideoViewInitialized(object? sender, InitializedEventArgs e)
     {
-        InitializePlayer(e.SwapChainOptions);
+        _mainSwapOptions = e.SwapChainOptions;
+        _player.Attach(VideoView, e.SwapChainOptions);
+        UpdateTransport();
     }
 
-    private void InitializePlayer(string[] swapChainOptions)
+    private async Task LoadPreviewAsync()
     {
-        if (_initialized)
-        {
-            return;
-        }
+        var root = Environment.GetEnvironmentVariable("TEMPO_LIBRARY") ?? @"G:\Karaoke";
+        ScanButton.IsEnabled = false;
+        StatusText.Text = "Читаю медиатеку…";
 
         try
         {
-            Core.Initialize();
-
-            // SwapChainOptions обязательны: без них libvlc откроет своё окно
-            // вместо вывода в VideoView.
-            var options = swapChainOptions
-                .Concat(new[] { "--no-video-title-show", "--quiet" })
-                .ToArray();
-
-            _libVlc = new LibVLC(options);
-            _mediaPlayer = new MediaPlayer(_libVlc);
-
-            _mediaPlayer.TimeChanged += OnTimeChanged;
-            _mediaPlayer.LengthChanged += OnLengthChanged;
-            _mediaPlayer.Playing += OnPlaying;
-            _mediaPlayer.Paused += OnPaused;
-            _mediaPlayer.Stopped += OnStopped;
-            _mediaPlayer.EndReached += OnEndReached;
-            _mediaPlayer.EncounteredError += OnEncounteredError;
-
-            VideoView.MediaPlayer = _mediaPlayer;
-            _initialized = true;
-            StatusText.Text = $"libvlc {_libVlc.Version} — готов";
+            var items = await Task.Run(() => EnumerateVideos(root));
+            _all.Clear();
+            _all.AddRange(items);
+            PopulateFolders();
+            ApplyFilter();
         }
         catch (Exception ex)
         {
-            StatusText.Text = $"libvlc не загрузился: {ex.Message}";
+            StatusText.Text = $"Не удалось прочитать {root}: {ex.Message}";
+        }
+        finally
+        {
+            ScanButton.IsEnabled = true;
         }
     }
 
-    private void OnUnloaded(object sender, RoutedEventArgs e)
+    private static List<MediaItem> EnumerateVideos(string root)
     {
-        VideoView.Initialized -= OnVideoViewInitialized;
-        VideoView.MediaPlayer = null;
-
-        if (_mediaPlayer is not null)
-        {
-            _mediaPlayer.TimeChanged -= OnTimeChanged;
-            _mediaPlayer.LengthChanged -= OnLengthChanged;
-            _mediaPlayer.Playing -= OnPlaying;
-            _mediaPlayer.Paused -= OnPaused;
-            _mediaPlayer.Stopped -= OnStopped;
-            _mediaPlayer.EndReached -= OnEndReached;
-            _mediaPlayer.EncounteredError -= OnEncounteredError;
-        }
-
-        _currentMedia?.Dispose();
-        _mediaPlayer?.Dispose();
-        _libVlc?.Dispose();
-        _mediaPlayer = null;
-        _libVlc = null;
-        _currentMedia = null;
-        _initialized = false;
-    }
-
-    private async void Open_Click(object sender, RoutedEventArgs e)
-    {
-        var picker = new FileOpenPicker
-        {
-            SuggestedStartLocation = PickerLocationId.VideosLibrary,
-        };
-        picker.FileTypeFilter.Add(".mkv");
-        picker.FileTypeFilter.Add(".mp4");
-        picker.FileTypeFilter.Add(".avi");
-        picker.FileTypeFilter.Add(".mov");
-        picker.FileTypeFilter.Add(".webm");
-
-        WinRT.Interop.InitializeWithWindow.Initialize(picker, App.WindowHandle);
-
-        var file = await picker.PickSingleFileAsync();
-        if (file is not null)
-        {
-            Play(file.Path);
-        }
-    }
-
-    private async void Sample_Click(object sender, RoutedEventArgs e)
-    {
-        var root = Environment.GetEnvironmentVariable("KARAOKE_SAMPLE") ?? @"G:\Karaoke";
-
-        StatusText.Text = "Ищу файл…";
-
-        string? path;
-        try
-        {
-            path = await Task.Run(() => FindSample(root));
-        }
-        catch (Exception ex)
-        {
-            StatusText.Text = $"Ошибка сканирования: {ex.Message}";
-            return;
-        }
-
-        if (path is null)
-        {
-            StatusText.Text = $"Не нашёл видео в {root}";
-            return;
-        }
-
-        Play(path);
-    }
-
-    private static string? FindSample(string root)
-    {
-        if (File.Exists(root))
-        {
-            return root;
-        }
-
-        if (!Directory.Exists(root))
-        {
-            return null;
-        }
-
         return Directory
             .EnumerateFiles(root, "*.*", SearchOption.AllDirectories)
-            .Where(p =>
-                p.EndsWith(".mkv", StringComparison.OrdinalIgnoreCase) ||
-                p.EndsWith(".mp4", StringComparison.OrdinalIgnoreCase))
-            .FirstOrDefault();
+            .Where(path => VideoExtensions.Contains(Path.GetExtension(path)))
+            .Take(500)
+            .Select(MediaItem.FromPath)
+            .OrderBy(item => item.Artist, StringComparer.CurrentCultureIgnoreCase)
+            .ThenBy(item => item.Title, StringComparer.CurrentCultureIgnoreCase)
+            .ToList();
     }
 
-    private void Play(string path)
+    private void PopulateFolders()
     {
-        if (_mediaPlayer is null || _libVlc is null)
+        _isPopulatingFolders = true;
+        FolderFilter.Items.Clear();
+        FolderFilter.Items.Add("Все папки");
+
+        foreach (var folder in _all
+                     .Select(item => item.Folder)
+                     .Where(folder => !string.IsNullOrWhiteSpace(folder))
+                     .Distinct(StringComparer.CurrentCultureIgnoreCase)
+                     .OrderBy(folder => folder, StringComparer.CurrentCultureIgnoreCase))
         {
-            StatusText.Text = "libvlc ещё не готов";
+            FolderFilter.Items.Add(folder);
+        }
+
+        FolderFilter.SelectedIndex = 0;
+        _isPopulatingFolders = false;
+    }
+
+    private void ApplyFilter()
+    {
+        var query = SearchBox.Text.Trim();
+        var folder = FolderFilter.SelectedItem as string;
+
+        IEnumerable<MediaItem> result = _all;
+        if (!string.IsNullOrWhiteSpace(folder) && folder != "Все папки")
+        {
+            result = result.Where(item =>
+                string.Equals(item.Folder, folder, StringComparison.CurrentCultureIgnoreCase));
+        }
+
+        if (!string.IsNullOrWhiteSpace(query))
+        {
+            var terms = query.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            result = result.Where(item => terms.All(term =>
+                item.DisplayTitle.Contains(term, StringComparison.CurrentCultureIgnoreCase) ||
+                item.Folder.Contains(term, StringComparison.CurrentCultureIgnoreCase)));
+        }
+
+        Filtered.Clear();
+        foreach (var item in result)
+        {
+            Filtered.Add(item);
+        }
+
+        CountText.Text = $"{Filtered.Count} песен";
+        StatusText.Text = $"Показано {Filtered.Count} из {_all.Count}";
+    }
+
+    private void SearchBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
+    {
+        ApplyFilter();
+    }
+
+    private void FolderFilter_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (_isPopulatingFolders)
+        {
             return;
         }
 
-        _mediaPlayer.Stop();
-        _currentMedia?.Dispose();
-        _currentMedia = new Media(_libVlc, path, FromType.FromPath);
+        ApplyFilter();
+    }
 
-        if (!_mediaPlayer.Play(_currentMedia))
+    private void Scan_Click(object sender, RoutedEventArgs e)
+    {
+        _ = LoadPreviewAsync();
+    }
+
+    private void LibraryList_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
+    {
+        if (LibraryList.SelectedItem is MediaItem item)
         {
-            StatusText.Text = $"Не удалось запустить: {Path.GetFileName(path)}";
+            PlayNow(item);
+        }
+    }
+
+    private void LibraryList_KeyDown(object sender, KeyRoutedEventArgs e)
+    {
+        if (e.Key == VirtualKey.Enter && LibraryList.SelectedItem is MediaItem item)
+        {
+            PlayNow(item);
+            e.Handled = true;
+        }
+    }
+
+    private void QueueList_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
+    {
+        if (QueueList.SelectedItem is MediaItem item)
+        {
+            PlayQueueItem(item);
+        }
+    }
+
+    private void QueueList_KeyDown(object sender, KeyRoutedEventArgs e)
+    {
+        if (e.Key == VirtualKey.Enter && QueueList.SelectedItem is MediaItem item)
+        {
+            PlayQueueItem(item);
+            e.Handled = true;
+        }
+    }
+
+    private void AddToQueue_Click(object sender, RoutedEventArgs e)
+    {
+        if ((sender as FrameworkElement)?.Tag is MediaItem item)
+        {
+            Queue.Add(item);
+            UpdateQueueCount();
+        }
+    }
+
+    private void RemoveFromQueue_Click(object sender, RoutedEventArgs e)
+    {
+        if ((sender as FrameworkElement)?.Tag is not MediaItem item)
+        {
             return;
         }
 
-        _lengthMs = 0;
-        StatusText.Text = Path.GetFileName(path);
-        PlayPauseButton.IsEnabled = true;
-        StopButton.IsEnabled = true;
-        PlayPauseButton.Content = "Пауза";
+        var index = Queue.IndexOf(item);
+        if (index < 0)
+        {
+            return;
+        }
+
+        Queue.RemoveAt(index);
+        if (index < _queueIndex)
+        {
+            _queueIndex--;
+        }
+        else if (index == _queueIndex)
+        {
+            _queueIndex = Math.Min(_queueIndex, Queue.Count - 1);
+        }
+
+        UpdateQueueCount();
+    }
+
+    private void ClearQueue_Click(object sender, RoutedEventArgs e)
+    {
+        Queue.Clear();
+        _queueIndex = -1;
+        UpdateQueueCount();
+    }
+
+    private void PlayNow(MediaItem item)
+    {
+        _current = item;
+        _queueIndex = Queue.IndexOf(item);
+
+        if (_detached && _playerWindow is not null)
+        {
+            _playerWindow.Play(item.Path);
+        }
+        else
+        {
+            _player.Play(item.Path);
+        }
+
+        UpdateNowPlaying();
+    }
+
+    private void PlayQueueItem(MediaItem item)
+    {
+        var index = Queue.IndexOf(item);
+        if (index < 0)
+        {
+            return;
+        }
+
+        _queueIndex = index;
+        _current = item;
+
+        if (_detached && _playerWindow is not null)
+        {
+            _playerWindow.Play(item.Path);
+        }
+        else
+        {
+            _player.Play(item.Path);
+        }
+
+        UpdateNowPlaying();
+    }
+
+    private void PlayQueueIndex(int index)
+    {
+        if (index < 0 || index >= Queue.Count)
+        {
+            return;
+        }
+
+        PlayQueueItem(Queue[index]);
+    }
+
+    private void PlayNext()
+    {
+        if (Queue.Count > 0)
+        {
+            var next = _queueIndex < 0 ? 0 : _queueIndex + 1;
+            if (next < Queue.Count)
+            {
+                PlayQueueIndex(next);
+            }
+            else
+            {
+                _player.Stop();
+            }
+
+            return;
+        }
+
+        if (Filtered.Count == 0)
+        {
+            return;
+        }
+
+        var index = _current is null ? -1 : Filtered.IndexOf(_current);
+        var nextInList = index < 0 ? 0 : index + 1;
+        if (nextInList < Filtered.Count)
+        {
+            PlayNow(Filtered[nextInList]);
+        }
+    }
+
+    private void PlayPrevious()
+    {
+        if (_player.PositionMs > 3000)
+        {
+            _player.Seek(0);
+            return;
+        }
+
+        if (Queue.Count > 0 && _queueIndex > 0)
+        {
+            PlayQueueIndex(_queueIndex - 1);
+            return;
+        }
+
+        if (Queue.Count > 0 && _queueIndex < 0)
+        {
+            PlayQueueIndex(0);
+            return;
+        }
+
+        if (Filtered.Count == 0)
+        {
+            return;
+        }
+
+        var index = _current is null ? -1 : Filtered.IndexOf(_current);
+        if (index > 0)
+        {
+            PlayNow(Filtered[index - 1]);
+        }
+        else
+        {
+            _player.Seek(0);
+        }
     }
 
     private void PlayPause_Click(object sender, RoutedEventArgs e)
     {
-        if (_mediaPlayer is null)
-        {
-            return;
-        }
-
-        if (_mediaPlayer.IsPlaying)
-        {
-            _mediaPlayer.Pause();
-        }
-        else
-        {
-            _mediaPlayer.Play();
-        }
+        _player.PlayPause();
+        UpdateTransport();
     }
 
     private void Stop_Click(object sender, RoutedEventArgs e)
     {
-        _mediaPlayer?.Stop();
-        TimeText.Text = "00:00 / 00:00";
-        PlayPauseButton.Content = "Играть";
+        _player.Stop();
+        UpdateTransport();
     }
 
-    private void OnTimeChanged(object? sender, MediaPlayerTimeChangedEventArgs e)
+    private void Previous_Click(object sender, RoutedEventArgs e)
     {
-        var time = FormatTime(e.Time);
-        var total = FormatTime(_lengthMs);
-        App.DispatcherQueue.TryEnqueue(() => TimeText.Text = $"{time} / {total}");
+        PlayPrevious();
     }
 
-    private void OnLengthChanged(object? sender, MediaPlayerLengthChangedEventArgs e)
+    private void Next_Click(object sender, RoutedEventArgs e)
     {
-        _lengthMs = e.Length;
+        PlayNext();
     }
 
-    private void OnPlaying(object? sender, EventArgs e)
+    private void SeekSlider_PointerPressed(object sender, PointerRoutedEventArgs e)
     {
-        App.DispatcherQueue.TryEnqueue(() => PlayPauseButton.Content = "Пауза");
+        _isSeeking = true;
     }
 
-    private void OnPaused(object? sender, EventArgs e)
+    private void SeekSlider_PointerReleased(object sender, PointerRoutedEventArgs e)
     {
-        App.DispatcherQueue.TryEnqueue(() => PlayPauseButton.Content = "Играть");
+        _isSeeking = false;
+        _player.Seek((long)SeekSlider.Value);
+        UpdateTransport();
     }
 
-    private void OnStopped(object? sender, EventArgs e)
+    private void SeekSlider_PointerCaptureLost(object sender, PointerRoutedEventArgs e)
     {
-        App.DispatcherQueue.TryEnqueue(() => PlayPauseButton.Content = "Играть");
+        _isSeeking = false;
+        _player.Seek((long)SeekSlider.Value);
+        UpdateTransport();
     }
 
-    private void OnEndReached(object? sender, EventArgs e)
+    private void SeekSlider_ValueChanged(object sender, RangeBaseValueChangedEventArgs e)
     {
-        App.DispatcherQueue.TryEnqueue(() =>
+        if (_isSeeking)
         {
-            PlayPauseButton.Content = "Играть";
-            StatusText.Text = "Конец файла";
-        });
+            TimeText.Text = $"{FormatTime((long)e.NewValue)} / {FormatTime(_player.LengthMs)}";
+        }
     }
 
-    private void OnEncounteredError(object? sender, EventArgs e)
+    private void VolumeSlider_ValueChanged(object sender, RangeBaseValueChangedEventArgs e)
     {
-        App.DispatcherQueue.TryEnqueue(() => StatusText.Text = "Ошибка воспроизведения");
+        if (_suppressVolume)
+        {
+            return;
+        }
+
+        _player.SetVolume((int)e.NewValue);
+    }
+
+    private void Mute_Click(object sender, RoutedEventArgs e)
+    {
+        _player.ToggleMute();
+        _suppressVolume = true;
+        VolumeSlider.Value = _player.Volume;
+        _suppressVolume = false;
+        UpdateTransport();
+    }
+
+    private void FullScreen_Click(object sender, RoutedEventArgs e)
+    {
+        WindowHelper.ToggleFullScreen(App.Window);
+    }
+
+    private void FullScreenAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+    {
+        args.Handled = true;
+        WindowHelper.ToggleFullScreen(App.Window);
+    }
+
+    private void EscapeAccelerator_Invoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+    {
+        args.Handled = true;
+
+        if (SearchBox.FocusState != FocusState.Unfocused && !string.IsNullOrWhiteSpace(SearchBox.Text))
+        {
+            SearchBox.Text = string.Empty;
+            ApplyFilter();
+            return;
+        }
+
+        WindowHelper.ExitFullScreen(App.Window);
+    }
+
+    private void Page_KeyDown(object sender, KeyRoutedEventArgs e)
+    {
+        if (e.Handled)
+        {
+            return;
+        }
+
+        var focused = FocusManager.GetFocusedElement(XamlRoot);
+        if (focused is TextBox or AutoSuggestBox or RichEditBox)
+        {
+            return;
+        }
+
+        switch (e.Key)
+        {
+            case VirtualKey.Space:
+                _player.PlayPause();
+                e.Handled = true;
+                break;
+            case VirtualKey.Left when focused is not ListView and not ListViewItem:
+                _player.Seek(_player.PositionMs - 5000);
+                e.Handled = true;
+                break;
+            case VirtualKey.Right when focused is not ListView and not ListViewItem:
+                _player.Seek(_player.PositionMs + 5000);
+                e.Handled = true;
+                break;
+            case VirtualKey.Up when focused is not ListView and not ListViewItem:
+                _player.SetVolume(_player.Volume + 5);
+                e.Handled = true;
+                break;
+            case VirtualKey.Down when focused is not ListView and not ListViewItem:
+                _player.SetVolume(_player.Volume - 5);
+                e.Handled = true;
+                break;
+        }
+    }
+
+    private void Detach_Click(object sender, RoutedEventArgs e)
+    {
+        if (_detached || _current is null)
+        {
+            return;
+        }
+
+        var position = _player.PositionMs;
+        var wasPlaying = _player.IsPlaying;
+        var volume = _player.Volume;
+
+        _player.Pause();
+        _detached = true;
+
+        PlayerColumn.Width = new GridLength(0);
+        PlayerPanel.Visibility = Visibility.Collapsed;
+        TransportBar.Visibility = Visibility.Collapsed;
+        DetachedBar.Visibility = Visibility.Visible;
+
+        _playerWindow = new PlayerWindow(
+            _current.Path,
+            position,
+            wasPlaying,
+            volume,
+            PlayNext,
+            PlayPrevious,
+            ReturnFromDetached);
+        _playerWindow.Activate();
+        UpdateTransport();
+    }
+
+    private void ReturnVideo_Click(object sender, RoutedEventArgs e)
+    {
+        ReturnFromDetached();
+    }
+
+    private void ReturnFromDetached()
+    {
+        if (!_detached)
+        {
+            return;
+        }
+
+        var window = _playerWindow;
+        _playerWindow = null;
+        _detached = false;
+
+        var position = window?.PositionMs ?? _player.PositionMs;
+        var wasPlaying = window?.IsPlaying ?? false;
+
+        PlayerPanel.Visibility = Visibility.Visible;
+        PlayerColumn.Width = new GridLength(2, GridUnitType.Star);
+        TransportBar.Visibility = Visibility.Visible;
+        DetachedBar.Visibility = Visibility.Collapsed;
+
+        if (_current is not null)
+        {
+            if (string.Equals(_player.CurrentPath, _current.Path, StringComparison.OrdinalIgnoreCase))
+            {
+                // Same media: just seek/resume the paused main player.
+                _player.Seek(position);
+                if (wasPlaying && !_player.IsPlaying)
+                {
+                    _player.PlayPause();
+                }
+            }
+            else
+            {
+                _player.PlayAt(_current.Path, position, wasPlaying);
+            }
+        }
+
+        window?.CloseForReturn();
+        UpdateTransport();
+    }
+
+    private void UpdateNowPlaying()
+    {
+        if (_current is null)
+        {
+            NowPlayingTitle.Text = "Ничего не играет";
+            NowPlayingSubtitle.Text = "Выберите песню двойным кликом";
+            DetachButton.IsEnabled = false;
+            return;
+        }
+
+        NowPlayingTitle.Text = _current.DisplayTitle;
+        NowPlayingSubtitle.Text = _current.Subtitle;
+        DetachButton.IsEnabled = true;
+    }
+
+    private void UpdateQueueCount()
+    {
+        QueueCountText.Text = $"{Queue.Count} песен";
+    }
+
+    private void UpdateTransport()
+    {
+        var length = Math.Max(1, _player.LengthMs);
+        SeekSlider.Maximum = length;
+
+        if (!_isSeeking)
+        {
+            SeekSlider.Value = Math.Clamp(_player.PositionMs, 0, length);
+        }
+
+        TimeText.Text = $"{FormatTime(_player.PositionMs)} / {FormatTime(_player.LengthMs)}";
+        PlayPauseIcon.Symbol = _player.IsPlaying ? Symbol.Pause : Symbol.Play;
+        MuteIcon.Symbol = _player.Volume == 0 ? Symbol.Mute : Symbol.Volume;
+
+        if (!_suppressVolume && Math.Abs(VolumeSlider.Value - _player.Volume) > 0.5)
+        {
+            _suppressVolume = true;
+            VolumeSlider.Value = _player.Volume;
+            _suppressVolume = false;
+        }
     }
 
     private static string FormatTime(long milliseconds)

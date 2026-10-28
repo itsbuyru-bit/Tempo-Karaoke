@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Window
+    x:Class="TempoKaraoke.PlayerWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid
+        x:Name="RootGrid"
+        Background="Black"
+        PointerMoved="RootGrid_PointerMoved">
+        <Grid.KeyboardAccelerators>
+            <KeyboardAccelerator Key="F11" Invoked="FullScreen_Invoked" />
+            <KeyboardAccelerator Key="Escape" Invoked="Escape_Invoked" />
+        </Grid.KeyboardAccelerators>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <MediaPlayerElement
+            x:Name="MediaElement"
+            Grid.Row="0"
+            AreTransportControlsEnabled="False"
+            Background="Black"
+            Stretch="Uniform" />
+
+        <Border
+            x:Name="ControlsBar"
+            Grid.Row="1"
+            Padding="16,8"
+            Background="#CC1A1A1A"
+            PointerEntered="ControlsBar_PointerEntered"
+            PointerExited="ControlsBar_PointerExited">
+            <Grid ColumnSpacing="12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Orientation="Horizontal" Spacing="4">
+                    <Button
+                        Click="Previous_Click"
+                        ToolTipService.ToolTip="Предыдущая">
+                        <SymbolIcon Symbol="Previous" />
+                    </Button>
+                    <Button
+                        Click="PlayPause_Click"
+                        Style="{StaticResource AccentButtonStyle}"
+                        ToolTipService.ToolTip="Играть/пауза">
+                        <SymbolIcon x:Name="PlayPauseIcon" Symbol="Play" />
+                    </Button>
+                    <Button Click="Stop_Click" ToolTipService.ToolTip="Стоп">
+                        <SymbolIcon Symbol="Stop" />
+                    </Button>
+                    <Button Click="Next_Click" ToolTipService.ToolTip="Следующая">
+                        <SymbolIcon Symbol="Next" />
+                    </Button>
+                </StackPanel>
+
+                <Slider
+                    x:Name="SeekSlider"
+                    Grid.Column="1"
+                    VerticalAlignment="Center"
+                    IsThumbToolTipEnabled="False"
+                    Maximum="1"
+                    Minimum="0"
+                    PointerCaptureLost="SeekSlider_PointerCaptureLost"
+                    PointerPressed="SeekSlider_PointerPressed"
+                    PointerReleased="SeekSlider_PointerReleased"
+                    StepFrequency="1000"
+                    ValueChanged="SeekSlider_ValueChanged" />
+
+                <TextBlock
+                    x:Name="TimeText"
+                    Grid.Column="2"
+                    VerticalAlignment="Center"
+                    FontFamily="Consolas"
+                    Foreground="White"
+                    Text="00:00 / 00:00" />
+
+                <StackPanel
+                    Grid.Column="3"
+                    Orientation="Horizontal"
+                    Spacing="4">
+                    <Button Click="Mute_Click" ToolTipService.ToolTip="Звук">
+                        <SymbolIcon x:Name="MuteIcon" Symbol="Volume" />
+                    </Button>
+                    <Slider
+                        x:Name="VolumeSlider"
+                        Width="110"
+                        VerticalAlignment="Center"
+                        Maximum="100"
+                        Minimum="0"
+                        ValueChanged="VolumeSlider_ValueChanged" />
+                </StackPanel>
+
+                <Button
+                    Grid.Column="4"
+                    Click="FullScreen_Click"
+                    ToolTipService.ToolTip="Полный экран (F11)">
+                    <SymbolIcon Symbol="FullScreen" />
+                </Button>
+
+                <Button
+                    Grid.Column="5"
+                    Click="Return_Click"
+                    Content="Вернуть в окно"
+                    Style="{StaticResource AccentButtonStyle}" />
+            </Grid>
+        </Border>
+    </Grid>
+</Window>
