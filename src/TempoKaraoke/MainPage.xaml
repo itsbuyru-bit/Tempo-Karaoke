@@ -227,7 +227,7 @@
                         Grid.Row="1"
                         HorizontalContentAlignment="Stretch"
                         IsAddTabButtonVisible="False"
-                        TabWidthMode="Equal"
+                        TabWidthMode="SizeToContent"
                         VerticalContentAlignment="Stretch">
                         <TabView.TabStripHeader>
                             <StackPanel Padding="20,0,0,0" Spacing="2" VerticalAlignment="Center">
@@ -241,7 +241,8 @@
                                     Style="{StaticResource CaptionTextBlockStyle}"
                                     Text="Читаю медиатеку…"
                                     TextTrimming="CharacterEllipsis"
-                                    TextWrapping="NoWrap" />
+                                    TextWrapping="NoWrap"
+                                    Visibility="Collapsed" />
                             </StackPanel>
                         </TabView.TabStripHeader>
                         <TabView.TabStripFooter>
@@ -251,12 +252,6 @@
                                 Orientation="Horizontal"
                                 Spacing="8">
                                 <Button
-                                    x:Name="ScanButton"
-                                    Click="Scan_Click"
-                                    ToolTipService.ToolTip="Обновить список">
-                                    <SymbolIcon Symbol="Refresh" />
-                                </Button>
-                                <Button
                                     Click="AddVideoFolder_Click"
                                     Content="Добавить папку" />
                             </StackPanel>
@@ -265,6 +260,7 @@
                             HorizontalContentAlignment="Stretch"
                             IsClosable="False"
                             VerticalContentAlignment="Stretch"
+                            FontSize="16"
                             Header="Все видео">
                             <Grid>
                                 <Grid.RowDefinitions>
@@ -282,17 +278,29 @@
                                         VerticalAlignment="Center"
                                         Orientation="Horizontal"
                                         Spacing="8">
-                                        <TextBlock
-                                            VerticalAlignment="Center"
-                                            Text="Сортировать по:" />
-                                        <ComboBox
-                                            x:Name="SortComboBox"
-                                            MinWidth="150"
-                                            SelectionChanged="SortComboBox_SelectionChanged">
-                                            <ComboBoxItem Content="А–Я" Tag="az" />
-                                            <ComboBoxItem Content="Исполнитель" Tag="artist" />
-                                            <ComboBoxItem Content="Коллекция" Tag="folder" />
-                                        </ComboBox>
+                                        <Button
+                                            x:Name="SortButton"
+                                            Padding="8,6"
+                                            Style="{StaticResource TextButtonStyle}">
+                                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                                <TextBlock Text="Сортировать по:" />
+                                                <TextBlock
+                                                    x:Name="SortValueText"
+                                                    Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
+                                                    Text="А–Я" />
+                                                <FontIcon FontSize="12" Glyph="&#xE70D;" />
+                                            </StackPanel>
+                                            <Button.Flyout>
+                                                <MenuFlyout>
+                                                    <MenuFlyoutItem
+                                                        Click="SortAz_Click"
+                                                        Text="А–Я" />
+                                                    <MenuFlyoutItem
+                                                        Click="SortDate_Click"
+                                                        Text="Дата изменения" />
+                                                </MenuFlyout>
+                                            </Button.Flyout>
+                                        </Button>
                                         <TextBlock
                                             x:Name="CountText"
                                             VerticalAlignment="Center"
@@ -409,6 +417,7 @@
                             HorizontalContentAlignment="Stretch"
                             IsClosable="False"
                             VerticalContentAlignment="Stretch"
+                            FontSize="16"
                             Header="Папки с видео">
                             <ListView
                                 x:Name="FolderList"

@@ -40,6 +40,7 @@ public sealed partial class MainPage : Page
     private bool _isInitializingSettings;
     private bool _isRestoringQueue;
     private int _queueIndex = -1;
+    private string _sortMode = "az";
     private readonly Stack<string> _navHistory = new();
     private string? _currentTag;
     private bool _isNavigatingBack;
@@ -60,7 +61,6 @@ public sealed partial class MainPage : Page
     {
         InitializeComponent();
 
-        SortComboBox.SelectedIndex = 0;
         _player = new PlayerService(Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread());
         _player.StateChanged += (_, _) => UpdateTransport();
         _player.EndReached += (_, _) => PlayNext();
@@ -389,7 +389,6 @@ public sealed partial class MainPage : Page
     private async Task LoadPreviewAsync()
     {
         var roots = SettingsService.VideoRoots;
-        ScanButton.IsEnabled = false;
         StatusText.Text = "Читаю медиатеку…";
 
         try
@@ -425,10 +424,6 @@ public sealed partial class MainPage : Page
         catch (Exception ex)
         {
             StatusText.Text = $"Не удалось прочитать библиотеку: {ex.Message}";
-        }
-        finally
-        {
-            ScanButton.IsEnabled = true;
         }
     }
 
@@ -488,20 +483,17 @@ public sealed partial class MainPage : Page
                 item.Folder.Contains(term, StringComparison.CurrentCultureIgnoreCase)));
         }
 
-        var sort = (SortComboBox.SelectedItem as ComboBoxItem)?.Tag as string ?? "artist";
+        var sort = _sortMode;
         result = sort switch
         {
-            "az" => result
-                .OrderBy(item => item.DisplayTitle, StringComparer.CurrentCultureIgnoreCase),
-            "title" => result
-                .OrderBy(item => item.Title, StringComparer.CurrentCultureIgnoreCase)
-                .ThenBy(item => item.Artist, StringComparer.CurrentCultureIgnoreCase),
+            "date" => result
+                .OrderByDescending(item => item.ModifiedUtc)
+                .ThenBy(item => item.DisplayTitle, StringComparer.CurrentCultureIgnoreCase),
             "folder" => result
                 .OrderBy(item => item.Folder, StringComparer.CurrentCultureIgnoreCase)
                 .ThenBy(item => item.DisplayTitle, StringComparer.CurrentCultureIgnoreCase),
             _ => result
-                .OrderBy(item => item.Artist, StringComparer.CurrentCultureIgnoreCase)
-                .ThenBy(item => item.Title, StringComparer.CurrentCultureIgnoreCase),
+                .OrderBy(item => item.DisplayTitle, StringComparer.CurrentCultureIgnoreCase),
         };
 
         Filtered.Clear();
@@ -534,8 +526,17 @@ public sealed partial class MainPage : Page
         _ = LoadPreviewAsync();
     }
 
-    private void SortComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    private void SortAz_Click(object sender, RoutedEventArgs e)
     {
+        _sortMode = "az";
+        SortValueText.Text = "А–Я";
+        ApplyFilter();
+    }
+
+    private void SortDate_Click(object sender, RoutedEventArgs e)
+    {
+        _sortMode = "date";
+        SortValueText.Text = "Дата изменения";
         ApplyFilter();
     }
 

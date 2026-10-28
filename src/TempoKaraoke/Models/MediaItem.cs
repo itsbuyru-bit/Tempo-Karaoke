@@ -12,12 +12,13 @@ public sealed class MediaItem : INotifyPropertyChanged
 {
     private long _durationMs;
 
-    public MediaItem(string path, string artist, string title, string folder)
+    public MediaItem(string path, string artist, string title, string folder, DateTime modifiedUtc = default)
     {
         Path = path;
         Artist = artist;
         Title = title;
         Folder = folder;
+        ModifiedUtc = modifiedUtc;
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -29,6 +30,8 @@ public sealed class MediaItem : INotifyPropertyChanged
     public string Title { get; }
 
     public string Folder { get; }
+
+    public DateTime ModifiedUtc { get; }
 
     public long DurationMs => _durationMs;
 
@@ -82,6 +85,16 @@ public sealed class MediaItem : INotifyPropertyChanged
         }
 
         var folder = System.IO.Path.GetFileName(System.IO.Path.GetDirectoryName(path) ?? string.Empty);
-        return new MediaItem(path, artist, title, folder);
+        var modifiedUtc = default(DateTime);
+        try
+        {
+            modifiedUtc = File.GetLastWriteTimeUtc(path);
+        }
+        catch
+        {
+            // A file can disappear between enumeration and metadata lookup.
+        }
+
+        return new MediaItem(path, artist, title, folder, modifiedUtc);
     }
 }
