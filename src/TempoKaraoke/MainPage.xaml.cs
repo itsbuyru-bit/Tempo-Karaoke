@@ -71,8 +71,7 @@ public sealed partial class MainPage : Page
                 ShowLibrary();
                 break;
             case "queue":
-                ShowLibrary();
-                QueueList.Focus(FocusState.Programmatic);
+                ShowQueue();
                 break;
             case "home":
                 ShowPlaceholder("Главная", "Здесь появятся недавние файлы и быстрый доступ к медиатеке.");
@@ -89,8 +88,18 @@ public sealed partial class MainPage : Page
     private void ShowLibrary()
     {
         LibraryPanel.Visibility = Visibility.Visible;
+        QueueView.Visibility = Visibility.Collapsed;
         PlaceholderView.Visibility = Visibility.Collapsed;
         SettingsView.Visibility = Visibility.Collapsed;
+    }
+
+    private void ShowQueue()
+    {
+        LibraryPanel.Visibility = Visibility.Collapsed;
+        QueueView.Visibility = Visibility.Visible;
+        PlaceholderView.Visibility = Visibility.Collapsed;
+        SettingsView.Visibility = Visibility.Collapsed;
+        QueueList.Focus(FocusState.Programmatic);
     }
 
     private void ShowPlaceholder(string title, string text)
@@ -98,6 +107,7 @@ public sealed partial class MainPage : Page
         PlaceholderTitle.Text = title;
         PlaceholderText.Text = text;
         LibraryPanel.Visibility = Visibility.Collapsed;
+        QueueView.Visibility = Visibility.Collapsed;
         PlaceholderView.Visibility = Visibility.Visible;
         SettingsView.Visibility = Visibility.Collapsed;
     }
@@ -105,6 +115,7 @@ public sealed partial class MainPage : Page
     private void ShowSettings()
     {
         LibraryPanel.Visibility = Visibility.Collapsed;
+        QueueView.Visibility = Visibility.Collapsed;
         PlaceholderView.Visibility = Visibility.Collapsed;
         SettingsView.Visibility = Visibility.Visible;
     }
@@ -135,7 +146,7 @@ public sealed partial class MainPage : Page
         };
 
         RootLayout.RequestedTheme = elementTheme;
-        if (App.Window.Content is FrameworkElement root)
+        if (App.Window is not null && App.Window.Content is FrameworkElement root)
         {
             root.RequestedTheme = elementTheme;
         }
@@ -246,6 +257,7 @@ public sealed partial class MainPage : Page
     private void OnPageLoaded(object sender, RoutedEventArgs e)
     {
         _timer.Start();
+        ApplyTheme(SettingsService.Theme);
         VolumeSlider.Value = _player.Volume;
         UpdateTransport();
         _ = LoadPreviewAsync();

@@ -106,8 +106,7 @@
             Padding="20,0,20,12"
             ColumnSpacing="12">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="2*" />
-                <ColumnDefinition Width="1.2*" />
+                <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
             <!--  Библиотека  -->
@@ -198,94 +197,100 @@
             </Border>
 
             <!--  Очередь  -->
-            <Border
-                Grid.Column="1"
-                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                BorderThickness="1"
-                CornerRadius="8">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="*" />
-                    </Grid.RowDefinitions>
+            <Grid
+                x:Name="QueueView"
+                Grid.Column="0"
+                Visibility="Collapsed">
+                <Border
+                    Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                    BorderThickness="1"
+                    CornerRadius="8">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
 
-                    <Grid Padding="16,12" ColumnSpacing="8">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <StackPanel Spacing="2">
-                            <TextBlock Text="Очередь" Style="{StaticResource BodyStrongTextBlockStyle}" />
-                            <TextBlock
-                                x:Name="QueueCountText"
-                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                Style="{StaticResource CaptionTextBlockStyle}"
-                                Text="0 песен" />
-                        </StackPanel>
-                        <Button
-                            Grid.Column="1"
-                            Click="ClearQueue_Click"
-                            ToolTipService.ToolTip="Очистить очередь">
-                            <SymbolIcon Symbol="Delete" />
-                        </Button>
+                        <Grid Padding="20,16" ColumnSpacing="12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Spacing="2">
+                                <TextBlock Text="Очередь воспроизведения" Style="{StaticResource TitleTextBlockStyle}" />
+                                <TextBlock
+                                    x:Name="QueueCountText"
+                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                    Style="{StaticResource CaptionTextBlockStyle}"
+                                    Text="0 песен" />
+                            </StackPanel>
+                            <Button
+                                Grid.Column="1"
+                                Click="ClearQueue_Click"
+                                ToolTipService.ToolTip="Очистить очередь">
+                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                    <SymbolIcon Symbol="Delete" />
+                                    <TextBlock Text="Очистить" />
+                                </StackPanel>
+                            </Button>
+                        </Grid>
+
+                        <ListView
+                            x:Name="QueueList"
+                            Grid.Row="1"
+                            Padding="12,0,12,12"
+                            DoubleTapped="QueueList_DoubleTapped"
+                            IsItemClickEnabled="True"
+                            ItemsSource="{x:Bind Queue, Mode=OneWay}"
+                            KeyDown="QueueList_KeyDown"
+                            ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                            ScrollViewer.HorizontalScrollMode="Disabled"
+                            SelectionMode="Single">
+                            <ListView.ItemContainerStyle>
+                                <Style TargetType="ListViewItem">
+                                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                    <Setter Property="Padding" Value="8,4" />
+                                </Style>
+                            </ListView.ItemContainerStyle>
+                            <ListView.ItemTemplate>
+                                <DataTemplate x:DataType="models:MediaItem">
+                                    <Grid Padding="8,8" ColumnSpacing="12">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Spacing="2">
+                                            <TextBlock
+                                                Text="{x:Bind DisplayTitle, Mode=OneTime}"
+                                                Style="{StaticResource BodyStrongTextBlockStyle}"
+                                                TextTrimming="CharacterEllipsis"
+                                                TextWrapping="NoWrap" />
+                                            <TextBlock
+                                                Text="{x:Bind Subtitle, Mode=OneTime}"
+                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                Style="{StaticResource CaptionTextBlockStyle}"
+                                                TextTrimming="CharacterEllipsis"
+                                                TextWrapping="NoWrap" />
+                                        </StackPanel>
+                                        <Button
+                                            Grid.Column="1"
+                                            Click="RemoveFromQueue_Click"
+                                            Tag="{x:Bind}"
+                                            ToolTipService.ToolTip="Убрать из очереди">
+                                            <SymbolIcon Symbol="Remove" />
+                                        </Button>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
                     </Grid>
-
-                    <ListView
-                        x:Name="QueueList"
-                        Grid.Row="1"
-                        Padding="8,0,8,8"
-                        DoubleTapped="QueueList_DoubleTapped"
-                        IsItemClickEnabled="True"
-                        ItemsSource="{x:Bind Queue, Mode=OneWay}"
-                        KeyDown="QueueList_KeyDown"
-                        ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                        ScrollViewer.HorizontalScrollMode="Disabled"
-                        SelectionMode="Single">
-                        <ListView.ItemContainerStyle>
-                            <Style TargetType="ListViewItem">
-                                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                                <Setter Property="Padding" Value="4" />
-                            </Style>
-                        </ListView.ItemContainerStyle>
-                        <ListView.ItemTemplate>
-                            <DataTemplate x:DataType="models:MediaItem">
-                                <Grid Padding="8,6" ColumnSpacing="8">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <StackPanel Spacing="2">
-                                        <TextBlock
-                                            Text="{x:Bind DisplayTitle, Mode=OneTime}"
-                                            Style="{StaticResource BodyStrongTextBlockStyle}"
-                                            TextTrimming="CharacterEllipsis"
-                                            TextWrapping="NoWrap" />
-                                        <TextBlock
-                                            Text="{x:Bind Subtitle, Mode=OneTime}"
-                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                            Style="{StaticResource CaptionTextBlockStyle}"
-                                            TextTrimming="CharacterEllipsis"
-                                            TextWrapping="NoWrap" />
-                                    </StackPanel>
-                                    <Button
-                                        Grid.Column="1"
-                                        Click="RemoveFromQueue_Click"
-                                        Tag="{x:Bind}"
-                                        ToolTipService.ToolTip="Убрать из очереди">
-                                        <SymbolIcon Symbol="Remove" />
-                                    </Button>
-                                </Grid>
-                            </DataTemplate>
-                        </ListView.ItemTemplate>
-                    </ListView>
-                </Grid>
-            </Border>
+                </Border>
+            </Grid>
 
             <StackPanel
                 x:Name="PlaceholderView"
                 Grid.Column="0"
-                Grid.ColumnSpan="2"
                 Padding="32,24"
                 Spacing="8"
                 Visibility="Collapsed">
