@@ -284,7 +284,14 @@ public sealed partial class MainPage : Page
     {
         _timer.Start();
         ApplyTheme(SettingsService.Theme);
-        VolumeSlider.Value = _player.Volume;
+        if (VolumeSlider is not null)
+        {
+            VolumeSlider.Value = _player.Volume;
+        }
+        if (VolumeValueText is not null)
+        {
+            VolumeValueText.Text = _player.Volume.ToString();
+        }
         UpdateTransport();
         _ = LoadPreviewAsync();
     }
@@ -1018,20 +1025,33 @@ public sealed partial class MainPage : Page
 
     private void VolumeSlider_ValueChanged(object sender, RangeBaseValueChangedEventArgs e)
     {
+        var volume = (int)e.NewValue;
+        if (VolumeValueText is not null)
+        {
+            VolumeValueText.Text = volume.ToString();
+        }
+
         if (_suppressVolume)
         {
             return;
         }
 
-        _player.SetVolume((int)e.NewValue);
+        _player.SetVolume(volume);
     }
 
     private void Mute_Click(object sender, RoutedEventArgs e)
     {
         _player.ToggleMute();
         _suppressVolume = true;
-        VolumeSlider.Value = _player.Volume;
+        if (VolumeSlider is not null)
+        {
+            VolumeSlider.Value = _player.Volume;
+        }
         _suppressVolume = false;
+        if (VolumeValueText is not null)
+        {
+            VolumeValueText.Text = _player.Volume.ToString();
+        }
         UpdateTransport();
     }
 
@@ -1203,9 +1223,20 @@ public sealed partial class MainPage : Page
         CurrentTimeText.Text = FormatTime(_player.PositionMs);
         TotalTimeText.Text = FormatTime(_player.LengthMs);
         PlayPauseIcon.Symbol = _player.IsPlaying ? Symbol.Pause : Symbol.Play;
-        MuteIcon.Symbol = _player.Volume == 0 ? Symbol.Mute : Symbol.Volume;
+        var muted = _player.Volume == 0;
+        MuteIcon.Symbol = muted ? Symbol.Mute : Symbol.Volume;
+        if (PopupMuteIcon is not null)
+        {
+            PopupMuteIcon.Symbol = muted ? Symbol.Mute : Symbol.Volume;
+        }
+        if (VolumeValueText is not null)
+        {
+            VolumeValueText.Text = _player.Volume.ToString();
+        }
 
-        if (!_suppressVolume && Math.Abs(VolumeSlider.Value - _player.Volume) > 0.5)
+        if (!_suppressVolume &&
+            VolumeSlider is not null &&
+            Math.Abs(VolumeSlider.Value - _player.Volume) > 0.5)
         {
             _suppressVolume = true;
             VolumeSlider.Value = _player.Volume;

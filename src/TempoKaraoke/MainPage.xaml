@@ -858,19 +858,32 @@
                             <SymbolIcon x:Name="MuteIcon" Symbol="Volume" />
                             <Button.Flyout>
                                 <Flyout Placement="Top">
-                                    <StackPanel Width="220" Spacing="8">
-                                        <TextBlock
-                                            Style="{StaticResource CaptionTextBlockStyle}"
-                                            Text="Громкость" />
+                                    <StackPanel
+                                        Width="360"
+                                        VerticalAlignment="Center"
+                                        Orientation="Horizontal"
+                                        Spacing="12">
+                                        <Button
+                                            AutomationProperties.AutomationId="PopupMuteButton"
+                                            Click="Mute_Click"
+                                            ToolTipService.ToolTip="Выключить звук">
+                                            <SymbolIcon x:Name="PopupMuteIcon" Symbol="Volume" />
+                                        </Button>
                                         <Slider
                                             x:Name="VolumeSlider"
+                                            Width="220"
+                                            VerticalAlignment="Center"
                                             Maximum="100"
                                             Minimum="0"
                                             ValueChanged="VolumeSlider_ValueChanged" />
-                                        <Button
-                                            HorizontalAlignment="Stretch"
-                                            Click="Mute_Click"
-                                            Content="Без звука" />
+                                        <TextBlock
+                                            x:Name="VolumeValueText"
+                                            Width="40"
+                                            VerticalAlignment="Center"
+                                            AutomationProperties.AutomationId="VolumeValueText"
+                                            FontFamily="Consolas"
+                                            Text="100"
+                                            TextAlignment="Right" />
                                     </StackPanel>
                                 </Flyout>
                             </Button.Flyout>
