@@ -54,6 +54,47 @@ public sealed partial class MainPage : Page
         VideoView.Initialized += OnVideoViewInitialized;
         Loaded += OnPageLoaded;
         Unloaded += OnPageUnloaded;
+        ShowLibrary();
+    }
+
+    private void NavView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
+    {
+        var tag = args.SelectedItemContainer?.Tag as string ?? "library";
+        switch (tag)
+        {
+            case "library":
+                ShowLibrary();
+                break;
+            case "queue":
+                ShowLibrary();
+                QueueList.Focus(FocusState.Programmatic);
+                break;
+            case "home":
+                ShowPlaceholder("Главная", "Здесь появятся недавние файлы и быстрый доступ к медиатеке.");
+                break;
+            case "playlists":
+                ShowPlaceholder("Плейлисты", "Именованные плейлисты и экспорт M3U — следующий этап.");
+                break;
+            case "settings":
+                ShowPlaceholder("Параметры", "Пути к библиотеке, тема и обновление индекса — следующий этап.");
+                break;
+        }
+    }
+
+    private void ShowLibrary()
+    {
+        LibraryPanel.Visibility = Visibility.Visible;
+        PlayerPanel.Visibility = Visibility.Visible;
+        PlaceholderView.Visibility = Visibility.Collapsed;
+    }
+
+    private void ShowPlaceholder(string title, string text)
+    {
+        PlaceholderTitle.Text = title;
+        PlaceholderText.Text = text;
+        LibraryPanel.Visibility = Visibility.Collapsed;
+        PlayerPanel.Visibility = Visibility.Collapsed;
+        PlaceholderView.Visibility = Visibility.Visible;
     }
 
     private void OnPageLoaded(object sender, RoutedEventArgs e)
@@ -398,6 +439,16 @@ public sealed partial class MainPage : Page
         PlayNext();
     }
 
+    private void SkipBack_Click(object sender, RoutedEventArgs e)
+    {
+        _player.Seek(_player.PositionMs - 10000);
+    }
+
+    private void SkipForward_Click(object sender, RoutedEventArgs e)
+    {
+        _player.Seek(_player.PositionMs + 30000);
+    }
+
     private void SeekSlider_PointerPressed(object sender, PointerRoutedEventArgs e)
     {
         _isSeeking = true;
@@ -589,12 +640,16 @@ public sealed partial class MainPage : Page
         {
             NowPlayingTitle.Text = "Ничего не играет";
             NowPlayingSubtitle.Text = "Выберите песню двойным кликом";
+            BarTitle.Text = "Ничего не играет";
+            BarSubtitle.Text = "Выберите песню двойным кликом";
             DetachButton.IsEnabled = false;
             return;
         }
 
         NowPlayingTitle.Text = _current.DisplayTitle;
         NowPlayingSubtitle.Text = _current.Subtitle;
+        BarTitle.Text = _current.DisplayTitle;
+        BarSubtitle.Text = _current.Subtitle;
         DetachButton.IsEnabled = true;
     }
 

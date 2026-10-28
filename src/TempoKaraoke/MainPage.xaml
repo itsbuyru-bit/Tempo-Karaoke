@@ -17,42 +17,89 @@
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <!--  Верхняя строка: поиск и фильтр  -->
-        <Grid Padding="20,14" ColumnSpacing="12">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
+        <NavigationView
+            x:Name="NavView"
+            Grid.Row="0"
+            IsBackButtonVisible="Collapsed"
+            IsSettingsVisible="False"
+            PaneDisplayMode="LeftCompact"
+            SelectionChanged="NavView_SelectionChanged">
+            <NavigationView.MenuItems>
+                <NavigationViewItem Content="Главная" Tag="home">
+                    <NavigationViewItem.Icon>
+                        <SymbolIcon Symbol="Home" />
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem
+                    x:Name="LibraryNavItem"
+                    Content="Библиотека видео"
+                    IsSelected="True"
+                    Tag="library">
+                    <NavigationViewItem.Icon>
+                        <SymbolIcon Symbol="Video" />
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem Content="Очередь" Tag="queue">
+                    <NavigationViewItem.Icon>
+                        <SymbolIcon Symbol="List" />
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem Content="Плейлисты" Tag="playlists">
+                    <NavigationViewItem.Icon>
+                        <SymbolIcon Symbol="Audio" />
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+            </NavigationView.MenuItems>
+            <NavigationView.FooterMenuItems>
+                <NavigationViewItem Content="Параметры" Tag="settings">
+                    <NavigationViewItem.Icon>
+                        <SymbolIcon Symbol="Setting" />
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+            </NavigationView.FooterMenuItems>
 
-            <AutoSuggestBox
-                x:Name="SearchBox"
-                PlaceholderText="Поиск: исполнитель, название или папка"
-                QueryIcon="Find"
-                TextChanged="SearchBox_TextChanged" />
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
 
-            <ComboBox
-                x:Name="FolderFilter"
-                Grid.Column="1"
-                MinWidth="200"
-                PlaceholderText="Все папки"
-                SelectionChanged="FolderFilter_SelectionChanged" />
+                <!--  Верхняя строка: поиск и фильтр  -->
+                <Grid Grid.Row="0" Padding="20,14" ColumnSpacing="12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
 
-            <TextBlock
-                x:Name="CountText"
-                Grid.Column="2"
-                VerticalAlignment="Center"
-                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                Text="0 песен" />
-        </Grid>
+                    <AutoSuggestBox
+                        x:Name="SearchBox"
+                        PlaceholderText="Поиск: исполнитель, название или папка"
+                        QueryIcon="Find"
+                        TextChanged="SearchBox_TextChanged" />
+
+                    <ComboBox
+                        x:Name="FolderFilter"
+                        Grid.Column="1"
+                        MinWidth="200"
+                        PlaceholderText="Все папки"
+                        SelectionChanged="FolderFilter_SelectionChanged" />
+
+                    <TextBlock
+                        x:Name="CountText"
+                        Grid.Column="2"
+                        VerticalAlignment="Center"
+                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                        Text="0 песен" />
+                </Grid>
 
         <!--  Три зоны: библиотека, плеер, очередь  -->
         <Grid
+            x:Name="LibraryView"
             Grid.Row="1"
             Padding="20,0,20,12"
             ColumnSpacing="12">
@@ -64,6 +111,7 @@
 
             <!--  Библиотека  -->
             <Border
+                x:Name="LibraryPanel"
                 Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                 BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
                 BorderThickness="1"
@@ -172,20 +220,24 @@
                                 x:Name="NowPlayingTitle"
                                 Style="{StaticResource SubtitleTextBlockStyle}"
                                 Text="Ничего не играет"
-                                TextTrimming="CharacterEllipsis" />
+                                TextTrimming="CharacterEllipsis"
+                                TextWrapping="NoWrap" />
                             <TextBlock
                                 x:Name="NowPlayingSubtitle"
                                 Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                 Style="{StaticResource CaptionTextBlockStyle}"
                                 Text="Выберите песню двойным кликом"
-                                TextTrimming="CharacterEllipsis" />
+                                TextTrimming="CharacterEllipsis"
+                                TextWrapping="NoWrap" />
                         </StackPanel>
                         <Button
                             x:Name="DetachButton"
                             Grid.Column="1"
                             Click="Detach_Click"
-                            Content="Открепить видео"
-                            IsEnabled="False" />
+                            IsEnabled="False"
+                            ToolTipService.ToolTip="Открепить видео">
+                            <FontIcon Glyph="&#xE8A7;" />
+                        </Button>
                     </Grid>
 
                     <vlc:VideoView
@@ -279,12 +331,29 @@
                     </ListView>
                 </Grid>
             </Border>
+
+            <StackPanel
+                x:Name="PlaceholderView"
+                Grid.Column="0"
+                Grid.ColumnSpan="2"
+                Padding="32,24"
+                Spacing="8"
+                Visibility="Collapsed">
+                <TextBlock x:Name="PlaceholderTitle" Style="{StaticResource TitleTextBlockStyle}" />
+                <TextBlock
+                    x:Name="PlaceholderText"
+                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                    Style="{StaticResource BodyTextBlockStyle}"
+                    TextWrapping="Wrap" />
+            </StackPanel>
         </Grid>
+            </Grid>
+        </NavigationView>
 
         <!--  Транспорт  -->
         <Border
             x:Name="TransportBar"
-            Grid.Row="2"
+            Grid.Row="1"
             Padding="20,10"
             Background="{ThemeResource LayerFillColorDefaultBrush}"
             BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
@@ -292,19 +361,50 @@
             <Grid ColumnSpacing="12">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
 
-                <StackPanel Orientation="Horizontal" Spacing="4">
+                <StackPanel
+                    Grid.Column="0"
+                    Width="190"
+                    VerticalAlignment="Center"
+                    Spacing="2">
+                    <TextBlock
+                        x:Name="BarTitle"
+                        Style="{StaticResource BodyStrongTextBlockStyle}"
+                        Text="Ничего не играет"
+                        TextTrimming="CharacterEllipsis"
+                        TextWrapping="NoWrap" />
+                    <TextBlock
+                        x:Name="BarSubtitle"
+                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                        Style="{StaticResource CaptionTextBlockStyle}"
+                        Text="Выберите песню двойным кликом"
+                        TextTrimming="CharacterEllipsis"
+                        TextWrapping="NoWrap" />
+                </StackPanel>
+
+                <StackPanel
+                    Grid.Column="1"
+                    Orientation="Horizontal"
+                    Spacing="4">
                     <Button
                         x:Name="PreviousButton"
                         Click="Previous_Click"
                         ToolTipService.ToolTip="Предыдущая (Ctrl+←)">
                         <SymbolIcon Symbol="Previous" />
                     </Button>
+                    <Button
+                        Click="SkipBack_Click"
+                        Content="−10"
+                        ToolTipService.ToolTip="Назад на 10 секунд" />
                     <Button
                         x:Name="PlayPauseButton"
                         Click="PlayPause_Click"
@@ -319,25 +419,16 @@
                         <SymbolIcon Symbol="Stop" />
                     </Button>
                     <Button
+                        Click="SkipForward_Click"
+                        Content="+30"
+                        ToolTipService.ToolTip="Вперёд на 30 секунд" />
+                    <Button
                         x:Name="NextButton"
                         Click="Next_Click"
                         ToolTipService.ToolTip="Следующая (Ctrl+→)">
                         <SymbolIcon Symbol="Next" />
                     </Button>
                 </StackPanel>
-
-                <Slider
-                    x:Name="SeekSlider"
-                    Grid.Column="1"
-                    VerticalAlignment="Center"
-                    IsThumbToolTipEnabled="False"
-                    Maximum="1"
-                    Minimum="0"
-                    PointerCaptureLost="SeekSlider_PointerCaptureLost"
-                    PointerPressed="SeekSlider_PointerPressed"
-                    PointerReleased="SeekSlider_PointerReleased"
-                    StepFrequency="1000"
-                    ValueChanged="SeekSlider_ValueChanged" />
 
                 <TextBlock
                     x:Name="TimeText"
@@ -358,7 +449,7 @@
                     </Button>
                     <Slider
                         x:Name="VolumeSlider"
-                        Width="110"
+                        Width="80"
                         VerticalAlignment="Center"
                         Maximum="100"
                         Minimum="0"
@@ -372,13 +463,29 @@
                     ToolTipService.ToolTip="Полный экран (F11)">
                     <SymbolIcon Symbol="FullScreen" />
                 </Button>
+
+                <Slider
+                    x:Name="SeekSlider"
+                    Grid.Row="1"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="5"
+                    Margin="0,6,0,0"
+                    VerticalAlignment="Center"
+                    IsThumbToolTipEnabled="False"
+                    Maximum="1"
+                    Minimum="0"
+                    PointerCaptureLost="SeekSlider_PointerCaptureLost"
+                    PointerPressed="SeekSlider_PointerPressed"
+                    PointerReleased="SeekSlider_PointerReleased"
+                    StepFrequency="1000"
+                    ValueChanged="SeekSlider_ValueChanged" />
             </Grid>
         </Border>
 
         <!--  Строка, когда видео откреплено  -->
         <Border
             x:Name="DetachedBar"
-            Grid.Row="2"
+            Grid.Row="1"
             Padding="20,10"
             Background="{ThemeResource LayerFillColorDefaultBrush}"
             BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
