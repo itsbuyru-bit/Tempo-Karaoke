@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "TempoKaraoke (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "TempoKaraoke (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}

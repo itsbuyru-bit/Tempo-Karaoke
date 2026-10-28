@@ -1,0 +1,32 @@
+# Build output
+**/bin/
+**/obj/
+**/AppPackages/
+**/BundleArtifacts/
+*.msix
+*.msixupload
+*.appx
+*.appxbundle
+*.appxupload
+
+# Reasonix runtime state (skills in .reasonix/skills are tracked)
+.reasonix/tasks/
+
+# IDE / user
+.vs/
+.idea/
+*.user
+*.suo
+*.userosscache
+
+# Logs and crash dumps
+*.log
+*.binlog
+crash/
+
+# Publish output
+publish/
+
+# OS
+.DS_Store
+Thumbs.db
