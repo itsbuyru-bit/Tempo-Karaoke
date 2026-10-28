@@ -15,7 +15,9 @@
         <KeyboardAccelerator Key="Escape" Invoked="EscapeAccelerator_Invoked" />
     </Page.KeyboardAccelerators>
 
-    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    <Grid
+        x:Name="RootLayout"
+        Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
@@ -294,6 +296,140 @@
                     Style="{StaticResource BodyTextBlockStyle}"
                     TextWrapping="Wrap" />
             </StackPanel>
+
+            <ScrollViewer
+                x:Name="SettingsView"
+                Grid.Column="0"
+                Visibility="Collapsed">
+                <StackPanel
+                    Padding="16,8,16,16"
+                    Spacing="16">
+                    <TextBlock Text="Параметры" Style="{StaticResource TitleTextBlockStyle}" />
+
+                    <TextBlock Text="Библиотеки" Style="{StaticResource BodyStrongTextBlockStyle}" />
+                    <Border
+                        Padding="16"
+                        Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                        BorderThickness="1"
+                        CornerRadius="8">
+                        <StackPanel Spacing="10">
+                            <Grid ColumnSpacing="12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Spacing="2">
+                                    <TextBlock Text="Пути к библиотеке видео" Style="{StaticResource BodyStrongTextBlockStyle}" />
+                                    <TextBlock
+                                        Text="Индексируются только видеофайлы."
+                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                        Style="{StaticResource CaptionTextBlockStyle}" />
+                                </StackPanel>
+                                <Button
+                                    x:Name="AddVideoFolderButton"
+                                    Grid.Column="1"
+                                    Click="AddVideoFolder_Click"
+                                    Content="Добавить папку" />
+                            </Grid>
+
+                            <ListView
+                                x:Name="VideoRootsList"
+                                MaxHeight="160"
+                                ItemsSource="{x:Bind VideoRoots, Mode=OneWay}"
+                                SelectionMode="None">
+                                <ListView.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid ColumnSpacing="8">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock
+                                                Text="{Binding}"
+                                                TextTrimming="CharacterEllipsis"
+                                                TextWrapping="NoWrap" />
+                                            <Button
+                                                Grid.Column="1"
+                                                Click="RemoveVideoFolder_Click"
+                                                Tag="{Binding}"
+                                                ToolTipService.ToolTip="Убрать папку">
+                                                <SymbolIcon Symbol="Remove" />
+                                            </Button>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
+
+                            <TextBlock
+                                Text="Музыка не индексируется: проект работает только с видео."
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                Style="{StaticResource CaptionTextBlockStyle}" />
+                        </StackPanel>
+                    </Border>
+
+                    <Border
+                        Padding="16"
+                        Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                        BorderThickness="1"
+                        CornerRadius="8">
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="Обновить библиотеки" Style="{StaticResource BodyStrongTextBlockStyle}" />
+                            <Button
+                                x:Name="RefreshLibrariesButton"
+                                Click="RefreshLibraries_Click"
+                                Content="Обновить" />
+                            <TextBlock
+                                Text="Если вы видите не все файлы, повторите индексацию."
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                Style="{StaticResource CaptionTextBlockStyle}" />
+                            <HyperlinkButton
+                                Click="OpenIndexingSettings_Click"
+                                Content="Управление параметрами индексирования системы" />
+                        </StackPanel>
+                    </Border>
+
+                    <TextBlock Text="Персонализация" Style="{StaticResource BodyStrongTextBlockStyle}" />
+                    <Border
+                        Padding="16"
+                        Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                        BorderThickness="1"
+                        CornerRadius="8">
+                        <StackPanel Spacing="12">
+                            <TextBlock Text="Тема приложения" Style="{StaticResource BodyStrongTextBlockStyle}" />
+                            <ComboBox
+                                x:Name="ThemeComboBox"
+                                SelectionChanged="ThemeComboBox_SelectionChanged">
+                                <ComboBoxItem Content="Использовать параметры системы" Tag="system" />
+                                <ComboBoxItem Content="Светлая" Tag="light" />
+                                <ComboBoxItem Content="Тёмная" Tag="dark" />
+                            </ComboBox>
+
+                            <TextBlock Text="Контрастный цвет" Style="{StaticResource BodyStrongTextBlockStyle}" />
+                            <ComboBox
+                                x:Name="AccentComboBox"
+                                SelectionChanged="AccentComboBox_SelectionChanged">
+                                <ComboBoxItem Content="Использовать системный акцент" Tag="system" />
+                            </ComboBox>
+                            <TextBlock
+                                Text="Пользовательские акценты — следующий этап."
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                Style="{StaticResource CaptionTextBlockStyle}" />
+
+                            <ToggleSwitch
+                                x:Name="ArtworkToggle"
+                                Header="Искать обложки в Интернете"
+                                Toggled="ArtworkToggle_Toggled" />
+                            <TextBlock
+                                Text="Обложки появятся вместе с метаданными в следующем этапе."
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                Style="{StaticResource CaptionTextBlockStyle}" />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
         </Grid>
             </Grid>
         </NavigationView>

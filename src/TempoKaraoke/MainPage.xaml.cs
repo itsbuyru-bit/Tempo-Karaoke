@@ -12,6 +12,7 @@ using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Input;
 using TempoKaraoke.Models;
 using TempoKaraoke.Services;
+using Windows.Storage.Pickers;
 using Windows.System;
 
 namespace TempoKaraoke;
@@ -33,11 +34,14 @@ public sealed partial class MainPage : Page
     private bool _isSeeking;
     private bool _suppressVolume;
     private bool _isPopulatingFolders;
+    private bool _isInitializingSettings;
     private int _queueIndex = -1;
 
     public ObservableCollection<MediaItem> Filtered { get; } = new();
 
     public ObservableCollection<MediaItem> Queue { get; } = new();
+
+    public ObservableCollection<string> VideoRoots { get; } = new();
 
     public MainPage()
     {
@@ -54,6 +58,7 @@ public sealed partial class MainPage : Page
         VideoView.Initialized += OnVideoViewInitialized;
         Loaded += OnPageLoaded;
         Unloaded += OnPageUnloaded;
+        InitializeSettings();
         ShowLibrary();
     }
 
@@ -76,7 +81,7 @@ public sealed partial class MainPage : Page
                 ShowPlaceholder("Плейлисты", "Именованные плейлисты и экспорт M3U — следующий этап.");
                 break;
             case "settings":
-                ShowPlaceholder("Параметры", "Пути к библиотеке, тема и обновление индекса — следующий этап.");
+                ShowSettings();
                 break;
         }
     }
@@ -85,6 +90,7 @@ public sealed partial class MainPage : Page
     {
         LibraryPanel.Visibility = Visibility.Visible;
         PlaceholderView.Visibility = Visibility.Collapsed;
+        SettingsView.Visibility = Visibility.Collapsed;
     }
 
     private void ShowPlaceholder(string title, string text)
@@ -93,6 +99,148 @@ public sealed partial class MainPage : Page
         PlaceholderText.Text = text;
         LibraryPanel.Visibility = Visibility.Collapsed;
         PlaceholderView.Visibility = Visibility.Visible;
+        SettingsView.Visibility = Visibility.Collapsed;
+    }
+
+    private void ShowSettings()
+    {
+        LibraryPanel.Visibility = Visibility.Collapsed;
+        PlaceholderView.Visibility = Visibility.Collapsed;
+        SettingsView.Visibility = Visibility.Visible;
+    }
+
+    private void InitializeSettings()
+    {
+        _isInitializingSettings = true;
+        RefreshVideoRoots();
+        ThemeComboBox.SelectedIndex = SettingsService.Theme switch
+        {
+            "light" => 1,
+            "dark" => 2,
+            _ => 0,
+        };
+        AccentComboBox.SelectedIndex = 0;
+        ArtworkToggle.IsOn = SettingsService.FetchArtwork;
+        _isInitializingSettings = false;
+        ApplyTheme(SettingsService.Theme);
+    }
+
+    private void ApplyTheme(string theme)
+    {
+        var elementTheme = theme switch
+        {
+            "light" => ElementTheme.Light,
+            "dark" => ElementTheme.Dark,
+            _ => ElementTheme.Default,
+        };
+
+        RootLayout.RequestedTheme = elementTheme;
+        if (App.Window.Content is FrameworkElement root)
+        {
+            root.RequestedTheme = elementTheme;
+        }
+    }
+
+    private void RefreshVideoRoots()
+    {
+        VideoRoots.Clear();
+        foreach (var root in SettingsService.VideoRoots)
+        {
+            VideoRoots.Add(root);
+        }
+    }
+
+    private async void AddVideoFolder_Click(object sender, RoutedEventArgs e)
+    {
+        var picker = new FolderPicker();
+        picker.FileTypeFilter.Add("*");
+        WinRT.Interop.InitializeWithWindow.Initialize(picker, App.WindowHandle);
+
+        var folder = await picker.PickSingleFolderAsync();
+        if (folder is null)
+        {
+            return;
+        }
+
+        var roots = SettingsService.VideoRoots;
+        if (roots.Any(root => string.Equals(root, folder.Path, StringComparison.OrdinalIgnoreCase)))
+        {
+            return;
+        }
+
+        roots.Add(folder.Path);
+        SettingsService.SetVideoRoots(roots);
+        RefreshVideoRoots();
+        await LoadPreviewAsync();
+    }
+
+    private async void RemoveVideoFolder_Click(object sender, RoutedEventArgs e)
+    {
+        if ((sender as FrameworkElement)?.Tag is not string root)
+        {
+            return;
+        }
+
+        var roots = SettingsService.VideoRoots;
+        roots.RemoveAll(path => string.Equals(path, root, StringComparison.OrdinalIgnoreCase));
+        if (roots.Count == 0)
+        {
+            roots.Add(SettingsService.DefaultVideoRoot);
+        }
+
+        SettingsService.SetVideoRoots(roots);
+        RefreshVideoRoots();
+        await LoadPreviewAsync();
+    }
+
+    private async void RefreshLibraries_Click(object sender, RoutedEventArgs e)
+    {
+        await LoadPreviewAsync();
+    }
+
+    private async void OpenIndexingSettings_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            await Launcher.LaunchUriAsync(new Uri("ms-settings:search-indexing"));
+        }
+        catch
+        {
+            // The Settings app may be unavailable in a restricted environment.
+        }
+    }
+
+    private void ThemeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (_isInitializingSettings)
+        {
+            return;
+        }
+
+        var theme = (ThemeComboBox.SelectedItem as ComboBoxItem)?.Tag as string ?? "system";
+        SettingsService.Theme = theme;
+        ApplyTheme(theme);
+    }
+
+    private void AccentComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (_isInitializingSettings)
+        {
+            return;
+        }
+
+        var accent = (AccentComboBox.SelectedItem as ComboBoxItem)?.Tag as string ?? "system";
+        SettingsService.Accent = accent;
+    }
+
+    private void ArtworkToggle_Toggled(object sender, RoutedEventArgs e)
+    {
+        if (_isInitializingSettings)
+        {
+            return;
+        }
+
+        SettingsService.FetchArtwork = ArtworkToggle.IsOn;
     }
 
     private void OnPageLoaded(object sender, RoutedEventArgs e)
@@ -120,13 +268,36 @@ public sealed partial class MainPage : Page
 
     private async Task LoadPreviewAsync()
     {
-        var root = Environment.GetEnvironmentVariable("TEMPO_LIBRARY") ?? @"G:\Karaoke";
+        var roots = SettingsService.VideoRoots;
         ScanButton.IsEnabled = false;
         StatusText.Text = "Читаю медиатеку…";
 
         try
         {
-            var items = await Task.Run(() => EnumerateVideos(root));
+            var items = await Task.Run(() =>
+            {
+                var all = new List<MediaItem>();
+                foreach (var root in roots)
+                {
+                    try
+                    {
+                        all.AddRange(EnumerateVideos(root));
+                    }
+                    catch
+                    {
+                        // A disconnected drive must not abort the whole scan.
+                    }
+                }
+
+                return all
+                    .GroupBy(item => item.Path, StringComparer.OrdinalIgnoreCase)
+                    .Select(group => group.First())
+                    .OrderBy(item => item.Artist, StringComparer.CurrentCultureIgnoreCase)
+                    .ThenBy(item => item.Title, StringComparer.CurrentCultureIgnoreCase)
+                    .Take(500)
+                    .ToList();
+            });
+
             _all.Clear();
             _all.AddRange(items);
             PopulateFolders();
@@ -134,7 +305,7 @@ public sealed partial class MainPage : Page
         }
         catch (Exception ex)
         {
-            StatusText.Text = $"Не удалось прочитать {root}: {ex.Message}";
+            StatusText.Text = $"Не удалось прочитать библиотеку: {ex.Message}";
         }
         finally
         {
@@ -142,16 +313,17 @@ public sealed partial class MainPage : Page
         }
     }
 
-    private static List<MediaItem> EnumerateVideos(string root)
+    private static IEnumerable<MediaItem> EnumerateVideos(string root)
     {
+        if (!Directory.Exists(root))
+        {
+            return Enumerable.Empty<MediaItem>();
+        }
+
         return Directory
             .EnumerateFiles(root, "*.*", SearchOption.AllDirectories)
             .Where(path => VideoExtensions.Contains(Path.GetExtension(path)))
-            .Take(500)
-            .Select(MediaItem.FromPath)
-            .OrderBy(item => item.Artist, StringComparer.CurrentCultureIgnoreCase)
-            .ThenBy(item => item.Title, StringComparer.CurrentCultureIgnoreCase)
-            .ToList();
+            .Select(MediaItem.FromPath);
     }
 
     private void PopulateFolders()
