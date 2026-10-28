@@ -10,6 +10,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Xaml.Media;
 using TempoKaraoke.Models;
 using TempoKaraoke.Services;
 using Windows.Storage.Pickers;
@@ -738,27 +739,109 @@ public sealed partial class MainPage : Page
             return;
         }
 
-        var content = new TextBlock
+        await ShowPropertiesAsync(item);
+    }
+
+    private async Task ShowPropertiesAsync(MediaItem item)
+    {
+        var panel = new StackPanel
         {
-            Text = $"Название: {item.DisplayTitle}\n" +
-                   $"Папка: {item.Folder}\n" +
-                   $"Формат: {item.Format}\n" +
-                   $"Длительность: {item.DurationText}\n\n" +
-                   item.Path,
-            TextWrapping = TextWrapping.Wrap,
-            IsTextSelectionEnabled = true,
-            MaxWidth = 560,
+            MinWidth = 760,
+            Spacing = 16,
         };
+
+        var grid = new Grid
+        {
+            ColumnSpacing = 32,
+            RowSpacing = 12,
+        };
+        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+
+        var row = 0;
+        void AddCell(string label, string value, int column)
+        {
+            var cell = new StackPanel { Spacing = 2 };
+            cell.Children.Add(new TextBlock
+            {
+                Text = label,
+                FontSize = 12,
+                Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 160, 160, 160)),
+            });
+            cell.Children.Add(new TextBlock
+            {
+                Text = string.IsNullOrWhiteSpace(value) ? "—" : value,
+                FontSize = 14,
+                TextWrapping = TextWrapping.Wrap,
+            });
+            Grid.SetRow(cell, row);
+            Grid.SetColumn(cell, column);
+            grid.Children.Add(cell);
+        }
+
+        void AddPair(string leftLabel, string leftValue, string rightLabel, string rightValue)
+        {
+            grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+            AddCell(leftLabel, leftValue, 0);
+            AddCell(rightLabel, rightValue, 1);
+            row++;
+        }
+
+        AddPair("Название", item.DisplayTitle, "Подзаголовок", string.Empty);
+        AddPair("Дополнительные исполнители", item.Artist, "Длительность", item.DurationText);
+        AddPair("Жанр", string.Empty, "Год", string.Empty);
+        AddPair("Разрешение", string.Empty, "Частота кадров", string.Empty);
+        AddPair("Звуковые каналы", string.Empty, "Тип элемента", "." + item.Format.ToLowerInvariant());
+        panel.Children.Add(grid);
+
+        var pathPanel = new StackPanel { Spacing = 4 };
+        pathPanel.Children.Add(new TextBlock
+        {
+            Text = "Расположение файла",
+            FontSize = 12,
+            Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 160, 160, 160)),
+        });
+        pathPanel.Children.Add(new TextBlock
+        {
+            Text = item.Path,
+            FontSize = 14,
+            IsTextSelectionEnabled = true,
+            TextWrapping = TextWrapping.Wrap,
+        });
+        panel.Children.Add(pathPanel);
+
+        var openFolder = new HyperlinkButton { Content = "Открыть папку с файлом" };
+        openFolder.Click += (_, _) => OpenContainingFolder(item.Path);
+        panel.Children.Add(openFolder);
 
         var dialog = new ContentDialog
         {
             Title = "Свойства",
-            Content = content,
+            Content = panel,
             CloseButtonText = "Закрыть",
+            MinWidth = 820,
+            MaxWidth = 900,
             XamlRoot = XamlRoot,
         };
 
         await dialog.ShowAsync();
+    }
+
+    private static void OpenContainingFolder(string path)
+    {
+        try
+        {
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(
+                "explorer.exe",
+                $"/select,\"{path}\"")
+            {
+                UseShellExecute = true,
+            });
+        }
+        catch
+        {
+            // Explorer may be unavailable in a restricted environment.
+        }
     }
 
     private void AddToQueue_Click(object sender, RoutedEventArgs e)

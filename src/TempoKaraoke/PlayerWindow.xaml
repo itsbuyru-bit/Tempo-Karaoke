@@ -83,6 +83,7 @@
                     Grid.Column="2"
                     VerticalAlignment="Center"
                     FontFamily="Segoe UI"
+                    FontSize="12"
                     FontWeight="Normal"
                     Foreground="White"
                     Text="0:00:00 / 0:00:00" />

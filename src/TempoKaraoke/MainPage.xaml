@@ -36,6 +36,15 @@
         <Style x:Key="CompactButtonStyle" TargetType="Button">
             <Setter Property="Padding" Value="10,6" />
             <Setter Property="MinHeight" Value="32" />
+            <Setter Property="CornerRadius" Value="4" />
+            <Setter Property="FontSize" Value="13" />
+        </Style>
+        <Style x:Key="TextButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="6,4" />
+            <Setter Property="MinHeight" Value="28" />
+            <Setter Property="CornerRadius" Value="4" />
             <Setter Property="FontSize" Value="13" />
         </Style>
     </Page.Resources>
@@ -73,7 +82,7 @@
                         <SymbolIcon Symbol="Video" />
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
-                <NavigationViewItem x:Name="QueueNavItem" Content="Очередь" Tag="queue">
+                <NavigationViewItem x:Name="QueueNavItem" Content="Очередь воспроизведения" Tag="queue">
                     <NavigationViewItem.Icon>
                         <SymbolIcon Symbol="List" />
                     </NavigationViewItem.Icon>
@@ -534,7 +543,7 @@
                                 Spacing="8">
                                 <Button
                                     Click="ClearQueue_Click"
-                                    Style="{StaticResource CompactButtonStyle}"
+                                    Style="{StaticResource TextButtonStyle}"
                                     ToolTipService.ToolTip="Очистить очередь">
                                     <StackPanel Orientation="Horizontal" Spacing="6">
                                         <SymbolIcon Symbol="Delete" />
@@ -566,18 +575,14 @@
                                     <Button
                                         Click="ClearSelection_Click"
                                         Content="Очистить"
-                                        Style="{StaticResource CompactButtonStyle}" />
+                                        Style="{StaticResource TextButtonStyle}" />
                                     <Button
                                         Click="PlaySelected_Click"
                                         Content="▶ Воспроизвести"
-                                        Style="{StaticResource CompactButtonStyle}" />
+                                        Style="{StaticResource AccentButtonStyle}" />
                                     <Button
                                         Click="PlaySelectedNext_Click"
                                         Content="Воспроизвести следующим"
-                                        Style="{StaticResource CompactButtonStyle}" />
-                                    <Button
-                                        Content="Изменить с помощью Clipchamp"
-                                        IsEnabled="False"
                                         Style="{StaticResource CompactButtonStyle}" />
                                     <Button
                                         Content="…"
@@ -620,8 +625,12 @@
                             SelectionMode="Multiple">
                             <ListView.ItemContainerStyle>
                                 <Style TargetType="ListViewItem">
+                                    <Setter Property="Background" Value="{ThemeResource LayerFillColorDefaultBrush}" />
+                                    <Setter Property="CornerRadius" Value="8" />
                                     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                                    <Setter Property="Padding" Value="8,4" />
+                                    <Setter Property="Margin" Value="0,0,0,4" />
+                                    <Setter Property="MinHeight" Value="56" />
+                                    <Setter Property="Padding" Value="12,8" />
                                 </Style>
                             </ListView.ItemContainerStyle>
                             <ListView.ItemTemplate>
@@ -887,32 +896,32 @@
                 Spacing="4">
                 <Button
                     x:Name="HeaderMenuButton"
-                    Width="32"
-                    Height="32"
-                    Padding="6"
+                    Width="28"
+                    Height="28"
+                    Padding="4"
                     AutomationProperties.AutomationId="HeaderMenuButton"
                     Click="HeaderMenu_Click"
-                    CornerRadius="16"
-                    MinHeight="32"
-                    MinWidth="32"
+                    CornerRadius="14"
+                    MinHeight="28"
+                    MinWidth="28"
                     Style="{StaticResource IconButtonStyle}"
                     ToolTipService.ToolTip="Скрыть/показать меню">
-                    <FontIcon FontSize="16" Glyph="&#xE700;" />
+                    <FontIcon FontSize="14" Glyph="&#xE700;" />
                 </Button>
                 <Button
                     x:Name="HeaderBackButton"
-                    Width="32"
-                    Height="32"
-                    Padding="6"
+                    Width="28"
+                    Height="28"
+                    Padding="4"
                     AutomationProperties.AutomationId="HeaderBackButton"
                     Click="HeaderBack_Click"
-                    CornerRadius="16"
-                    MinHeight="32"
-                    MinWidth="32"
+                    CornerRadius="14"
+                    MinHeight="28"
+                    MinWidth="28"
                     Style="{StaticResource IconButtonStyle}"
                     ToolTipService.ToolTip="Назад"
                     Visibility="Collapsed">
-                    <FontIcon FontSize="16" Glyph="&#xE72B;" />
+                    <FontIcon FontSize="14" Glyph="&#xE72B;" />
                 </Button>
                 <Border
                     x:Name="HeaderIcon"
@@ -941,11 +950,11 @@
         <Border
             x:Name="TransportBar"
             Grid.Row="1"
-            Padding="16,8"
+            Padding="16,4"
             Background="{ThemeResource LayerFillColorDefaultBrush}"
             BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
             BorderThickness="0,1,0,0">
-            <Grid ColumnSpacing="12" RowSpacing="8">
+            <Grid ColumnSpacing="12" RowSpacing="4">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
@@ -961,6 +970,7 @@
                         x:Name="CurrentTimeText"
                         VerticalAlignment="Center"
                         FontFamily="Segoe UI"
+                        FontSize="12"
                         FontWeight="Normal"
                         Text="0:00:00" />
                     <Slider
@@ -980,6 +990,7 @@
                         Grid.Column="2"
                         VerticalAlignment="Center"
                         FontFamily="Segoe UI"
+                        FontSize="12"
                         FontWeight="Normal"
                         Text="0:00:00" />
                 </Grid>
