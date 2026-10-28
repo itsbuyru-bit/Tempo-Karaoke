@@ -35,6 +35,7 @@ public sealed partial class MainPage : Page
     private bool _suppressVolume;
     private bool _isPopulatingFolders;
     private bool _isInitializingSettings;
+    private bool _isRestoringQueue;
     private int _queueIndex = -1;
 
     public ObservableCollection<MediaItem> Filtered { get; } = new();
@@ -59,6 +60,8 @@ public sealed partial class MainPage : Page
         Loaded += OnPageLoaded;
         Unloaded += OnPageUnloaded;
         InitializeSettings();
+        RestoreQueue();
+        Queue.CollectionChanged += (_, _) => SaveQueue();
         ShowLibrary();
     }
 
@@ -589,6 +592,36 @@ public sealed partial class MainPage : Page
         {
             QueueList.ScrollIntoView(item);
         }
+    }
+
+    private void RestoreQueue()
+    {
+        _isRestoringQueue = true;
+        foreach (var path in SettingsService.QueuePaths)
+        {
+            var item = IsRemote(path) ? MediaItem.FromUrl(path) : MediaItem.FromPath(path);
+            Queue.Add(item);
+        }
+        _isRestoringQueue = false;
+        UpdateQueueCount();
+    }
+
+    private void SaveQueue()
+    {
+        if (_isRestoringQueue)
+        {
+            return;
+        }
+
+        SettingsService.QueuePaths = Queue.Select(item => item.Path).ToList();
+    }
+
+    private static bool IsRemote(string path)
+    {
+        return Uri.TryCreate(path, UriKind.Absolute, out var uri) &&
+               (uri.Scheme == Uri.UriSchemeHttp ||
+                uri.Scheme == Uri.UriSchemeHttps ||
+                uri.Scheme == "rtsp");
     }
 
     private void PlayNow(MediaItem item)

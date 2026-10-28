@@ -277,6 +277,9 @@
                         <ListView
                             x:Name="QueueList"
                             Grid.Row="1"
+                            AllowDrop="True"
+                            CanDragItems="True"
+                            CanReorderItems="True"
                             Padding="12,0,12,12"
                             DoubleTapped="QueueList_DoubleTapped"
                             IsItemClickEnabled="True"
