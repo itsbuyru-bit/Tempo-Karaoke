@@ -42,12 +42,17 @@ public sealed partial class MainPage : Page
 
     public ObservableCollection<MediaItem> Queue { get; } = new();
 
+    public ObservableCollection<MediaItem> Recent { get; } = new();
+
     public ObservableCollection<string> VideoRoots { get; } = new();
+
+    public ObservableCollection<FolderInfo> FolderGroups { get; } = new();
 
     public MainPage()
     {
         InitializeComponent();
 
+        SortComboBox.SelectedIndex = 0;
         _player = new PlayerService(Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread());
         _player.StateChanged += (_, _) => UpdateTransport();
         _player.EndReached += (_, _) => PlayNext();
@@ -62,6 +67,8 @@ public sealed partial class MainPage : Page
         InitializeSettings();
         RestoreQueue();
         Queue.CollectionChanged += (_, _) => SaveQueue();
+        RestoreRecent();
+        Recent.CollectionChanged += (_, _) => UpdateRecentEmpty();
         ShowLibrary();
     }
 
@@ -77,7 +84,7 @@ public sealed partial class MainPage : Page
                 ShowQueue();
                 break;
             case "home":
-                ShowPlaceholder("Главная", "Здесь появятся недавние файлы и быстрый доступ к медиатеке.");
+                ShowHome();
                 break;
             case "playlists":
                 ShowPlaceholder("Плейлисты", "Именованные плейлисты и экспорт M3U — следующий этап.");
@@ -90,14 +97,26 @@ public sealed partial class MainPage : Page
 
     private void ShowLibrary()
     {
+        HomeView.Visibility = Visibility.Collapsed;
         LibraryPanel.Visibility = Visibility.Visible;
         QueueView.Visibility = Visibility.Collapsed;
         PlaceholderView.Visibility = Visibility.Collapsed;
         SettingsView.Visibility = Visibility.Collapsed;
     }
 
+    private void ShowHome()
+    {
+        HomeView.Visibility = Visibility.Visible;
+        LibraryPanel.Visibility = Visibility.Collapsed;
+        QueueView.Visibility = Visibility.Collapsed;
+        PlaceholderView.Visibility = Visibility.Collapsed;
+        SettingsView.Visibility = Visibility.Collapsed;
+        UpdateRecentEmpty();
+    }
+
     private void ShowQueue()
     {
+        HomeView.Visibility = Visibility.Collapsed;
         LibraryPanel.Visibility = Visibility.Collapsed;
         QueueView.Visibility = Visibility.Visible;
         PlaceholderView.Visibility = Visibility.Collapsed;
@@ -109,6 +128,7 @@ public sealed partial class MainPage : Page
     {
         PlaceholderTitle.Text = title;
         PlaceholderText.Text = text;
+        HomeView.Visibility = Visibility.Collapsed;
         LibraryPanel.Visibility = Visibility.Collapsed;
         QueueView.Visibility = Visibility.Collapsed;
         PlaceholderView.Visibility = Visibility.Visible;
@@ -117,6 +137,7 @@ public sealed partial class MainPage : Page
 
     private void ShowSettings()
     {
+        HomeView.Visibility = Visibility.Collapsed;
         LibraryPanel.Visibility = Visibility.Collapsed;
         QueueView.Visibility = Visibility.Collapsed;
         PlaceholderView.Visibility = Visibility.Collapsed;
@@ -344,16 +365,20 @@ public sealed partial class MainPage : Page
     private void PopulateFolders()
     {
         _isPopulatingFolders = true;
+
+        FolderGroups.Clear();
+        foreach (var group in _all
+                     .GroupBy(item => item.Folder, StringComparer.CurrentCultureIgnoreCase)
+                     .OrderBy(group => group.Key, StringComparer.CurrentCultureIgnoreCase))
+        {
+            FolderGroups.Add(new FolderInfo(group.Key, group.Count()));
+        }
+
         FolderFilter.Items.Clear();
         FolderFilter.Items.Add("Все папки");
-
-        foreach (var folder in _all
-                     .Select(item => item.Folder)
-                     .Where(folder => !string.IsNullOrWhiteSpace(folder))
-                     .Distinct(StringComparer.CurrentCultureIgnoreCase)
-                     .OrderBy(folder => folder, StringComparer.CurrentCultureIgnoreCase))
+        foreach (var group in FolderGroups)
         {
-            FolderFilter.Items.Add(folder);
+            FolderFilter.Items.Add(group.Name);
         }
 
         FolderFilter.SelectedIndex = 0;
@@ -379,6 +404,20 @@ public sealed partial class MainPage : Page
                 item.DisplayTitle.Contains(term, StringComparison.CurrentCultureIgnoreCase) ||
                 item.Folder.Contains(term, StringComparison.CurrentCultureIgnoreCase)));
         }
+
+        var sort = (SortComboBox.SelectedItem as ComboBoxItem)?.Tag as string ?? "artist";
+        result = sort switch
+        {
+            "title" => result
+                .OrderBy(item => item.Title, StringComparer.CurrentCultureIgnoreCase)
+                .ThenBy(item => item.Artist, StringComparer.CurrentCultureIgnoreCase),
+            "folder" => result
+                .OrderBy(item => item.Folder, StringComparer.CurrentCultureIgnoreCase)
+                .ThenBy(item => item.DisplayTitle, StringComparer.CurrentCultureIgnoreCase),
+            _ => result
+                .OrderBy(item => item.Artist, StringComparer.CurrentCultureIgnoreCase)
+                .ThenBy(item => item.Title, StringComparer.CurrentCultureIgnoreCase),
+        };
 
         Filtered.Clear();
         foreach (var item in result)
@@ -408,6 +447,48 @@ public sealed partial class MainPage : Page
     private void Scan_Click(object sender, RoutedEventArgs e)
     {
         _ = LoadPreviewAsync();
+    }
+
+    private void SortComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        ApplyFilter();
+    }
+
+    private void PlayAll_Click(object sender, RoutedEventArgs e)
+    {
+        if (Filtered.Count == 0)
+        {
+            return;
+        }
+
+        Queue.Clear();
+        _isRestoringQueue = true;
+        foreach (var item in Filtered.ToList())
+        {
+            Queue.Add(item);
+        }
+        _isRestoringQueue = false;
+        UpdateQueueCount();
+        SaveQueue();
+        PlayQueueIndex(0);
+    }
+
+    private void FolderList_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
+    {
+        if (FolderList.SelectedItem is not FolderInfo folder)
+        {
+            return;
+        }
+
+        var match = FolderFilter.Items
+            .OfType<string>()
+            .FirstOrDefault(name => string.Equals(name, folder.Name, StringComparison.CurrentCultureIgnoreCase));
+        if (match is not null)
+        {
+            FolderFilter.SelectedItem = match;
+        }
+
+        LibraryTabs.SelectedIndex = 0;
     }
 
     private void LibraryList_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
@@ -616,6 +697,77 @@ public sealed partial class MainPage : Page
         SettingsService.QueuePaths = Queue.Select(item => item.Path).ToList();
     }
 
+    private void RestoreRecent()
+    {
+        foreach (var path in SettingsService.RecentPaths)
+        {
+            Recent.Add(IsRemote(path) ? MediaItem.FromUrl(path) : MediaItem.FromPath(path));
+        }
+
+        UpdateRecentEmpty();
+    }
+
+    private void RecordRecent(MediaItem item)
+    {
+        var existing = Recent.FirstOrDefault(
+            recent => string.Equals(recent.Path, item.Path, StringComparison.OrdinalIgnoreCase));
+        if (existing is not null)
+        {
+            Recent.Remove(existing);
+        }
+
+        Recent.Insert(0, item);
+        while (Recent.Count > 12)
+        {
+            Recent.RemoveAt(Recent.Count - 1);
+        }
+
+        SettingsService.RecentPaths = Recent.Select(recent => recent.Path).ToList();
+        UpdateRecentEmpty();
+    }
+
+    private void UpdateRecentEmpty()
+    {
+        if (RecentEmptyText is null)
+        {
+            return;
+        }
+
+        RecentEmptyText.Visibility = Recent.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
+    }
+
+    private void RecentList_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
+    {
+        if (RecentList.SelectedItem is MediaItem item)
+        {
+            PlayNow(item);
+        }
+    }
+
+    private void RecentList_KeyDown(object sender, KeyRoutedEventArgs e)
+    {
+        if (e.Key == VirtualKey.Enter && RecentList.SelectedItem is MediaItem item)
+        {
+            PlayNow(item);
+            e.Handled = true;
+        }
+    }
+
+    private void OpenLibrary_Click(object sender, RoutedEventArgs e)
+    {
+        NavView.SelectedItem = LibraryNavItem;
+    }
+
+    private void OpenQueue_Click(object sender, RoutedEventArgs e)
+    {
+        NavView.SelectedItem = QueueNavItem;
+    }
+
+    private void OpenSettings_Click(object sender, RoutedEventArgs e)
+    {
+        NavView.SelectedItem = SettingsNavItem;
+    }
+
     private static bool IsRemote(string path)
     {
         return Uri.TryCreate(path, UriKind.Absolute, out var uri) &&
@@ -628,6 +780,7 @@ public sealed partial class MainPage : Page
     {
         _current = item;
         _queueIndex = Queue.IndexOf(item);
+        RecordRecent(item);
 
         if (_detached && _playerWindow is not null)
         {
@@ -651,6 +804,7 @@ public sealed partial class MainPage : Page
 
         _queueIndex = index;
         _current = item;
+        RecordRecent(item);
 
         if (_detached && _playerWindow is not null)
         {

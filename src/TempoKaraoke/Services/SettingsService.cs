@@ -13,6 +13,7 @@ public static class SettingsService
 {
     private const string VideoRootsKey = "VideoRoots";
     private const string QueuePathsKey = "QueuePaths";
+    private const string RecentPathsKey = "RecentPaths";
     private const string ThemeKey = "Theme";
     private const string AccentKey = "Accent";
     private const string FetchArtworkKey = "FetchArtwork";
@@ -88,6 +89,31 @@ public static class SettingsService
             if (Container is not null)
             {
                 Container.Values[QueuePathsKey] = string.Join('\n', value);
+            }
+        }
+    }
+
+    public static List<string> RecentPaths
+    {
+        get
+        {
+            var raw = Container?.Values[RecentPathsKey] as string;
+            if (string.IsNullOrWhiteSpace(raw))
+            {
+                return new List<string>();
+            }
+
+            return raw
+                .Split('\n', StringSplitOptions.RemoveEmptyEntries)
+                .Select(path => path.Trim())
+                .Where(path => path.Length > 0)
+                .ToList();
+        }
+        set
+        {
+            if (Container is not null)
+            {
+                Container.Values[RecentPathsKey] = string.Join('\n', value);
             }
         }
     }
