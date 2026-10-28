@@ -46,7 +46,7 @@ public sealed partial class MainPage : Page
         _player = new PlayerService(Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread());
         _player.StateChanged += (_, _) => UpdateTransport();
         _player.EndReached += (_, _) => PlayNext();
-        _player.Failed += (_, message) => NowPlayingSubtitle.Text = message;
+        _player.Failed += (_, message) => BarSubtitle.Text = message;
 
         _timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(200) };
         _timer.Tick += (_, _) => UpdateTransport();
@@ -84,7 +84,6 @@ public sealed partial class MainPage : Page
     private void ShowLibrary()
     {
         LibraryPanel.Visibility = Visibility.Visible;
-        PlayerPanel.Visibility = Visibility.Visible;
         PlaceholderView.Visibility = Visibility.Collapsed;
     }
 
@@ -93,7 +92,6 @@ public sealed partial class MainPage : Page
         PlaceholderTitle.Text = title;
         PlaceholderText.Text = text;
         LibraryPanel.Visibility = Visibility.Collapsed;
-        PlayerPanel.Visibility = Visibility.Collapsed;
         PlaceholderView.Visibility = Visibility.Visible;
     }
 
@@ -572,8 +570,6 @@ public sealed partial class MainPage : Page
         _player.Pause();
         _detached = true;
 
-        PlayerColumn.Width = new GridLength(0);
-        PlayerPanel.Visibility = Visibility.Collapsed;
         TransportBar.Visibility = Visibility.Collapsed;
         DetachedBar.Visibility = Visibility.Visible;
 
@@ -608,8 +604,6 @@ public sealed partial class MainPage : Page
         var position = window?.PositionMs ?? _player.PositionMs;
         var wasPlaying = window?.IsPlaying ?? false;
 
-        PlayerPanel.Visibility = Visibility.Visible;
-        PlayerColumn.Width = new GridLength(2, GridUnitType.Star);
         TransportBar.Visibility = Visibility.Visible;
         DetachedBar.Visibility = Visibility.Collapsed;
 
@@ -638,16 +632,12 @@ public sealed partial class MainPage : Page
     {
         if (_current is null)
         {
-            NowPlayingTitle.Text = "Ничего не играет";
-            NowPlayingSubtitle.Text = "Выберите песню двойным кликом";
             BarTitle.Text = "Ничего не играет";
             BarSubtitle.Text = "Выберите песню двойным кликом";
             DetachButton.IsEnabled = false;
             return;
         }
 
-        NowPlayingTitle.Text = _current.DisplayTitle;
-        NowPlayingSubtitle.Text = _current.Subtitle;
         BarTitle.Text = _current.DisplayTitle;
         BarSubtitle.Text = _current.Subtitle;
         DetachButton.IsEnabled = true;
