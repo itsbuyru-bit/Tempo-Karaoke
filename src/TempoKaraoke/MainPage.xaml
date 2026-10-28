@@ -225,15 +225,53 @@
                                     Style="{StaticResource CaptionTextBlockStyle}"
                                     Text="0 песен" />
                             </StackPanel>
-                            <Button
+                            <StackPanel
                                 Grid.Column="1"
-                                Click="ClearQueue_Click"
-                                ToolTipService.ToolTip="Очистить очередь">
-                                <StackPanel Orientation="Horizontal" Spacing="6">
-                                    <SymbolIcon Symbol="Delete" />
-                                    <TextBlock Text="Очистить" />
-                                </StackPanel>
-                            </Button>
+                                VerticalAlignment="Center"
+                                Orientation="Horizontal"
+                                Spacing="8">
+                                <Button
+                                    Click="ClearQueue_Click"
+                                    ToolTipService.ToolTip="Очистить очередь">
+                                    <StackPanel Orientation="Horizontal" Spacing="6">
+                                        <SymbolIcon Symbol="Delete" />
+                                        <TextBlock Text="Очистить" />
+                                    </StackPanel>
+                                </Button>
+                                <Button
+                                    Content="Добавить в"
+                                    IsEnabled="False"
+                                    ToolTipService.ToolTip="Плейлисты — следующий этап" />
+                                <SplitButton
+                                    Click="AddFilesSplitButton_Click"
+                                    Content="Добавить файлы">
+                                    <SplitButton.Flyout>
+                                        <MenuFlyout>
+                                            <MenuFlyoutItem
+                                                Click="AddFiles_Click"
+                                                Text="Добавить файлы в очередь">
+                                                <MenuFlyoutItem.Icon>
+                                                    <SymbolIcon Symbol="OpenFile" />
+                                                </MenuFlyoutItem.Icon>
+                                            </MenuFlyoutItem>
+                                            <MenuFlyoutItem
+                                                Click="AddFolderToQueue_Click"
+                                                Text="Добавить папку в очередь">
+                                                <MenuFlyoutItem.Icon>
+                                                    <SymbolIcon Symbol="Folder" />
+                                                </MenuFlyoutItem.Icon>
+                                            </MenuFlyoutItem>
+                                            <MenuFlyoutItem
+                                                Click="AddUrlToQueue_Click"
+                                                Text="Добавить по URL">
+                                                <MenuFlyoutItem.Icon>
+                                                    <SymbolIcon Symbol="Link" />
+                                                </MenuFlyoutItem.Icon>
+                                            </MenuFlyoutItem>
+                                        </MenuFlyout>
+                                    </SplitButton.Flyout>
+                                </SplitButton>
+                            </StackPanel>
                         </Grid>
 
                         <ListView

@@ -217,6 +217,14 @@ public sealed class PlayerService : IDisposable
         Detach();
     }
 
+    private static bool IsRemote(string path)
+    {
+        return Uri.TryCreate(path, UriKind.Absolute, out var uri) &&
+               (uri.Scheme == Uri.UriSchemeHttp ||
+                uri.Scheme == Uri.UriSchemeHttps ||
+                uri.Scheme == "rtsp");
+    }
+
     private void PlayCore(string path, bool play)
     {
         if (_mediaPlayer is null || _libVlc is null)
@@ -226,7 +234,9 @@ public sealed class PlayerService : IDisposable
 
         _mediaPlayer.Stop();
         _media?.Dispose();
-        _media = new Media(_libVlc, path, FromType.FromPath);
+        _media = IsRemote(path)
+            ? new Media(_libVlc, path, FromType.FromLocation)
+            : new Media(_libVlc, path, FromType.FromPath);
         _lastLengthMs = 0;
 
         if (!_mediaPlayer.Play(_media))

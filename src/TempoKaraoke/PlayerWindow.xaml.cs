@@ -97,13 +97,23 @@ public sealed partial class PlayerWindow : Window
         SetSource(path, 0, true);
     }
 
+    private static bool IsRemote(string path)
+    {
+        return Uri.TryCreate(path, UriKind.Absolute, out var uri) &&
+               (uri.Scheme == Uri.UriSchemeHttp ||
+                uri.Scheme == Uri.UriSchemeHttps ||
+                uri.Scheme == "rtsp");
+    }
+
     private void SetSource(string path, long positionMs, bool resume)
     {
         _path = path;
         _positionMs = positionMs;
         _resume = resume;
 
-        var uri = new Uri($"file:///{path.Replace('\\', '/')}");
+        var uri = IsRemote(path)
+            ? new Uri(path)
+            : new Uri($"file:///{path.Replace('\\', '/')}");
         _mediaPlayer.Source = MediaSource.CreateFromUri(uri);
     }
 

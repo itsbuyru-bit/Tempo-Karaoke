@@ -483,6 +483,114 @@ public sealed partial class MainPage : Page
         UpdateQueueCount();
     }
 
+    private async void AddFilesSplitButton_Click(SplitButton sender, SplitButtonClickEventArgs args)
+    {
+        await PickFilesToQueueAsync();
+    }
+
+    private async void AddFiles_Click(object sender, RoutedEventArgs e)
+    {
+        await PickFilesToQueueAsync();
+    }
+
+    private async Task PickFilesToQueueAsync()
+    {
+        var picker = new FileOpenPicker
+        {
+            SuggestedStartLocation = PickerLocationId.VideosLibrary,
+        };
+        picker.FileTypeFilter.Add(".mkv");
+        picker.FileTypeFilter.Add(".mp4");
+        picker.FileTypeFilter.Add(".avi");
+        picker.FileTypeFilter.Add(".mov");
+        picker.FileTypeFilter.Add(".webm");
+        picker.FileTypeFilter.Add(".m4v");
+        picker.FileTypeFilter.Add(".wmv");
+
+        WinRT.Interop.InitializeWithWindow.Initialize(picker, App.WindowHandle);
+
+        var files = await picker.PickMultipleFilesAsync();
+        foreach (var file in files)
+        {
+            AddToQueue(MediaItem.FromPath(file.Path));
+        }
+    }
+
+    private async void AddFolderToQueue_Click(object sender, RoutedEventArgs e)
+    {
+        var picker = new FolderPicker();
+        picker.FileTypeFilter.Add("*");
+        WinRT.Interop.InitializeWithWindow.Initialize(picker, App.WindowHandle);
+
+        var folder = await picker.PickSingleFolderAsync();
+        if (folder is null)
+        {
+            return;
+        }
+
+        var items = await Task.Run(() => EnumerateVideos(folder.Path)
+            .OrderBy(item => item.DisplayTitle, StringComparer.CurrentCultureIgnoreCase)
+            .ToList());
+
+        if (items.Count == 0)
+        {
+            BarSubtitle.Text = "В папке нет видеофайлов";
+            return;
+        }
+
+        foreach (var item in items)
+        {
+            AddToQueue(item);
+        }
+    }
+
+    private async void AddUrlToQueue_Click(object sender, RoutedEventArgs e)
+    {
+        var input = new TextBox
+        {
+            PlaceholderText = "https://example.com/video.mkv",
+            Width = 420,
+        };
+
+        var dialog = new ContentDialog
+        {
+            Title = "Добавить по URL",
+            Content = input,
+            PrimaryButtonText = "Добавить",
+            CloseButtonText = "Отмена",
+            DefaultButton = ContentDialogButton.Primary,
+            XamlRoot = XamlRoot,
+        };
+
+        if (await dialog.ShowAsync() != ContentDialogResult.Primary)
+        {
+            return;
+        }
+
+        var url = input.Text.Trim();
+        if (Uri.TryCreate(url, UriKind.Absolute, out var uri) &&
+            (uri.Scheme == Uri.UriSchemeHttp ||
+             uri.Scheme == Uri.UriSchemeHttps ||
+             uri.Scheme == "rtsp"))
+        {
+            AddToQueue(MediaItem.FromUrl(url));
+        }
+        else
+        {
+            BarSubtitle.Text = "Некорректный URL";
+        }
+    }
+
+    private void AddToQueue(MediaItem item)
+    {
+        Queue.Add(item);
+        UpdateQueueCount();
+        if (QueueView.Visibility == Visibility.Visible)
+        {
+            QueueList.ScrollIntoView(item);
+        }
+    }
+
     private void PlayNow(MediaItem item)
     {
         _current = item;

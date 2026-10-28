@@ -33,6 +33,8 @@ public sealed class MediaItem
 
     public override string ToString() => DisplayTitle;
 
+    public static MediaItem FromUrl(string url) => new(url, string.Empty, url, "URL");
+
     public static MediaItem FromPath(string path)
     {
         var fileName = System.IO.Path.GetFileNameWithoutExtension(path);
