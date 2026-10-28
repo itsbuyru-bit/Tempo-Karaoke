@@ -233,7 +233,8 @@
                             <StackPanel Padding="20,0,0,0" Spacing="2" VerticalAlignment="Center">
                                 <TextBlock
                                     Text="Видео"
-                                    Style="{StaticResource TitleTextBlockStyle}" />
+                                    FontSize="40"
+                                    FontWeight="SemiBold" />
                                 <TextBlock
                                     x:Name="StatusText"
                                     Foreground="{ThemeResource TextFillColorSecondaryBrush}"
@@ -453,13 +454,16 @@
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
 
-                        <Grid Padding="20,16" ColumnSpacing="12">
+                        <Grid Padding="20,0,20,8" ColumnSpacing="12">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
                             <StackPanel Spacing="2">
-                                <TextBlock Text="Очередь воспроизведения" Style="{StaticResource TitleTextBlockStyle}" />
+                                <TextBlock
+                                    Text="Очередь воспроизведения"
+                                    FontSize="40"
+                                    FontWeight="SemiBold" />
                                 <TextBlock
                                     x:Name="QueueCountText"
                                     Foreground="{ThemeResource TextFillColorSecondaryBrush}"
@@ -641,10 +645,13 @@
             <StackPanel
                 x:Name="PlaceholderView"
                 Grid.Column="0"
-                Padding="32,24"
+                Padding="20,0,20,12"
                 Spacing="8"
                 Visibility="Collapsed">
-                <TextBlock x:Name="PlaceholderTitle" Style="{StaticResource TitleTextBlockStyle}" />
+                <TextBlock
+                    x:Name="PlaceholderTitle"
+                    FontSize="40"
+                    FontWeight="SemiBold" />
                 <TextBlock
                     x:Name="PlaceholderText"
                     Foreground="{ThemeResource TextFillColorSecondaryBrush}"
@@ -657,9 +664,12 @@
                 Grid.Column="0"
                 Visibility="Collapsed">
                 <StackPanel
-                    Padding="24,16,24,24"
+                    Padding="24,0,24,24"
                     Spacing="12">
-                    <TextBlock Text="Параметры" Style="{StaticResource TitleTextBlockStyle}" />
+                    <TextBlock
+                        Text="Параметры"
+                        FontSize="40"
+                        FontWeight="SemiBold" />
 
                     <TextBlock Text="Библиотеки" Style="{StaticResource BodyStrongTextBlockStyle}" />
 
@@ -917,11 +927,11 @@
         <Border
             x:Name="TransportBar"
             Grid.Row="1"
-            Padding="16,4"
+            Padding="16,2"
             Background="{ThemeResource LayerFillColorDefaultBrush}"
             BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
             BorderThickness="0,1,0,0">
-            <Grid ColumnSpacing="12" RowSpacing="4">
+            <Grid ColumnSpacing="12" RowSpacing="2">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
@@ -972,7 +982,7 @@
                     <Border
                         x:Name="MiniPlayerCard"
                         Grid.Column="0"
-                        Padding="4"
+                        Padding="2"
                         Background="Transparent"
                         CornerRadius="8"
                         PointerEntered="MiniPlayer_PointerEntered"
