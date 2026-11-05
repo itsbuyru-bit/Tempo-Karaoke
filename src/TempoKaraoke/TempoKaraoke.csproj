@@ -9,7 +9,7 @@
       Package.appxmanifest: MSIX берёт версию из манифеста, портативная сборка —
       из assembly (её читает AppInfo и установщик Inno при обновлении).
     -->
-    <Version>1.8.22.0</Version>
+    <Version>1.8.22.1</Version>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon Condition="Exists('Assets\AppIcon.ico')">Assets\AppIcon.ico</ApplicationIcon>
     <Platforms>x86;x64;ARM64</Platforms>

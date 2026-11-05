@@ -45,6 +45,9 @@ UsePreviousAppDir=yes
 ; «для всех пользователей» (Program Files + UAC).
 PrivilegesRequired=lowest
 PrivilegesRequiredOverridesAllowed=dialog commandline
+; Тихая установка (обновление из приложения) повторяет область предыдущей
+; установки: per-user остаётся per-user, all-users остаётся all-users.
+UsePreviousPrivileges=yes
 ; Приложение работает без identity, поэтому архитектура — только x64.
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
@@ -103,6 +106,19 @@ begin
   // Наша оболочка запускает дочерние процессы из того же exe.
   KillRunningApp();
   Result := '';
+end;
+
+// --- Маркер области установки ----------------------------------------------
+// Обновление из приложения читает его и ставит новую версию в ту же область.
+procedure CurStepChanged(CurStep: TSetupStep);
+begin
+  if CurStep = ssPostInstall then
+  begin
+    if IsAdminInstallMode then
+      SaveStringToFile(ExpandConstant('{app}\install-scope.txt'), 'all', False)
+    else
+      SaveStringToFile(ExpandConstant('{app}\install-scope.txt'), 'user', False);
+  end;
 end;
 
 // --- Удаление пользовательских данных --------------------------------------

@@ -2829,6 +2829,10 @@
                             Spacing="12">
                             <TextBlock
  x:Name="UpdateStatusText" VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" />
+                            <HyperlinkButton
+ x:Name="UpdateNotesLink" AutomationProperties.AutomationId="UpdateNotesLink" Click="OpenUpdateNotes_Click" Visibility="Collapsed" x:Uid="Settings_UpdatesNotes" loc:Localization.Key="Settings_UpdatesNotes.Content" />
+                            <Button
+ x:Name="UpdateNowButton" AutomationProperties.AutomationId="UpdateNowButton" Click="InstallUpdate_Click" Visibility="Collapsed" Style="{StaticResource AccentButtonStyle}" x:Uid="Settings_UpdatesInstallButton" loc:Localization.Key="Settings_UpdatesInstallButton.Content" />
                             <Button
  x:Name="CheckUpdatesButton" AutomationProperties.AutomationId="CheckUpdatesButton" Click="CheckUpdates_Click" x:Uid="Settings_UpdatesCheckButton" loc:Localization.Key="Settings_UpdatesCheckButton.Content" />
                         </StackPanel>

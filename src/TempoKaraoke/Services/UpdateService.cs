@@ -81,18 +81,7 @@ public static class UpdateService
         try
         {
             var url = $"https://api.github.com/repos/{RepositoryOwner}/{RepositoryName}/releases/latest";
-            using var response = await Http.GetAsync(url, cancellationToken).ConfigureAwait(false);
-            if (!response.IsSuccessStatusCode)
-            {
-                return UpdateCheckResult.Failed($"HTTP {(int)response.StatusCode}");
-            }
-
-            await using var stream = await response.Content
-                .ReadAsStreamAsync(cancellationToken)
-                .ConfigureAwait(false);
-            var release = await JsonSerializer
-                .DeserializeAsync(stream, AppJsonContext.Default.GitHubRelease, cancellationToken)
-                .ConfigureAwait(false);
+            var release = await FetchLatestReleaseAsync(url, cancellationToken).ConfigureAwait(false);
 
             if (release is null)
             {
@@ -128,6 +117,42 @@ public static class UpdateService
         catch (Exception ex)
         {
             return UpdateCheckResult.Failed(ex.Message);
+        }
+    }
+
+    /// <summary>
+    /// Запрашивает последний релиз. Один повтор на случай обрыва соединения:
+    /// в логах пользователей встречается «Unable to read data from the transport connection».
+    /// </summary>
+    private static async Task<GitHubRelease?> FetchLatestReleaseAsync(string url, CancellationToken cancellationToken)
+    {
+        for (var attempt = 0; ; attempt++)
+        {
+            try
+            {
+                using var response = await Http.GetAsync(url, cancellationToken).ConfigureAwait(false);
+                if (!response.IsSuccessStatusCode)
+                {
+                    throw new HttpRequestException($"HTTP {(int)response.StatusCode}");
+                }
+
+                await using var stream = await response.Content
+                    .ReadAsStreamAsync(cancellationToken)
+                    .ConfigureAwait(false);
+
+                return await JsonSerializer
+                    .DeserializeAsync(stream, AppJsonContext.Default.GitHubRelease, cancellationToken)
+                    .ConfigureAwait(false);
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch (Exception) when (attempt == 0)
+            {
+                LogService.Warn("Update check failed once, retrying.");
+                await Task.Delay(TimeSpan.FromSeconds(2), cancellationToken).ConfigureAwait(false);
+            }
         }
     }
 
@@ -178,8 +203,7 @@ public static class UpdateService
 
     /// <summary>
     /// Запускает установщик в тихом режиме. Inno сам закроет приложение и
-    /// перезапустит его после установки. Область установки сохраняется:
-    /// Program Files → /ALLUSERS, иначе → /CURRENTUSER.
+    /// перезапустит его после установки. Область установки сохраняется.
     /// </summary>
     public static bool LaunchInstaller(string installerPath)
     {
@@ -188,43 +212,41 @@ public static class UpdateService
             return false;
         }
 
-        var scope = IsInstalledForAllUsers() ? " /ALLUSERS" : " /CURRENTUSER";
-
         System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(installerPath)
         {
-            Arguments = "/SILENT /SUPPRESSMSGBOXES /CLOSEAPPLICATIONS /NORESTART" + scope,
+            Arguments = "/SILENT /SUPPRESSMSGBOXES /CLOSEAPPLICATIONS /NORESTART" + GetInstallScopeArgument(),
             UseShellExecute = true,
         });
 
         return true;
     }
 
-    /// <summary>Приложение установлено в Program Files → установка «для всех».</summary>
-    private static bool IsInstalledForAllUsers()
+    /// <summary>
+    /// Область установки: явный флаг нужен только когда она известна.
+    /// Если неизвестна — флаг не передаём, и Inno повторяет область предыдущей
+    /// установки (UsePreviousPrivileges=yes).
+    /// </summary>
+    private static string GetInstallScopeArgument()
     {
         try
         {
-            var directory = AppContext.BaseDirectory;
-            var roots = new[]
+            var marker = Path.Combine(AppContext.BaseDirectory, "install-scope.txt");
+            if (File.Exists(marker))
             {
-                Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),
-                Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86),
-            };
-
-            foreach (var root in roots)
-            {
-                if (!string.IsNullOrEmpty(root) && directory.StartsWith(root, StringComparison.OrdinalIgnoreCase))
-                {
-                    return true;
-                }
+                var scope = File.ReadAllText(marker).Trim();
+                return scope.Equals("all", StringComparison.OrdinalIgnoreCase) ? " /ALLUSERS" : " /CURRENTUSER";
             }
+
+            // Старые установки без маркера: Program Files на любом диске значит
+            // установку для всех пользователей (путь мог быть выбран вручную).
+            return AppContext.BaseDirectory.Contains(@"\Program Files", StringComparison.OrdinalIgnoreCase)
+                ? " /ALLUSERS"
+                : string.Empty;
         }
         catch
         {
-            // Если путь не определить — обновляемся как per-user.
+            return string.Empty;
         }
-
-        return false;
     }
 
     private static bool IsInstallerAsset(GitHubReleaseAsset asset)

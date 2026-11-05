@@ -6729,6 +6729,7 @@ public sealed partial class MainPage : Page, IRemoteHost
 
         _isCheckingUpdates = true;
         InstallUpdateButton.IsEnabled = false;
+        UpdateNowButton.IsEnabled = false;
         CheckUpdatesButton.IsEnabled = false;
 
         try
@@ -6755,7 +6756,27 @@ public sealed partial class MainPage : Page, IRemoteHost
         {
             _isCheckingUpdates = false;
             InstallUpdateButton.IsEnabled = true;
+            UpdateNowButton.IsEnabled = true;
             CheckUpdatesButton.IsEnabled = true;
+        }
+    }
+
+    /// <summary>Открывает страницу релиза с описанием изменений.</summary>
+    private void OpenUpdateNotes_Click(object sender, RoutedEventArgs e)
+    {
+        var url = _pendingUpdate?.ReleaseUrl;
+        if (string.IsNullOrWhiteSpace(url))
+        {
+            return;
+        }
+
+        try
+        {
+            Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
+        }
+        catch (Exception ex)
+        {
+            UpdateStatusText.Text = LocalizationService.Format("Update_Failed", ex.Message);
         }
     }
 
@@ -6798,6 +6819,8 @@ public sealed partial class MainPage : Page, IRemoteHost
                     UpdateBar.Title = LocalizationService.Get("Update_BarTitle");
                     UpdateBar.Message = LocalizationService.Format("Update_BarMessage", result.Info.Version);
                     UpdateBar.IsOpen = true;
+                    UpdateNowButton.Visibility = Visibility.Visible;
+                    UpdateNotesLink.Visibility = Visibility.Visible;
 
                     // При старте дополнительно показываем системное уведомление:
                     // окно может быть свёрнуто или не в фокусе.
@@ -6811,6 +6834,9 @@ public sealed partial class MainPage : Page, IRemoteHost
                     break;
 
                 case UpdateCheckStatus.UpToDate:
+                    _pendingUpdate = null;
+                    UpdateNowButton.Visibility = Visibility.Collapsed;
+                    UpdateNotesLink.Visibility = Visibility.Collapsed;
                     UpdateStatusText.Text = LocalizationService.Format(
                         "Update_UpToDate",
                         AppInfo.SemanticVersion);

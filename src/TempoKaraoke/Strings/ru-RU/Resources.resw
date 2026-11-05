@@ -298,4 +298,6 @@
   <data name="Update_InstallButton.Content" xml:space="preserve"><value>Обновить</value></data>
   <data name="Update_ToastTitle" xml:space="preserve"><value>Доступно обновление Tempo Karaoke</value></data>
   <data name="Update_ToastBody" xml:space="preserve"><value>Версия {0} уже вышла. Откройте «Параметры → Обновления», чтобы установить.</value></data>
+  <data name="Settings_UpdatesInstallButton.Content" xml:space="preserve"><value>Обновить</value></data>
+  <data name="Settings_UpdatesNotes.Content" xml:space="preserve"><value>Что нового</value></data>
 </root>
