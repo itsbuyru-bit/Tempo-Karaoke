@@ -379,8 +379,8 @@ Submit for certification.
   компонента, четвёртый — счётчик сборки.
 - `broadFileSystemAccess` — restricted capability. При сабмите её нужно
   обосновать: приложению нужен доступ к папкам с видео, которые выбирает
-  пользователь (иначе библиотека на `G:\Karaoke` не читается). Без обоснования
-  пакет не пропустят.
+  пользователь. Без обоснования пакет не пропустят.
+- `runFullTrust` тоже restricted: обоснование обязательно (см. ниже).
 - Архитектура — x64. Для ARM64 соберите отдельный пакет (`-Arch arm64`) или
   bundle через `winapp package ... --arch x64 --arch arm64 --no-sign`.
 - Скриншоты для листинга делайте с реального экрана приложения на своей
@@ -388,3 +388,72 @@ Submit for certification.
   Store logo 300×300 — `poster/tempo-karaoke-store-logo-300.png`.
 - После смены identity старые установки (и MSIX, и установщик) считаются другим
   приложением: обновление поверх них не встанет, нужна переустановка.
+
+## Обоснование restricted capabilities (Partner Center)
+
+Поля «Почему вам требуется …» в разделе «Примечания о сертификации».
+Ниже — проверенные формулировки.
+
+### runFullTrust (EN)
+
+```
+Tempo Karaoke is a WinUI 3 / .NET desktop application that runs as a full-trust
+Win32 process, not inside the AppContainer sandbox. The app plays video through
+the native libvlc engine (VideoLAN.LibVLC), which loads its own native DLLs and
+needs GPU and audio access; it keeps a local SQLite cache of the user's media
+metadata; it hosts an in-process HTTP/WebSocket server so phones on the same
+network can control playback; and it starts a companion process of the same
+executable to run the Wi-Fi Direct advertisement publisher. None of these work
+inside the AppContainer sandbox. The app installs no services or drivers, does
+not start with Windows unless the user enables it, and does not touch anything
+outside the user's own session.
+```
+
+### broadFileSystemAccess (EN)
+
+```
+The app is a karaoke player for the user's own video collection, which can live
+on any local drive, an external disk or a network share. The user explicitly
+adds the folders in the app's settings through the system folder picker; Tempo
+Karaoke then enumerates video files in those folders, reads metadata to build a
+searchable library, generates thumbnails and plays the files with libvlc.
+broadFileSystemAccess is needed so the library works for the folders the user
+chooses, without copying or moving media into app storage. The app only reads
+files and never modifies, deletes or uploads them. File paths, names and content
+never leave the device.
+```
+
+### Те же тексты по-русски
+
+```
+runFullTrust: Tempo Karaoke — настольное приложение WinUI 3 / .NET, работающее
+как процесс Win32 с полным доверием, а не в песочнице AppContainer. Видео
+воспроизводится нативным движком libvlc (VideoLAN.LibVLC), который загружает
+собственные DLL и требует доступа к GPU и аудио; приложение ведёт локальный
+кэш метаданных в SQLite; поднимает встроенный HTTP/WebSocket-сервер, чтобы
+телефоны в той же сети управляли воспроизведением; и запускает второй процесс
+того же exe для Wi-Fi Direct. В песочнице AppContainer это невозможно.
+Приложение не устанавливает службы и драйверы, не стартует с Windows без
+согласия пользователя и не выходит за пределы его сеанса.
+
+broadFileSystemAccess: приложение — караоке-плеер для собственной коллекции
+видео пользователя, которая может лежать на любом локальном диске, внешнем
+носителе или сетевой папке. Пользователь сам добавляет папки в настройках
+через системный выбор папок; Tempo Karaoke перечисляет видеофайлы в этих
+папках, читает метаданные для поиска, строит миниатюры и воспроизводит файлы
+через libvlc. broadFileSystemAccess нужен, чтобы библиотека работала с
+выбранными пользователем папками без копирования медиа в хранилище
+приложения. Приложение только читает файлы и никогда их не изменяет, не
+удаляет и не выгружает. Пути, имена и содержимое файлов не покидают устройство.
+```
+
+### Что написать в «Дополнительная информация о тестировании»
+
+```
+1. Запустите приложение. Библиотека пустая: «Add a video folder in Settings».
+2. Параметры → «Add folder» → выберите любую папку с видеофайлами (MKV/MP4).
+   Каталог появится через несколько секунд.
+3. Нажмите Ctrl+F и введите часть имени файла — работает поиск.
+4. Откройте «Web remote» → «Start remote» — появится QR-код и адрес.
+5. Никаких тестовых медиа в пакете нет — подойдёт любой видеофайл.
+```
