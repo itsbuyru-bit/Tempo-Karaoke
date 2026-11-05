@@ -284,20 +284,20 @@
   <data name="Settings_UpdatesCheck.Header" xml:space="preserve"><value>Версия приложения</value></data>
   <data name="Settings_UpdatesCheck.Description" xml:space="preserve"><value>Установщик закроет приложение, заменит файлы и запустит новую версию. Библиотека, очередь и настройки сохранятся.</value></data>
   <data name="Settings_UpdatesCheckButton.Content" xml:space="preserve"><value>Проверить обновления</value></data>
-  <data name="Update_CurrentVersion" xml:space="preserve"><value>Версия {0}</value></data>
-  <data name="Update_Checking" xml:space="preserve"><value>Проверяю обновления…</value></data>
-  <data name="Update_UpToDate" xml:space="preserve"><value>Установлена последняя версия {0}.</value></data>
-  <data name="Update_Available" xml:space="preserve"><value>Доступна версия {0}.</value></data>
+  
+  <data name="Update_Checking" xml:space="preserve"><value>Проверка обновлений…</value></data>
+  <data name="Update_UpToDate" xml:space="preserve"><value>Установлена последняя версия v{0}</value></data>
+  <data name="Update_Available" xml:space="preserve"><value>Доступно обновление v{0} (текущая: v{1})</value></data>
   <data name="Update_NotConfigured" xml:space="preserve"><value>Канал обновлений не настроен.</value></data>
   <data name="Update_Failed" xml:space="preserve"><value>Не удалось проверить обновления: {0}</value></data>
   <data name="Update_Downloading" xml:space="preserve"><value>Скачиваю обновление… {0}</value></data>
   <data name="Update_Installing" xml:space="preserve"><value>Запускаю установщик…</value></data>
   <data name="Update_InstallFailed" xml:space="preserve"><value>Не удалось запустить установщик обновления.</value></data>
-  <data name="Update_BarTitle" xml:space="preserve"><value>Доступно обновление</value></data>
-  <data name="Update_BarMessage" xml:space="preserve"><value>Tempo Karaoke {0} уже можно установить.</value></data>
-  <data name="Update_InstallButton.Content" xml:space="preserve"><value>Обновить</value></data>
-  <data name="Update_ToastTitle" xml:space="preserve"><value>Доступно обновление Tempo Karaoke</value></data>
-  <data name="Update_ToastBody" xml:space="preserve"><value>Версия {0} уже вышла. Откройте «Параметры → Обновления», чтобы установить.</value></data>
-  <data name="Settings_UpdatesInstallButton.Content" xml:space="preserve"><value>Обновить</value></data>
+  
+  
+  
+  
+  
+  <data name="Settings_UpdatesInstallButton.Content" xml:space="preserve"><value>Обновить до v{0}</value></data>
   <data name="Settings_UpdatesNotes.Content" xml:space="preserve"><value>Что нового</value></data>
 </root>

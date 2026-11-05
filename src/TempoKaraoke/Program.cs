@@ -21,7 +21,7 @@ public static class Program
 
         if (!AppInfo.IsPackaged)
         {
-            // Стабильный AUMID нужен уведомлениям и группировке на панели задач.
+            // Стабильный AUMID нужен группировке на панели задач и привязке ярлыка.
             TrySetAppUserModelId();
 
             if (!HasLocalWindowsAppRuntime())
@@ -75,7 +75,7 @@ public static class Program
         }
         catch
         {
-            // Не критично: без AUMID просто не будет уведомлений/группировки.
+            // Не критично: без AUMID просто не будет группировки на панели задач.
         }
     }
 }

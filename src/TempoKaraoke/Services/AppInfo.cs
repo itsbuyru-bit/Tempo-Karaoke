@@ -20,6 +20,14 @@ public static class AppInfo
     /// <summary>Версия для сравнения с релизами GitHub.</summary>
     public static Version CurrentVersion { get; } = ReadVersion();
 
+    /// <summary>
+    /// Версия для интерфейса: 4 сегмента, если есть ревизия (1.8.22.1),
+    /// иначе три (1.8.22). Четвёртый сегмент не отбрасываем.
+    /// </summary>
+    public static string DisplayVersion => CurrentVersion.Revision > 0
+        ? CurrentVersion.ToString(4)
+        : CurrentVersion.ToString(3);
+
     private static bool DetectPackaged()
     {
         try

@@ -2369,7 +2369,7 @@ public sealed partial class MainPage : Page, IRemoteHost
         if (UpdateService.IsSupported)
         {
             CheckUpdatesToggle.IsOn = SettingsService.CheckUpdatesOnStartup;
-            UpdateStatusText.Text = LocalizationService.Format("Update_CurrentVersion", AppInfo.PackageVersion);
+            UpdateStatusText.Text = LocalizationService.Format("Update_UpToDate", AppInfo.DisplayVersion);
         }
         else
         {
@@ -6728,7 +6728,6 @@ public sealed partial class MainPage : Page, IRemoteHost
         }
 
         _isCheckingUpdates = true;
-        InstallUpdateButton.IsEnabled = false;
         UpdateNowButton.IsEnabled = false;
         CheckUpdatesButton.IsEnabled = false;
 
@@ -6755,7 +6754,6 @@ public sealed partial class MainPage : Page, IRemoteHost
         finally
         {
             _isCheckingUpdates = false;
-            InstallUpdateButton.IsEnabled = true;
             UpdateNowButton.IsEnabled = true;
             CheckUpdatesButton.IsEnabled = true;
         }
@@ -6801,12 +6799,10 @@ public sealed partial class MainPage : Page, IRemoteHost
             return;
         }
 
+        var previousStatus = UpdateStatusText.Text;
         _isCheckingUpdates = true;
-        if (userInitiated)
-        {
-            CheckUpdatesButton.IsEnabled = false;
-            UpdateStatusText.Text = LocalizationService.Get("Update_Checking");
-        }
+        CheckUpdatesButton.IsEnabled = false;
+        UpdateStatusText.Text = LocalizationService.Get("Update_Checking");
 
         try
         {
@@ -6815,37 +6811,36 @@ public sealed partial class MainPage : Page, IRemoteHost
             {
                 case UpdateCheckStatus.UpdateAvailable when result.Info is not null:
                     _pendingUpdate = result.Info;
-                    UpdateStatusText.Text = LocalizationService.Format("Update_Available", result.Info.Version);
-                    UpdateBar.Title = LocalizationService.Get("Update_BarTitle");
-                    UpdateBar.Message = LocalizationService.Format("Update_BarMessage", result.Info.Version);
-                    UpdateBar.IsOpen = true;
+                    UpdateStatusText.Text = LocalizationService.Format(
+                        "Update_Available",
+                        result.Info.Version,
+                        AppInfo.DisplayVersion);
+                    UpdateNowButton.Content = LocalizationService.Format(
+                        "Settings_UpdatesInstallButton.Content",
+                        result.Info.Version);
                     UpdateNowButton.Visibility = Visibility.Visible;
                     UpdateNotesLink.Visibility = Visibility.Visible;
-
-                    // При старте дополнительно показываем системное уведомление:
-                    // окно может быть свёрнуто или не в фокусе.
-                    if (!userInitiated)
-                    {
-                        NotificationService.Show(
-                            LocalizationService.Get("Update_ToastTitle"),
-                            LocalizationService.Format("Update_ToastBody", result.Info.Version));
-                    }
-
+                    SettingsUpdateBadge.Visibility = Visibility.Visible;
                     break;
 
                 case UpdateCheckStatus.UpToDate:
                     _pendingUpdate = null;
                     UpdateNowButton.Visibility = Visibility.Collapsed;
                     UpdateNotesLink.Visibility = Visibility.Collapsed;
+                    SettingsUpdateBadge.Visibility = Visibility.Collapsed;
                     UpdateStatusText.Text = LocalizationService.Format(
                         "Update_UpToDate",
-                        AppInfo.SemanticVersion);
+                        AppInfo.DisplayVersion);
                     break;
 
                 case UpdateCheckStatus.NotConfigured:
                     if (userInitiated)
                     {
                         UpdateStatusText.Text = LocalizationService.Get("Update_NotConfigured");
+                    }
+                    else
+                    {
+                        UpdateStatusText.Text = previousStatus;
                     }
 
                     break;
@@ -6856,6 +6851,10 @@ public sealed partial class MainPage : Page, IRemoteHost
                         UpdateStatusText.Text = LocalizationService.Format(
                             "Update_Failed",
                             result.Error ?? string.Empty);
+                    }
+                    else
+                    {
+                        UpdateStatusText.Text = previousStatus;
                     }
 
                     break;

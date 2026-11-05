@@ -284,20 +284,20 @@
   <data name="Settings_UpdatesCheck.Header" xml:space="preserve"><value>App version</value></data>
   <data name="Settings_UpdatesCheck.Description" xml:space="preserve"><value>The installer closes the app, replaces files and starts the new version. Library, queue and settings are kept.</value></data>
   <data name="Settings_UpdatesCheckButton.Content" xml:space="preserve"><value>Check for updates</value></data>
-  <data name="Update_CurrentVersion" xml:space="preserve"><value>Version {0}</value></data>
+  
   <data name="Update_Checking" xml:space="preserve"><value>Checking for updates…</value></data>
-  <data name="Update_UpToDate" xml:space="preserve"><value>You have the latest version {0}.</value></data>
-  <data name="Update_Available" xml:space="preserve"><value>Version {0} is available.</value></data>
+  <data name="Update_UpToDate" xml:space="preserve"><value>You have the latest version v{0}</value></data>
+  <data name="Update_Available" xml:space="preserve"><value>Version v{0} is available (current: v{1})</value></data>
   <data name="Update_NotConfigured" xml:space="preserve"><value>Update channel is not configured.</value></data>
   <data name="Update_Failed" xml:space="preserve"><value>Could not check for updates: {0}</value></data>
   <data name="Update_Downloading" xml:space="preserve"><value>Downloading update… {0}</value></data>
   <data name="Update_Installing" xml:space="preserve"><value>Starting the installer…</value></data>
   <data name="Update_InstallFailed" xml:space="preserve"><value>Could not start the update installer.</value></data>
-  <data name="Update_BarTitle" xml:space="preserve"><value>Update available</value></data>
-  <data name="Update_BarMessage" xml:space="preserve"><value>Tempo Karaoke {0} is ready to install.</value></data>
-  <data name="Update_InstallButton.Content" xml:space="preserve"><value>Update</value></data>
-  <data name="Update_ToastTitle" xml:space="preserve"><value>Tempo Karaoke update available</value></data>
-  <data name="Update_ToastBody" xml:space="preserve"><value>Version {0} is ready. Open Settings → Updates to install it.</value></data>
-  <data name="Settings_UpdatesInstallButton.Content" xml:space="preserve"><value>Update</value></data>
+  
+  
+  
+  
+  
+  <data name="Settings_UpdatesInstallButton.Content" xml:space="preserve"><value>Update to v{0}</value></data>
   <data name="Settings_UpdatesNotes.Content" xml:space="preserve"><value>What's new</value></data>
 </root>
