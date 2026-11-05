@@ -14,11 +14,12 @@ jobs:
         with:
           dotnet-version: '10.0.x'
 
+      # RID нужен заранее: приложение собирается под win-x64 и тянет runtime-паки.
       - name: Restore
-        run: dotnet restore TempoKaraoke.slnx
+        run: dotnet restore TempoKaraoke.slnx -r win-x64
 
       - name: Build app
-        run: dotnet build src/TempoKaraoke/TempoKaraoke.csproj -c Debug -p:Platform=x64 -p:RuntimeIdentifier=win-x64 --no-restore
+        run: dotnet build src/TempoKaraoke/TempoKaraoke.csproj -c Debug -p:Platform=x64 -p:RuntimeIdentifier=win-x64
 
       - name: Test
-        run: dotnet test tests/TempoKaraoke.Tests/TempoKaraoke.Tests.csproj -c Debug --no-restore
+        run: dotnet test tests/TempoKaraoke.Tests/TempoKaraoke.Tests.csproj -c Debug
