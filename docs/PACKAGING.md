@@ -362,8 +362,12 @@ Store подписывает пакет сам.
 
 ```powershell
 .\scripts\build-msix.ps1 -Mode store
-# -> artifacts\msix\TempoKaraoke_<версия>_x64.msix
+# -> artifacts\msix\store\TempoKaraoke_<версия>_x64.msix
 ```
+
+Пакет для sideload собирается в `artifacts\msix\sideload\` и **подписан**
+самодельным сертификатом — его в Partner Center загружать нельзя (Store
+принимает только неподписанный пакет и подписывает его сам).
 
 Далее в Partner Center: **Packages → Add package** → загрузить `.msix`
 (принимаются `.msix`, `.msixbundle`, `.msixupload`) → заполнить Store listing →

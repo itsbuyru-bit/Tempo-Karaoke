@@ -27,7 +27,7 @@ param(
 $ErrorActionPreference = 'Stop'
 $root = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..')).Path
 if (-not $CertPath) { $CertPath = Join-Path $root 'certs\TempoKaraoke.pfx' }
-if (-not $Output) { $Output = Join-Path $root 'artifacts\msix' }
+if (-not $Output) { $Output = Join-Path $root "artifacts\msix\$Mode" }
 $project = Join-Path $root 'src\TempoKaraoke\TempoKaraoke.csproj'
 New-Item -ItemType Directory -Force -Path $Output | Out-Null
 
