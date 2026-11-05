@@ -178,7 +178,8 @@ public static class UpdateService
 
     /// <summary>
     /// Запускает установщик в тихом режиме. Inno сам закроет приложение и
-    /// перезапустит его после установки.
+    /// перезапустит его после установки. Область установки сохраняется:
+    /// Program Files → /ALLUSERS, иначе → /CURRENTUSER.
     /// </summary>
     public static bool LaunchInstaller(string installerPath)
     {
@@ -187,13 +188,43 @@ public static class UpdateService
             return false;
         }
 
+        var scope = IsInstalledForAllUsers() ? " /ALLUSERS" : " /CURRENTUSER";
+
         System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(installerPath)
         {
-            Arguments = "/SILENT /SUPPRESSMSGBOXES /CLOSEAPPLICATIONS /NORESTART",
+            Arguments = "/SILENT /SUPPRESSMSGBOXES /CLOSEAPPLICATIONS /NORESTART" + scope,
             UseShellExecute = true,
         });
 
         return true;
+    }
+
+    /// <summary>Приложение установлено в Program Files → установка «для всех».</summary>
+    private static bool IsInstalledForAllUsers()
+    {
+        try
+        {
+            var directory = AppContext.BaseDirectory;
+            var roots = new[]
+            {
+                Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),
+                Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86),
+            };
+
+            foreach (var root in roots)
+            {
+                if (!string.IsNullOrEmpty(root) && directory.StartsWith(root, StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+        }
+        catch
+        {
+            // Если путь не определить — обновляемся как per-user.
+        }
+
+        return false;
     }
 
     private static bool IsInstallerAsset(GitHubReleaseAsset asset)

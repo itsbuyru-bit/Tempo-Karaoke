@@ -19,14 +19,20 @@ public static class Program
             return WiFiDirectHelperRuntime.Run(args);
         }
 
-        if (!AppInfo.IsPackaged && !HasLocalWindowsAppRuntime())
+        if (!AppInfo.IsPackaged)
         {
-            // Портативная сборка (WindowsPackageType=None): Windows App SDK не
-            // инициализируется автоматически (WindowsAppSdkAutoInitialize=false),
-            // поэтому поднимаем рантайм вручную. 0x00020006 — Windows App SDK 2.6.
-            // Self-contained сборке bootstrap не нужен: он поднял бы установленный
-            // рантайм вместо локального.
-            global::Microsoft.Windows.ApplicationModel.DynamicDependency.Bootstrap.TryInitialize(0x00020006, out _);
+            // Стабильный AUMID нужен уведомлениям и группировке на панели задач.
+            TrySetAppUserModelId();
+
+            if (!HasLocalWindowsAppRuntime())
+            {
+                // Портативная сборка (WindowsPackageType=None): Windows App SDK не
+                // инициализируется автоматически (WindowsAppSdkAutoInitialize=false),
+                // поэтому поднимаем рантайм вручную. 0x00020006 — Windows App SDK 2.6.
+                // Self-contained сборке bootstrap не нужен: он поднял бы установленный
+                // рантайм вместо локального.
+                global::Microsoft.Windows.ApplicationModel.DynamicDependency.Bootstrap.TryInitialize(0x00020006, out _);
+            }
         }
 
         global::WinRT.ComWrappersSupport.InitializeComWrappers();
@@ -53,6 +59,23 @@ public static class Program
         catch
         {
             return false;
+        }
+    }
+
+    private const string AppUserModelId = "CappuccinoDev.TempoKaraoke";
+
+    [System.Runtime.InteropServices.DllImport("shell32.dll", CharSet = System.Runtime.InteropServices.CharSet.Unicode)]
+    private static extern int SetCurrentProcessExplicitAppUserModelID(string appId);
+
+    private static void TrySetAppUserModelId()
+    {
+        try
+        {
+            SetCurrentProcessExplicitAppUserModelID(AppUserModelId);
+        }
+        catch
+        {
+            // Не критично: без AUMID просто не будет уведомлений/группировки.
         }
     }
 }

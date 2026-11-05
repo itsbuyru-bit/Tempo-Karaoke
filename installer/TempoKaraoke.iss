@@ -41,8 +41,10 @@ DisableProgramGroupPage=yes
 DisableDirPage=no
 DirExistsWarning=no
 UsePreviousAppDir=yes
-; Установка в профиль пользователя: без UAC и без запроса пароля администратора.
+; Установка в профиль пользователя по умолчанию; диалог позволяет выбрать
+; «для всех пользователей» (Program Files + UAC).
 PrivilegesRequired=lowest
+PrivilegesRequiredOverridesAllowed=dialog commandline
 ; Приложение работает без identity, поэтому архитектура — только x64.
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
@@ -75,8 +77,9 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 Source: "{#PublishDir}\*"; DestDir: "{app}"; Excludes: "*.pdb,*.lib"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
-Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
-Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
+; AppUserModelID связывает ярлык с уведомлениями приложения.
+Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; AppUserModelID: "CappuccinoDev.TempoKaraoke"
+Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon; AppUserModelID: "CappuccinoDev.TempoKaraoke"
 
 [Run]
 ; В тихом режиме (обновление из приложения) тоже перезапускаем новую версию.

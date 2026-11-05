@@ -6798,6 +6798,16 @@ public sealed partial class MainPage : Page, IRemoteHost
                     UpdateBar.Title = LocalizationService.Get("Update_BarTitle");
                     UpdateBar.Message = LocalizationService.Format("Update_BarMessage", result.Info.Version);
                     UpdateBar.IsOpen = true;
+
+                    // При старте дополнительно показываем системное уведомление:
+                    // окно может быть свёрнуто или не в фокусе.
+                    if (!userInitiated)
+                    {
+                        NotificationService.Show(
+                            LocalizationService.Get("Update_ToastTitle"),
+                            LocalizationService.Format("Update_ToastBody", result.Info.Version));
+                    }
+
                     break;
 
                 case UpdateCheckStatus.UpToDate:

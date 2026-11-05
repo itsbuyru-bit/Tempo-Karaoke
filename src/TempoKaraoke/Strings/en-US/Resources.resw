@@ -296,4 +296,6 @@
   <data name="Update_BarTitle" xml:space="preserve"><value>Update available</value></data>
   <data name="Update_BarMessage" xml:space="preserve"><value>Tempo Karaoke {0} is ready to install.</value></data>
   <data name="Update_InstallButton.Content" xml:space="preserve"><value>Update</value></data>
+  <data name="Update_ToastTitle" xml:space="preserve"><value>Tempo Karaoke update available</value></data>
+  <data name="Update_ToastBody" xml:space="preserve"><value>Version {0} is ready. Open Settings → Updates to install it.</value></data>
 </root>

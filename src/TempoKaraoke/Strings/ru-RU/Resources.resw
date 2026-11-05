@@ -296,4 +296,6 @@
   <data name="Update_BarTitle" xml:space="preserve"><value>Доступно обновление</value></data>
   <data name="Update_BarMessage" xml:space="preserve"><value>Tempo Karaoke {0} уже можно установить.</value></data>
   <data name="Update_InstallButton.Content" xml:space="preserve"><value>Обновить</value></data>
+  <data name="Update_ToastTitle" xml:space="preserve"><value>Доступно обновление Tempo Karaoke</value></data>
+  <data name="Update_ToastBody" xml:space="preserve"><value>Версия {0} уже вышла. Откройте «Параметры → Обновления», чтобы установить.</value></data>
 </root>
