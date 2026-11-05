@@ -65,8 +65,6 @@ public static class SettingsService
     private static readonly object Sync = new();
     private static SettingsData? _data;
 
-    public const string DefaultVideoRoot = @"G:\Karaoke";
-
     /// <summary>Файл хранилища; миграция переписывает пути прямо в нём.</summary>
     public static string FilePath => AppStorage.PathFor(FileName);
 
@@ -90,19 +88,7 @@ public static class SettingsService
         }
     }
 
-    public static List<string> VideoRoots
-    {
-        get
-        {
-            var roots = Data.VideoRoots;
-            if (!Data.VideoRootsConfigured && roots.Count == 0)
-            {
-                return new List<string> { DefaultVideoRoot };
-            }
-
-            return new List<string>(roots);
-        }
-    }
+    public static List<string> VideoRoots => new(Data.VideoRoots);
 
     public static void SetVideoRoots(IEnumerable<string> roots)
     {
@@ -307,11 +293,6 @@ public static class SettingsService
         catch
         {
             // В портативном режиме LocalSettings недоступны — это нормально.
-        }
-
-        if (data.VideoRoots.Count == 0)
-        {
-            data.VideoRoots.Add(DefaultVideoRoot);
         }
 
         data.VideoRootsConfigured = true;
