@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -41,6 +42,9 @@ public sealed class CoreBehaviorTests
     [Fact]
     public void GroupsVersionsOfTheSameSongAndPicksLargest()
     {
+        // Core форматирует подписи по текущей UI-культуре — фиксируем её,
+        // иначе тест падает на англоязычном CI.
+        using var culture = CultureScope.For("ru-RU");
         var small = new MediaItem(@"G:\Karaoke\A\Алла Пугачёва - Свеча горела.mkv", "Алла Пугачёва", "Свеча горела", "A", sizeBytes: 100);
         var large = new MediaItem(@"G:\Karaoke\B\Алла Пугачёва - Свеча горела.mkv", "Алла Пугачёва", "Свеча горела", "B", sizeBytes: 200);
 
@@ -96,6 +100,7 @@ public sealed class CoreBehaviorTests
     [Fact]
     public void PlaylistAddsAndDeduplicates()
     {
+        using var culture = CultureScope.For("ru-RU");
         var playlist = new Playlist { Name = "Тест" };
 
         Assert.True(playlist.AddItem(@"G:\Karaoke\a.mkv"));
@@ -113,5 +118,28 @@ public sealed class CoreBehaviorTests
     {
         var cleaned = MediaTitleCleaner.Clean("Исполнитель - Песня (Клип 2024) [Текст песни] Караоке");
         Assert.Equal("Исполнитель - Песня", cleaned);
+    }
+
+    /// <summary>Временно переключает культуру потока, чтобы тест не зависел от локали CI.</summary>
+    private sealed class CultureScope : IDisposable
+    {
+        private readonly CultureInfo _previousCulture;
+        private readonly CultureInfo _previousUiCulture;
+
+        private CultureScope(CultureInfo culture)
+        {
+            _previousCulture = CultureInfo.CurrentCulture;
+            _previousUiCulture = CultureInfo.CurrentUICulture;
+            CultureInfo.CurrentCulture = culture;
+            CultureInfo.CurrentUICulture = culture;
+        }
+
+        public static CultureScope For(string name) => new(CultureInfo.GetCultureInfo(name));
+
+        public void Dispose()
+        {
+            CultureInfo.CurrentCulture = _previousCulture;
+            CultureInfo.CurrentUICulture = _previousUiCulture;
+        }
     }
 }
