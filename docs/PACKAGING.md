@@ -381,7 +381,7 @@ Submit for certification.
   bundle через `winapp package ... --arch x64 --arch arm64 --no-sign`.
 - Скриншоты для листинга: `poster/tempo-karaoke-poster-ru.jpg` и
   `poster/tempo-karaoke-poster-en.jpg` (2752×1536, 16:9) подходят как
-  Store screenshot (минимум 1366×768). Отдельно Partner Center попросит
-  Store logo 300×300 PNG — его нужно подготовить из иконки приложения.
+  Store screenshot (минимум 1366×768). Store logo 300×300 —
+  `poster/tempo-karaoke-store-logo-300.png`.
 - После смены identity старые установки (и MSIX, и установщик) считаются другим
   приложением: обновление поверх них не встанет, нужна переустановка.
