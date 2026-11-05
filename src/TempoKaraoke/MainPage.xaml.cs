@@ -2346,7 +2346,7 @@ public sealed partial class MainPage : Page, IRemoteHost
         RemoteView.Visibility = Visibility.Collapsed;
         RemoteParticipantsView.Visibility = Visibility.Collapsed;
         AboutView.Visibility = Visibility.Visible;
-        AboutVersionText.Text = LocalizationService.Format("About_Version", AppInfo.SemanticVersion);
+        AboutVersionText.Text = LocalizationService.Format("About_Version", AppInfo.DisplayVersion);
         ApplyLanguageDeferred(AboutView);
     }
 
@@ -2595,7 +2595,7 @@ public sealed partial class MainPage : Page, IRemoteHost
             PopulateFolders();
             ApplyFilter();
             UpdateQueueCount();
-            AboutVersionText.Text = LocalizationService.Format("About_Version", AppInfo.SemanticVersion);
+            AboutVersionText.Text = LocalizationService.Format("About_Version", AppInfo.DisplayVersion);
         }
         catch (Exception ex)
         {
@@ -8150,7 +8150,7 @@ public sealed partial class MainPage : Page, IRemoteHost
             PopulateFolders();
             ApplyFilter();
             UpdateQueueCount();
-            AboutVersionText.Text = LocalizationService.Format("About_Version", AppInfo.SemanticVersion);
+            AboutVersionText.Text = LocalizationService.Format("About_Version", AppInfo.DisplayVersion);
             if (LanguageComboBox is not null)
             {
                 _isInitializingSettings = true;

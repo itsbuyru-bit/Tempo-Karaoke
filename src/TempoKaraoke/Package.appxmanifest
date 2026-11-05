@@ -12,7 +12,7 @@
   <Identity
     Name="CappuccinoDev.TempoKaraoke"
     Publisher="CN=9A24F022-CB13-4663-A71C-17E8B461355B"
-    Version="1.8.22.2" />
+    Version="1.8.22.3" />
 
   <mp:PhoneIdentity PhoneProductId="8ECFDE07-71F6-4AC1-9968-53F119FF033C" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
