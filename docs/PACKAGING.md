@@ -379,9 +379,8 @@ Submit for certification.
   пакет не пропустят.
 - Архитектура — x64. Для ARM64 соберите отдельный пакет (`-Arch arm64`) или
   bundle через `winapp package ... --arch x64 --arch arm64 --no-sign`.
-- Скриншоты для листинга: `poster/tempo-karaoke-poster-ru.jpg` и
-  `poster/tempo-karaoke-poster-en.jpg` (2752×1536, 16:9) подходят как
-  Store screenshot (минимум 1366×768). Store logo 300×300 —
-  `poster/tempo-karaoke-store-logo-300.png`.
+- Скриншоты для листинга делайте с реального экрана приложения на своей
+  медиатеке: в репозитории нет ни чужих библиотек, ни обложек.
+  Store logo 300×300 — `poster/tempo-karaoke-store-logo-300.png`.
 - После смены identity старые установки (и MSIX, и установщик) считаются другим
   приложением: обновление поверх них не встанет, нужна переустановка.

@@ -24,6 +24,9 @@
 /screenshot.png
 /thumb-test.png
 
+# Постеры-макеты с чужой медиатекой: остаются локально, в репозиторий не идут
+/poster/*.jpg
+
 # IDE / user
 .vs/
 .idea/
