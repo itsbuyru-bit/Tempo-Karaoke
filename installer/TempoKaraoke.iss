@@ -101,3 +101,36 @@ begin
   KillRunningApp();
   Result := '';
 end;
+
+// --- Удаление пользовательских данных --------------------------------------
+// Галочка в деинсталляторе: по умолчанию данные остаются, чтобы переустановка
+// не теряла настройки, очередь и кэш библиотеки.
+var
+  DeleteUserData: Boolean;
+  UserDataDir: String;
+
+function InitializeUninstall(): Boolean;
+begin
+  Result := True;
+  DeleteUserData := False;
+  UserDataDir := ExpandConstant('{localappdata}\TempoKaraoke');
+
+  // При тихой деинсталляции ничего не спрашиваем и данные не трогаем.
+  if UninstallSilent or (not DirExists(UserDataDir)) then
+    Exit;
+
+  DeleteUserData := MsgBox(
+    'Удалить также настройки, очередь и кэш библиотеки?' + #13#10 +
+    UserDataDir + #13#10 + #13#10 +
+    'Если оставить (Нет), данные сохранятся для следующей установки.',
+    mbConfirmation, MB_YESNO) = IDYES;
+end;
+
+procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
+begin
+  if (CurUninstallStep = usPostUninstall) and DeleteUserData then
+  begin
+    KillRunningApp();
+    DelTree(UserDataDir, True, True, True);
+  end;
+end;

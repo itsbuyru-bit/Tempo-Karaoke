@@ -23,10 +23,10 @@ jobs:
         run: dotnet restore TempoKaraoke.slnx -r win-x64
 
       - name: Test
-        run: dotnet test tests/TempoKaraoke.Tests/TempoKaraoke.Tests.csproj -c Release --no-restore
+        run: dotnet test tests/TempoKaraoke.Tests/TempoKaraoke.Tests.csproj -c Release
 
       - name: Publish portable
-        run: dotnet publish src/TempoKaraoke/TempoKaraoke.csproj -c Release -p:PublishProfile=portable-x64 --no-restore
+        run: dotnet publish src/TempoKaraoke/TempoKaraoke.csproj -c Release -p:PublishProfile=portable-x64
 
       - name: Install Inno Setup
         run: choco install innosetup --no-progress -y
