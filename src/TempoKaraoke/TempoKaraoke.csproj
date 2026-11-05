@@ -40,7 +40,10 @@
     <Content Include="Assets\Square150x150Logo*.png" />
     <Content Include="Assets\StoreLogo*.png" />
     <Content Include="Assets\AppIcon.ico" />
-    <Content Include="Assets\AppIcon-*.png" />
+    <!-- AppIcon-192.png нужен в рантайме: иконка в шапке (ms-appx:///Assets/...) и /appicon.png веб-пульта (читается из каталога приложения). -->
+    <Content Include="Assets\AppIcon-*.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Assets\Wide310x150Logo*.png" />
     <Content Include="public\locales\*.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
