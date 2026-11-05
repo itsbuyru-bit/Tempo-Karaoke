@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/TempoKaraoke.Core/TempoKaraoke.Core.csproj" />
+    <Project Path="src/TempoKaraoke/TempoKaraoke.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/TempoKaraoke.Tests/TempoKaraoke.Tests.csproj" />
+  </Folder>
+</Solution>

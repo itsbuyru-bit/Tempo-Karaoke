@@ -9,8 +9,20 @@
 *.appxbundle
 *.appxupload
 
-# Reasonix runtime state (skills in .reasonix/skills are tracked)
-.reasonix/tasks/
+# Signing material (never commit dev certificates)
+*.pfx
+*.cer
+
+# Reasonix runtime state and agent-only skills
+.reasonix/
+
+# Agent tooling config (локальная настройка MCP)
+.mcp.json
+
+# Исходники иконок и скриншоты — не нужны для сборки приложения
+/ico/
+/screenshot.png
+/thumb-test.png
 
 # IDE / user
 .vs/
@@ -27,6 +39,20 @@ crash/
 # Publish output
 publish/
 
+# Installer output
+artifacts/
+
+# Signing material (never commit dev certificates)
+*.pfx
+*.cer
+certs/
+
 # OS
 .DS_Store
 Thumbs.db
+
+# Local scratch/export files (not part of the app)
+export.json
+Export.md
+tempokaraoke_mobile_remote.html
+*.trx

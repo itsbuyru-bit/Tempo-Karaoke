@@ -6,19 +6,19 @@
   xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
   xmlns:uap10="http://schemas.microsoft.com/appx/manifest/uap/windows10/10"
   xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
-  xmlns:systemai="http://schemas.microsoft.com/appx/manifest/systemai/windows10"
-  IgnorableNamespaces="uap uap10 rescap systemai">
+
+  IgnorableNamespaces="uap uap10 rescap">
 
   <Identity
-    Name="8ECFDE07-71F6-4AC1-9968-53F119FF033C"
-    Publisher="CN=AppPublisher"
-    Version="1.0.0.0" />
+    Name="CappuccinoDev.TempoKaraoke"
+    Publisher="CN=9A24F022-CB13-4663-A71C-17E8B461355B"
+    Version="1.8.21.0" />
 
   <mp:PhoneIdentity PhoneProductId="8ECFDE07-71F6-4AC1-9968-53F119FF033C" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
     <DisplayName>Tempo Karaoke</DisplayName>
-    <PublisherDisplayName>AppPublisher</PublisherDisplayName>
+    <PublisherDisplayName>Cappuccino Dev</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
     <uap10:PackageIntegrity>
       <uap10:Content Enforcement="on"/>
@@ -52,6 +52,6 @@
 
   <Capabilities>
     <rescap:Capability Name="runFullTrust" />
-    <systemai:Capability Name="systemAIModels"/>
+    <rescap:Capability Name="broadFileSystemAccess" />
   </Capabilities>
 </Package>

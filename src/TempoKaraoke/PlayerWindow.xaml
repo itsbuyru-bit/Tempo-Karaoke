@@ -5,12 +5,23 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d">
+    mc:Ignorable="d" xmlns:loc="using:TempoKaraoke">
 
     <Grid
         x:Name="RootGrid"
         Background="Black"
+        KeyboardAcceleratorPlacementMode="Hidden"
         PointerMoved="RootGrid_PointerMoved">
+        <Grid.Resources>
+            <Style x:Key="PlayerIconButtonStyle" TargetType="Button">
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="BorderThickness" Value="0" />
+                <Setter Property="CornerRadius" Value="6" />
+                <Setter Property="MinWidth" Value="40" />
+                <Setter Property="MinHeight" Value="40" />
+                <Setter Property="Padding" Value="8" />
+            </Style>
+        </Grid.Resources>
         <Grid.KeyboardAccelerators>
             <KeyboardAccelerator Key="F11" Invoked="FullScreen_Invoked" />
             <KeyboardAccelerator Key="Escape" Invoked="Escape_Invoked" />
@@ -32,7 +43,7 @@
             x:Name="ControlsBar"
             Grid.Row="1"
             Padding="16,8"
-            Background="#CC1A1A1A"
+            Background="{ThemeResource SolidBackgroundFillColorBaseBrush}"
             PointerEntered="ControlsBar_PointerEntered"
             PointerExited="ControlsBar_PointerExited">
             <Grid ColumnSpacing="12">
@@ -47,76 +58,85 @@
 
                 <StackPanel Orientation="Horizontal" Spacing="4">
                     <Button
-                        Click="Previous_Click"
-                        ToolTipService.ToolTip="Предыдущая">
+ Click="Previous_Click" Style="{StaticResource PlayerIconButtonStyle}" loc:Localization.AutomationNameKey="Ui_Previous_1_AutomationName.AutomationName" loc:Localization.ToolTipKey="Ui_Previous_1_ToolTip.ToolTip">
                         <SymbolIcon Symbol="Previous" />
                     </Button>
                     <Button
-                        Click="PlayPause_Click"
-                        Style="{StaticResource AccentButtonStyle}"
-                        ToolTipService.ToolTip="Играть/пауза">
+ MinWidth="40" MinHeight="40" Click="PlayPause_Click" Style="{StaticResource AccentButtonStyle}" loc:Localization.AutomationNameKey="Ui_PlayOrPause_2_AutomationName.AutomationName" loc:Localization.ToolTipKey="Ui_PlayOrPause_2_ToolTip.ToolTip">
                         <SymbolIcon x:Name="PlayPauseIcon" Symbol="Play" />
                     </Button>
-                    <Button Click="Stop_Click" ToolTipService.ToolTip="Стоп">
+                    <Button
+ Click="Stop_Click" Style="{StaticResource PlayerIconButtonStyle}" loc:Localization.AutomationNameKey="Ui_Stop_3_AutomationName.AutomationName" loc:Localization.ToolTipKey="Ui_Stop_3_ToolTip.ToolTip">
                         <SymbolIcon Symbol="Stop" />
                     </Button>
-                    <Button Click="Next_Click" ToolTipService.ToolTip="Следующая">
+                    <Button
+ Click="Next_Click" Style="{StaticResource PlayerIconButtonStyle}" loc:Localization.AutomationNameKey="Ui_Next_4_AutomationName.AutomationName" loc:Localization.ToolTipKey="Ui_Next_4_ToolTip.ToolTip">
                         <SymbolIcon Symbol="Next" />
                     </Button>
                 </StackPanel>
 
                 <Slider
-                    x:Name="SeekSlider"
-                    Grid.Column="1"
-                    VerticalAlignment="Center"
-                    IsThumbToolTipEnabled="False"
-                    Maximum="1"
-                    Minimum="0"
-                    PointerCaptureLost="SeekSlider_PointerCaptureLost"
-                    PointerPressed="SeekSlider_PointerPressed"
-                    PointerReleased="SeekSlider_PointerReleased"
-                    StepFrequency="1000"
-                    ValueChanged="SeekSlider_ValueChanged" />
+ x:Name="SeekSlider" Grid.Column="1" VerticalAlignment="Center" IsThumbToolTipEnabled="False" Maximum="1" Minimum="0" PointerCaptureLost="SeekSlider_PointerCaptureLost" PointerPressed="SeekSlider_PointerPressed" PointerReleased="SeekSlider_PointerReleased" StepFrequency="1000" ValueChanged="SeekSlider_ValueChanged" loc:Localization.AutomationNameKey="Ui_PlaybackPosition_5_AutomationName.AutomationName" />
 
                 <TextBlock
                     x:Name="TimeText"
                     Grid.Column="2"
                     VerticalAlignment="Center"
-                    FontFamily="Segoe UI"
-                    FontSize="12"
-                    FontWeight="Normal"
-                    Foreground="White"
+                    Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                    Style="{StaticResource CaptionTextBlockStyle}"
                     Text="0:00:00 / 0:00:00" />
 
                 <StackPanel
                     Grid.Column="3"
                     Orientation="Horizontal"
                     Spacing="4">
-                    <Button Click="Mute_Click" ToolTipService.ToolTip="Звук">
+                    <Button
+ Click="Mute_Click" Style="{StaticResource PlayerIconButtonStyle}" loc:Localization.AutomationNameKey="Ui_Mute_6_AutomationName.AutomationName" loc:Localization.ToolTipKey="Ui_Mute_6_ToolTip.ToolTip">
                         <SymbolIcon x:Name="MuteIcon" Symbol="Volume" />
                     </Button>
                     <Slider
-                        x:Name="VolumeSlider"
-                        Width="110"
-                        VerticalAlignment="Center"
-                        Maximum="100"
-                        Minimum="0"
-                        ValueChanged="VolumeSlider_ValueChanged" />
+ x:Name="VolumeSlider" Width="110" VerticalAlignment="Center" Maximum="100" Minimum="0" ValueChanged="VolumeSlider_ValueChanged" loc:Localization.AutomationNameKey="Ui_Volume_7_AutomationName.AutomationName" />
                 </StackPanel>
 
                 <Button
-                    Grid.Column="4"
-                    Click="FullScreen_Click"
-                    ToolTipService.ToolTip="Полный экран (F11)">
+ Grid.Column="4" Click="FullScreen_Click" Style="{StaticResource PlayerIconButtonStyle}" loc:Localization.AutomationNameKey="Ui_FullScreen_8_AutomationName.AutomationName" loc:Localization.ToolTipKey="Ui_FullScreen_8_ToolTip.ToolTip">
                     <SymbolIcon Symbol="FullScreen" />
                 </Button>
 
                 <Button
-                    Grid.Column="5"
-                    Click="Return_Click"
-                    Content="Вернуть в окно"
-                    Style="{StaticResource AccentButtonStyle}" />
+ Grid.Column="5" Click="Return_Click" Style="{StaticResource AccentButtonStyle}" x:Uid="Ui_ReturnToWindow" loc:Localization.Key="Ui_ReturnToWindow.Content" />
             </Grid>
         </Border>
+
+        <!--  Отсчёт перед следующим треком в откреплённом окне  -->
+        <Grid
+            x:Name="CountdownOverlay"
+            Grid.RowSpan="2"
+            Background="#E6000000"
+            Visibility="Collapsed">
+            <StackPanel
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Spacing="12">
+                <TextBlock
+ HorizontalAlignment="Center" Foreground="White" Style="{StaticResource SubtitleTextBlockStyle}" x:Uid="Ui_NextIn_10" loc:Localization.Key="Ui_NextIn_10.Text" />
+                <TextBlock
+                    x:Name="CountdownValueText"
+                    HorizontalAlignment="Center"
+                    FontSize="72"
+                    FontWeight="SemiBold"
+                    Foreground="White"
+                    Text="10" />
+                <StackPanel
+                    HorizontalAlignment="Center"
+                    Orientation="Horizontal"
+                    Spacing="12">
+                    <Button
+ Click="CountdownPlayNow_Click" Style="{StaticResource AccentButtonStyle}" x:Uid="Ui_PlayNow_11" loc:Localization.Key="Ui_PlayNow_11.Content" />
+                    <Button
+ Click="CountdownCancel_Click" x:Uid="Ui_Cancel_12" loc:Localization.Key="Ui_Cancel_12.Content" />
+                </StackPanel>
+            </StackPanel>
+        </Grid>
     </Grid>
 </Window>

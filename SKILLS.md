@@ -4,7 +4,7 @@
 **project scope** (высший приоритет для этого workspace). Вызов — `/имя` или
 автоматически по описанию.
 
-## Что установлено (22)
+## Что установлено (27)
 
 ### Microsoft WinUI 3 — 7 скиллов
 
@@ -43,11 +43,30 @@
 | `winapp-maui` | Только если выберете .NET MAUI |
 | `winapp-troubleshoot` | Ошибки упаковки, подписи, установки, identity |
 
-### Проектные — 1 скилл
+### Microsoft WinUI Gallery — 2 скилла
+
+Источник: [microsoft/WinUI-Gallery](https://github.com/microsoft/WinUI-Gallery),
+коммит `7360ac322414e118eadfb0c7c2f4ecc31a218f59` (2026-10-27), MIT.
+Текст скиллов синтезирован под Tempo Karaoke, а не скопирован из Gallery.
+
+| Скилл | Когда использовать |
+|---|---|
+| `winui-gallery-gost` | Нормативный ГОСТ оформления: навигация, типографика, отступы, карточки, темы, a11y, приёмка. Перед любой страницей или ревью XAML |
+| `winui-gallery-patterns` | Готовые рецепты: shell, заголовок с вкладками, тулбар, сетка, настройки, очередь, свойства, медиа-панель |
+
+### Microsoft libraries — 2 скилла
+
+| Скилл | Когда использовать | Источник / лицензия |
+|---|---|---|
+| `win2d` | Кастомная GPU-2D-графика в WinUI 3: waveform, анимация текста, частицы, визуализаторы. Не для обычного видео | [Microsoft/Win2D](https://github.com/Microsoft/Win2D), MIT |
+| `cswin32` | Win32 P/Invoke и COM, когда WinRT/Windows App SDK API не хватает: мониторы/DPI, hotkeys, window styles | [Microsoft/CsWin32](https://github.com/Microsoft/CsWin32), MIT |
+
+### Проектные — 2 скилла
 
 | Скилл | Назначение |
 |---|---|
 | `grill-me` | Допрос требований до кода: по одному вопросу через `ask`, дерево решений, критерии приёмки. Адаптирован под Reasonix и под этот проект |
+| `chrome-devtools-mcp` | Отладка мобильного пульта через Chrome DevTools MCP: консоль, сеть, эмуляция телефона, скриншоты; конфиг в `.mcp.json`, версия MCP-сервера — `latest` (на 2026-11-05 это 1.12.0) |
 
 `grill-me` — не копия чужого текста. Идея взята из публичного
 [RobMitt/grill-me-skill](https://github.com/RobMitt/grill-me-skill) (≈1,2k звёзд,
@@ -57,10 +76,40 @@
 
 - `winui-*`, `winapp-*` — MIT, Microsoft. Текст лицензии:
   `.reasonix/skills/.licenses/winappCli-LICENSE.txt`.
+- `winui-gallery-*` — MIT, Microsoft. Текст лицензии:
+  `.reasonix/skills/.licenses/WinUI-Gallery-LICENSE.txt`. Скиллы — внутренняя
+  нормативная надстройка проекта, не официальный стандарт Microsoft.
+- `win2d` — MIT, Microsoft. Текст лицензии:
+  `.reasonix/skills/.licenses/Win2D-LICENSE.txt`.
+- `cswin32` — MIT, Microsoft. Текст лицензии:
+  `.reasonix/skills/.licenses/CsWin32-LICENSE.txt`.
 - `grill-me` — оригинальный текст этого проекта.
+- `chrome-devtools-mcp` — проектный скилл; MCP-сервер `chrome-devtools-mcp@latest`
+  (на 2026-11-05 — 1.12.0).
 - Каталог [microsoft/win-dev-skills](https://github.com/microsoft/win-dev-skills)
   (коммит `5ce74fa`, 2026-10-07) сам содержит только плагин `windbg`; `winui` и
   `winappcli` он подключает из `microsoft/winappCli` по пину `v0.7.1`.
+
+## Проверено, но не добавлено
+
+- **Microsoft Learn: design principles / guidelines / accessibility** — уже
+  покрыто `winui-design`, `winui-code-review`, `winapp-ui-automation` и
+  `winui-gallery-gost` (в ГОСТ добавлен раздел 0 с принципами Windows 11 и
+  ссылками). Отдельный дублирующий скилл не нужен.
+- **`ub-mode` (Robert C. Martin) и его инструменты `crapper` / `dryer` /
+  `mutator` / `uml-viewer`** — оценены 2026-11-04 и не взяты. Скилл — чистый
+  чек-лист без кода (MIT, веттинг 🟢), но его гейты опираются на Python-утилиты,
+  которые не понимают C#: поддержаны Clojure, Java, Go, TypeScript, Rust,
+  Python. «Commit often / push в конце» противоречит `AGENTS.md`, а
+  `uml-viewer` — Clojure/JVM-GUI без файла лицензии. Полезные правила
+  (`Subtract Before You Add`, `Test Behavior`, `Boundary Discipline`,
+  `Guard the Context Window`) частично пересекаются с `grill-me`,
+  `winui-design` и `winui-code-review`; отдельный скилл не нужен. Для CRAP /
+  дублирования / мутаций в C# есть свои средства (CA1502 + coverlet,
+  jscpd/CPD, Stryker.NET) — вернуться, если понадобится гейт качества.
+- **ColorCode-Universal** — подсветка синтаксиса в UWP `RichTextBlock`; в
+  караоке-плеере нет редактора кода, а лицензия репозитория — `NOASSERTION`.
+  Не добавляю; вернуться, если появится просмотр кода/сниппетов.
 
 ## Что намеренно не установлено
 
@@ -131,10 +180,6 @@ cp -a "$TMPDIR/ecc/skills/<name>" .reasonix/skills/
 
 ## Важно про git
 
-Папка `AppPlayList_Karaoke` **не является отдельным git-репозиторием**: `git`
-поднимается к `D:\Laba\ReasonixLocal_RU`, и файлы проекта видны как untracked в
-чужом репозитории. Причём `.gitignore` родителя содержит `.reasonix/`, поэтому
-скиллы в родительский репозиторий не попадут вообще. Перед началом кода стоит
-выполнить `git init` здесь — тогда `.reasonix/skills` будет коммититься как часть
-проекта. Альтернатива — добавить папку в `.gitignore` родителя. Это решение за
-вами.
+`AppPlayList_Karaoke` — отдельный git-репозиторий в `D:\Laba\AppPlayList_Karaoke`.
+Родительский `D:\Laba\ReasonixLocal_RU` больше не используется. Скиллы в
+`.reasonix/skills` входят в этот репозиторий.

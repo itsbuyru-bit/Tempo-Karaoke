@@ -1,0 +1,299 @@
+<?xml version='1.0' encoding='utf-8'?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="ContextMenu_PlayNext.Content" xml:space="preserve"><value>Воспроизвести следующим</value></data>
+  <data name="ContextMenu_Play_4_AutomationName.AutomationName" xml:space="preserve"><value>Воспроизвести</value></data>
+  <data name="ContextMenu_Play_4_ToolTip.ToolTip" xml:space="preserve"><value>Воспроизвести</value></data>
+  <data name="ContextMenu_Play_70_AutomationName.AutomationName" xml:space="preserve"><value>Воспроизвести</value></data>
+  <data name="ContextMenu_Play_91_AutomationName.AutomationName" xml:space="preserve"><value>Воспроизвести</value></data>
+  <data name="ContextMenu_Play_91_ToolTip.ToolTip" xml:space="preserve"><value>Воспроизвести</value></data>
+  <data name="ContextMenu_Play_AutomationName.AutomationName" xml:space="preserve"><value>Воспроизвести</value></data>
+  <data name="ContextMenu_Play_ToolTip.ToolTip" xml:space="preserve"><value>Воспроизвести</value></data>
+  <data name="Library_AllFolders" xml:space="preserve"><value>Все папки</value></data>
+  <data name="Library_ShowingSummary" xml:space="preserve"><value>Показано {0} песен · {1} файлов</value></data>
+  <data name="Navigation_Home.Content" xml:space="preserve"><value>Главная</value></data>
+  <data name="Navigation_Home_15.Text" xml:space="preserve"><value>Главная</value></data>
+  <data name="Navigation_Participants.Content" xml:space="preserve"><value>Участники</value></data>
+  <data name="Navigation_Playlists.Content" xml:space="preserve"><value>Плейлисты</value></data>
+  <data name="Navigation_Queue.Content" xml:space="preserve"><value>Очередь воспроизведения</value></data>
+  <data name="Navigation_Queue_53.Text" xml:space="preserve"><value>Очередь воспроизведения</value></data>
+  <data name="Navigation_Remote.Content" xml:space="preserve"><value>Веб-пульт</value></data>
+  <data name="Navigation_Remote_143.Text" xml:space="preserve"><value>Веб-пульт</value></data>
+  <data name="Navigation_VideoLibrary.Content" xml:space="preserve"><value>Библиотека видео</value></data>
+  <data name="Plural_SongCount_Few" xml:space="preserve"><value>{0} песни</value></data>
+  <data name="Plural_SongCount_Many" xml:space="preserve"><value>{0} песен</value></data>
+  <data name="Plural_SongCount_One" xml:space="preserve"><value>{0} песня</value></data>
+  <data name="Plural_SongCount_Other" xml:space="preserve"><value>{0} песни</value></data>
+  <data name="Queue_ClearQueueButton_AutomationName.AutomationName" xml:space="preserve"><value>Очистить очередь</value></data>
+  <data name="Queue_ClearQueueButton_ToolTip.ToolTip" xml:space="preserve"><value>Очистить очередь</value></data>
+  <data name="Ui_0Songs.Text" xml:space="preserve"><value>0 песен</value></data>
+  <data name="Ui_0Songs_54.Text" xml:space="preserve"><value>0 песен</value></data>
+  <data name="Ui_10Seconds.Text" xml:space="preserve"><value>−10 секунд</value></data>
+  <data name="Ui_10Seconds_183.Text" xml:space="preserve"><value>+30 секунд</value></data>
+  <data name="Ui_AZ.Text" xml:space="preserve"><value>А–Я</value></data>
+  <data name="Ui_AZ_28.Text" xml:space="preserve"><value>А–Я</value></data>
+  <data name="Ui_AZ_40.Content" xml:space="preserve"><value>А–Я</value></data>
+  <data name="Ui_AZ_46.Content" xml:space="preserve"><value>А–Я</value></data>
+  <data name="Ui_AddASongFromTheLibraryOrFilesFromDisk.Text" xml:space="preserve"><value>Добавьте песню из библиотеки или файлы с диска.</value></data>
+  <data name="Ui_AddAllToQueue.Text" xml:space="preserve"><value>Добавить все в очередь</value></data>
+  <data name="Ui_AddByURL.Text" xml:space="preserve"><value>Добавить по URL</value></data>
+  <data name="Ui_AddFiles.Content" xml:space="preserve"><value>Добавить файлы</value></data>
+  <data name="Ui_AddFilesToQueue.Text" xml:space="preserve"><value>Добавить файлы в очередь</value></data>
+  <data name="Ui_AddFolder.Text" xml:space="preserve"><value>Добавить папку</value></data>
+  <data name="Ui_AddFolderToQueue.Text" xml:space="preserve"><value>Добавить папку в очередь</value></data>
+  <data name="Ui_AddPlaylistToQueue_AutomationName.AutomationName" xml:space="preserve"><value>Поставить плейлист в очередь</value></data>
+  <data name="Ui_AddPlaylistToQueue_ToolTip.ToolTip" xml:space="preserve"><value>Добавить плейлист в очередь</value></data>
+  <data name="Ui_AddQueueToPlaylist_AutomationName.AutomationName" xml:space="preserve"><value>Добавить очередь в список</value></data>
+  <data name="Ui_AddQueueToPlaylist_ToolTip.ToolTip" xml:space="preserve"><value>Добавить очередь в список</value></data>
+  <data name="Ui_AddTo.Text" xml:space="preserve"><value>Добавить в</value></data>
+  <data name="Ui_AddToQueueOrPlaylist_AutomationName.AutomationName" xml:space="preserve"><value>Добавить в очередь или список</value></data>
+  <data name="Ui_AddToQueueOrPlaylist_ToolTip.ToolTip" xml:space="preserve"><value>Добавить в очередь или список</value></data>
+  <data name="Ui_AddTo_67.Content" xml:space="preserve"><value>Добавить в</value></data>
+  <data name="Ui_AddVideo.Content" xml:space="preserve"><value>Добавить видео</value></data>
+  <data name="Ui_AddVideoFolder_130.Content" xml:space="preserve"><value>Добавить папку</value></data>
+  <data name="Ui_AddVideoFolder_130_AutomationName.AutomationName" xml:space="preserve"><value>Добавить папку с видео</value></data>
+  <data name="Ui_AddVideoFolder_AutomationName.AutomationName" xml:space="preserve"><value>Добавить папку с видео</value></data>
+  <data name="Ui_AddVideosOrImportM3U.Text" xml:space="preserve"><value>Добавьте видео или импортируйте M3U.</value></data>
+  <data name="Ui_AllVideos.Text" xml:space="preserve"><value>Все видео</value></data>
+  <data name="Ui_BackToFolders_AutomationName.AutomationName" xml:space="preserve"><value>Назад к папкам</value></data>
+  <data name="Ui_BackToFolders_ToolTip.ToolTip" xml:space="preserve"><value>Назад</value></data>
+  <data name="Ui_BackToPlaylists_AutomationName.AutomationName" xml:space="preserve"><value>Назад к спискам</value></data>
+  <data name="Ui_BackToPlaylists_ToolTip.ToolTip" xml:space="preserve"><value>Назад к спискам</value></data>
+  <data name="Ui_Back_AutomationName.AutomationName" xml:space="preserve"><value>Назад</value></data>
+  <data name="Ui_Back_ToolTip.ToolTip" xml:space="preserve"><value>Назад</value></data>
+  <data name="Ui_Cancel.Content" xml:space="preserve"><value>Отмена</value></data>
+  <data name="Ui_Cancel_12.Content" xml:space="preserve"><value>Отмена</value></data>
+  <data name="Ui_Cancel_167.Content" xml:space="preserve"><value>Отмена</value></data>
+  <data name="Ui_Cancel_193.Content" xml:space="preserve"><value>Отмена</value></data>
+  <data name="Ui_ChangeTheQueryOrResetTheFilter.Text" xml:space="preserve"><value>Измените запрос или сбросьте фильтр.</value></data>
+  <data name="Ui_ChooseAThemeOrUseTheSystemTheme.Description" xml:space="preserve"><value>Выберите тему оформления или используйте системную.</value></data>
+  <data name="Ui_ChooseAThemeOrUseTheSystemTheme.Header" xml:space="preserve"><value>Тема приложения</value></data>
+  <data name="Ui_Clear.Text" xml:space="preserve"><value>Очистить</value></data>
+  <data name="Ui_Clear_65.Content" xml:space="preserve"><value>Очистить</value></data>
+  <data name="Ui_ConnectedRemoteRole_AutomationName.AutomationName" xml:space="preserve"><value>Роль подключённого пульта</value></data>
+  <data name="Ui_Connection.Content" xml:space="preserve"><value>Подключение</value></data>
+  <data name="Ui_CopyLink_AutomationName.AutomationName" xml:space="preserve"><value>Скопировать ссылку</value></data>
+  <data name="Ui_CopyLink_ToolTip.ToolTip" xml:space="preserve"><value>Скопировать ссылку</value></data>
+  <data name="Ui_CountdownBeforeNextTrack.OffContent" xml:space="preserve"><value>Выкл</value></data>
+  <data name="Ui_CountdownBeforeNextTrack.OnContent" xml:space="preserve"><value>Вкл</value></data>
+  <data name="Ui_CountdownBeforeNextTrack_AutomationName.AutomationName" xml:space="preserve"><value>Отсчёт перед следующим треком</value></data>
+  <data name="Ui_CountdownOnVideoBeforeTheNextSongInTheQu.Description" xml:space="preserve"><value>Обратный отсчёт на видео перед следующей песней очереди.</value></data>
+  <data name="Ui_CountdownOnVideoBeforeTheNextSongInTheQu.Header" xml:space="preserve"><value>Отсчёт перед следующим треком</value></data>
+  <data name="Ui_CountdownSeconds_AutomationName.AutomationName" xml:space="preserve"><value>Секунды отсчёта</value></data>
+  <data name="Ui_CreateNewPlaylist.Text" xml:space="preserve"><value>Создать новый список воспроизведения</value></data>
+  <data name="Ui_CreatePlaylist.Content" xml:space="preserve"><value>Создать список</value></data>
+  <data name="Ui_CreatePlaylist_82.Content" xml:space="preserve"><value>Создать список воспроизведения</value></data>
+  <data name="Ui_CreatePlaylist_AutomationName.AutomationName" xml:space="preserve"><value>Создать список воспроизведения</value></data>
+  <data name="Ui_Dark.Content" xml:space="preserve"><value>Тёмная</value></data>
+  <data name="Ui_DateModified.Text" xml:space="preserve"><value>Дата изменения</value></data>
+  <data name="Ui_DateModified_41.Content" xml:space="preserve"><value>Дата изменения</value></data>
+  <data name="Ui_DateModified_47.Content" xml:space="preserve"><value>Дата изменения</value></data>
+  <data name="Ui_DeletePlaylist_AutomationName.AutomationName" xml:space="preserve"><value>Удалить плейлист</value></data>
+  <data name="Ui_DeletePlaylist_ToolTip.ToolTip" xml:space="preserve"><value>Удалить плейлист</value></data>
+  <data name="Ui_DeleteSelected_AutomationName.AutomationName" xml:space="preserve"><value>Удалить выбранные</value></data>
+  <data name="Ui_DeleteSelected_ToolTip.ToolTip" xml:space="preserve"><value>Удалить выбранные</value></data>
+  <data name="Ui_DetachVideo_186.Text" xml:space="preserve"><value>Открепить видео</value></data>
+  <data name="Ui_DetachVideo_AutomationName.AutomationName" xml:space="preserve"><value>Открепить видео</value></data>
+  <data name="Ui_DetachVideo_ToolTip.ToolTip" xml:space="preserve"><value>Открепить видео</value></data>
+  <data name="Ui_DeviceName.PlaceholderText" xml:space="preserve"><value>Имя гостя</value></data>
+  <data name="Ui_DeviceName_AutomationName.AutomationName" xml:space="preserve"><value>Имя устройства</value></data>
+  <data name="Ui_Diagnostics.Text" xml:space="preserve"><value>Диагностика</value></data>
+  <data name="Ui_DirectConnectionWiFiDirect.Text" xml:space="preserve"><value>Прямое подключение (Wi-Fi Direct)</value></data>
+  <data name="Ui_DirectLink.Text" xml:space="preserve"><value>Прямая ссылка</value></data>
+  <data name="Ui_DoubleClickASongToPlay.Text" xml:space="preserve"><value>Выберите песню двойным кликом</value></data>
+  <data name="Ui_EnglishIsSelectedOnFirstLaunchYouCanSwit.Description" xml:space="preserve"><value>Английский выбирается при первом запуске. Русский можно включить вручную.</value></data>
+  <data name="Ui_EnglishIsSelectedOnFirstLaunchYouCanSwit.Header" xml:space="preserve"><value>Язык интерфейса</value></data>
+  <data name="Ui_ExportM3U.Text" xml:space="preserve"><value>Экспорт M3U</value></data>
+  <data name="Ui_FilterByFolder.PlaceholderText" xml:space="preserve"><value>Все папки</value></data>
+  <data name="Ui_FilterByFolder_AutomationName.AutomationName" xml:space="preserve"><value>Фильтр по папке</value></data>
+  <data name="Ui_FullScreen_8_AutomationName.AutomationName" xml:space="preserve"><value>Полный экран</value></data>
+  <data name="Ui_FullScreen_8_ToolTip.ToolTip" xml:space="preserve"><value>Полный экран</value></data>
+  <data name="Ui_FullScreen_AutomationName.AutomationName" xml:space="preserve"><value>Полный экран</value></data>
+  <data name="Ui_FullScreen_ToolTip.ToolTip" xml:space="preserve"><value>Полный экран</value></data>
+  <data name="Ui_Guest.Text" xml:space="preserve"><value>Гость</value></data>
+  <data name="Ui_HostPIN.Text" xml:space="preserve"><value>PIN ведущего</value></data>
+  <data name="Ui_IfThePageDoesNotOpenCheckThatThePhoneIsC.Text" xml:space="preserve"><value>Если страница не открывается, проверьте, подключён ли телефон к той же сети.</value></data>
+  <data name="Ui_ImportM3U.Text" xml:space="preserve"><value>Импорт M3U</value></data>
+  <data name="Ui_Interface.Text" xml:space="preserve"><value>Интерфейс</value></data>
+  <data name="Ui_InterfaceLanguage_AutomationName.AutomationName" xml:space="preserve"><value>Язык интерфейса</value></data>
+  <data name="Ui_Libraries.Text" xml:space="preserve"><value>Библиотеки</value></data>
+  <data name="Ui_LibraryFolders.Text" xml:space="preserve"><value>Каталоги библиотеки</value></data>
+  <data name="Ui_LibraryFolders_131.Header" xml:space="preserve"><value>Папки библиотеки</value></data>
+  <data name="Ui_Light.Content" xml:space="preserve"><value>Светлая</value></data>
+  <data name="Ui_Logging.OffContent" xml:space="preserve"><value>Выкл</value></data>
+  <data name="Ui_Logging.OnContent" xml:space="preserve"><value>Вкл</value></data>
+  <data name="Ui_Logging_AutomationName.AutomationName" xml:space="preserve"><value>Ведение логов</value></data>
+  <data name="Ui_ManageNamesAndAccessForGuestsConnectedFr.Text" xml:space="preserve"><value>Управление именами и доступом для устройств, подключённых из браузера.</value></data>
+  <data name="Ui_MediaInformation_185.Text" xml:space="preserve"><value>Информация о медиа</value></data>
+  <data name="Ui_MediaInformation_AutomationName.AutomationName" xml:space="preserve"><value>Информация о медиа</value></data>
+  <data name="Ui_MediaInformation_ToolTip.ToolTip" xml:space="preserve"><value>Информация о медиа</value></data>
+  <data name="Ui_Min.Text" xml:space="preserve"><value>мин.</value></data>
+  <data name="Ui_MinutesWithoutPhones_AutomationName.AutomationName" xml:space="preserve"><value>Минут без устройств</value></data>
+  <data name="Ui_More_181_AutomationName.AutomationName" xml:space="preserve"><value>Ещё</value></data>
+  <data name="Ui_More_181_ToolTip.ToolTip" xml:space="preserve"><value>Ещё</value></data>
+  <data name="Ui_More_5_AutomationName.AutomationName" xml:space="preserve"><value>Ещё</value></data>
+  <data name="Ui_More_5_ToolTip.ToolTip" xml:space="preserve"><value>Ещё</value></data>
+  <data name="Ui_More_87_AutomationName.AutomationName" xml:space="preserve"><value>Ещё</value></data>
+  <data name="Ui_More_87_ToolTip.ToolTip" xml:space="preserve"><value>Ещё</value></data>
+  <data name="Ui_More_AutomationName.AutomationName" xml:space="preserve"><value>Ещё</value></data>
+  <data name="Ui_More_ToolTip.ToolTip" xml:space="preserve"><value>Ещё</value></data>
+  <data name="Ui_Mute_6_AutomationName.AutomationName" xml:space="preserve"><value>Выключить звук</value></data>
+  <data name="Ui_Mute_6_ToolTip.ToolTip" xml:space="preserve"><value>Звук</value></data>
+  <data name="Ui_Mute_ToolTip.ToolTip" xml:space="preserve"><value>Выключить звук</value></data>
+  <data name="Ui_NextIn.Text" xml:space="preserve"><value>Следующая через</value></data>
+  <data name="Ui_NextIn_10.Text" xml:space="preserve"><value>Следующая через</value></data>
+  <data name="Ui_NextIn_191.Text" xml:space="preserve"><value>Следующая через</value></data>
+  <data name="Ui_Next_4_AutomationName.AutomationName" xml:space="preserve"><value>Следующая</value></data>
+  <data name="Ui_Next_4_ToolTip.ToolTip" xml:space="preserve"><value>Следующая</value></data>
+  <data name="Ui_Next_AutomationName.AutomationName" xml:space="preserve"><value>Следующая</value></data>
+  <data name="Ui_Next_ToolTip.ToolTip" xml:space="preserve"><value>Следующая (Ctrl+→)</value></data>
+  <data name="Ui_NoSavedDevices.Text" xml:space="preserve"><value>Нет сохранённых устройств</value></data>
+  <data name="Ui_NoVideosInThisPlaylistYet.Text" xml:space="preserve"><value>В списке пока нет видео</value></data>
+  <data name="Ui_NothingFound.Text" xml:space="preserve"><value>Ничего не найдено</value></data>
+  <data name="Ui_NothingFound_50.Text" xml:space="preserve"><value>Ничего не найдено</value></data>
+  <data name="Ui_NothingIsPlaying.Text" xml:space="preserve"><value>Ничего не играет</value></data>
+  <data name="Ui_NothingIsPlaying_187.Text" xml:space="preserve"><value>Ничего не играет</value></data>
+  <data name="Ui_NothingPlayedYet.Text" xml:space="preserve"><value>Пока ничего не играло</value></data>
+  <data name="Settings_PathsTitle.Description" xml:space="preserve"><value>Индексируются только видеофайлы. Музыка не индексируется.</value></data>
+  <data name="Settings_PathsTitle.Header" xml:space="preserve"><value>Пути к библиотеке видео</value></data>
+  <data name="Ui_OpenInExplorer_ToolTip.ToolTip" xml:space="preserve"><value>Открыть в проводнике</value></data>
+  <data name="Ui_OpenLogsFolder.Content" xml:space="preserve"><value>Открыть папку логов</value></data>
+  <data name="Ui_OpenVideoFullScreen_ToolTip.ToolTip" xml:space="preserve"><value>Открыть видео на всё окно</value></data>
+  <data name="Ui_Password.Text" xml:space="preserve"><value>Пароль</value></data>
+  <data name="Ui_Personalization.Text" xml:space="preserve"><value>Персонализация</value></data>
+  <data name="Ui_Play.Content" xml:space="preserve"><value>Играть</value></data>
+  <data name="Ui_PlayAll.Content" xml:space="preserve"><value>▶ Воспроизвести все</value></data>
+  <data name="Ui_PlayAll_36.Text" xml:space="preserve"><value>Воспроизвести все</value></data>
+  <data name="Ui_PlayAll_43.Text" xml:space="preserve"><value>Воспроизвести все</value></data>
+  <data name="Ui_PlayAll_85.Text" xml:space="preserve"><value>Воспроизвести всё</value></data>
+  <data name="Ui_PlayNow.Content" xml:space="preserve"><value>Играть сейчас</value></data>
+  <data name="Ui_PlayNow_11.Content" xml:space="preserve"><value>Играть сейчас</value></data>
+  <data name="Ui_PlayOrPause_2_AutomationName.AutomationName" xml:space="preserve"><value>Играть или пауза</value></data>
+  <data name="Ui_PlayOrPause_2_ToolTip.ToolTip" xml:space="preserve"><value>Играть/пауза</value></data>
+  <data name="Ui_PlayOrPause_AutomationName.AutomationName" xml:space="preserve"><value>Играть или пауза</value></data>
+  <data name="Ui_PlayOrPause_ToolTip.ToolTip" xml:space="preserve"><value>Играть/пауза (Space)</value></data>
+  <data name="Ui_PlayPlaylist_AutomationName.AutomationName" xml:space="preserve"><value>Воспроизвести плейлист</value></data>
+  <data name="Ui_PlayPlaylist_ToolTip.ToolTip" xml:space="preserve"><value>Воспроизвести плейлист</value></data>
+  <data name="Ui_Playback.Text" xml:space="preserve"><value>Воспроизведение</value></data>
+  <data name="Ui_PlaybackPosition_5_AutomationName.AutomationName" xml:space="preserve"><value>Позиция воспроизведения</value></data>
+  <data name="Ui_PlaybackPosition_AutomationName.AutomationName" xml:space="preserve"><value>Позиция воспроизведения</value></data>
+  <data name="Ui_PlaylistName.Text" xml:space="preserve"><value>Безымянный список воспроизведения</value></data>
+  <data name="Ui_PlaylistName_AutomationName.AutomationName" xml:space="preserve"><value>Название списка воспроизведения</value></data>
+  <data name="Ui_Playlists.Text" xml:space="preserve"><value>Списки воспроизведения</value></data>
+  <data name="Ui_PointYourPhoneCameraAtTheQRCodeToConnect.Text" xml:space="preserve"><value>Наведите камеру устройства на QR-код, чтобы подключиться к сети TempoKaraoke.</value></data>
+  <data name="Ui_Previous_1_AutomationName.AutomationName" xml:space="preserve"><value>Предыдущая</value></data>
+  <data name="Ui_Previous_1_ToolTip.ToolTip" xml:space="preserve"><value>Предыдущая</value></data>
+  <data name="Ui_Previous_AutomationName.AutomationName" xml:space="preserve"><value>Предыдущая</value></data>
+  <data name="Ui_Previous_ToolTip.ToolTip" xml:space="preserve"><value>Предыдущая (Ctrl+←)</value></data>
+  <data name="Ui_QRCodeAndPINAreValidOnlyUntilTheRemoteIs.Description" xml:space="preserve"><value>QR-код и PIN действуют только до выключения пульта.</value></data>
+  <data name="Ui_QRCodeAndPINAreValidOnlyUntilTheRemoteIs.Header" xml:space="preserve"><value>Одноразовый доступ с устройства</value></data>
+  <data name="Ui_QRCodeToConnectPhone_AutomationName.AutomationName" xml:space="preserve"><value>QR-код для подключения устройства</value></data>
+  <data name="Ui_QRCodeToConnectToWiFi_AutomationName.AutomationName" xml:space="preserve"><value>QR-код для подключения к Wi-Fi сети</value></data>
+  <data name="Ui_QueueIsEmpty.Text" xml:space="preserve"><value>Очередь пуста</value></data>
+  <data name="Ui_QuickSearch.PlaceholderText" xml:space="preserve"><value>Начните вводить название или исполнителя</value></data>
+  <data name="Ui_QuickSearch_AutomationName.AutomationName" xml:space="preserve"><value>Быстрый поиск</value></data>
+  <data name="Ui_ReadingMediaLibrary.Text" xml:space="preserve"><value>Читаю медиатеку…</value></data>
+  <data name="Ui_RecentMediaFiles.Text" xml:space="preserve"><value>Последние файлы мультимедиа</value></data>
+  <data name="Ui_Refresh.Content" xml:space="preserve"><value>Обновить</value></data>
+  <data name="Ui_RegularEventsAreLoggedOnlyWhenEnabledCra.Description" xml:space="preserve"><value>Обычные события пишутся только при включённой опции; падения — всегда.</value></data>
+  <data name="Ui_RegularEventsAreLoggedOnlyWhenEnabledCra.Header" xml:space="preserve"><value>Ведение логов</value></data>
+  <data name="Ui_RemoteAutoOff.OffContent" xml:space="preserve"><value>Выкл</value></data>
+  <data name="Ui_RemoteAutoOff.OnContent" xml:space="preserve"><value>Вкл</value></data>
+  <data name="Ui_RemoteAutoOff_AutomationName.AutomationName" xml:space="preserve"><value>Автоотключение пульта</value></data>
+  <data name="Ui_RemoteMode_AutomationName.AutomationName" xml:space="preserve"><value>Режим пульта</value></data>
+  <data name="Ui_RemoteParticipants.Text" xml:space="preserve"><value>Участники веб-пульта</value></data>
+  <data name="Ui_RemoteParticipants_120_AutomationName.AutomationName" xml:space="preserve"><value>Участники пульта</value></data>
+  <data name="Ui_RemoveDevice_AutomationName.AutomationName" xml:space="preserve"><value>Удалить устройство</value></data>
+  <data name="Ui_RemoveDevice_ToolTip.ToolTip" xml:space="preserve"><value>Удалить устройство</value></data>
+  <data name="Ui_RemoveFolder_AutomationName.AutomationName" xml:space="preserve"><value>Удалить папку</value></data>
+  <data name="Ui_RemoveFolder_ToolTip.ToolTip" xml:space="preserve"><value>Удалить папку</value></data>
+  <data name="Ui_RemoveFromPlaylist_AutomationName.AutomationName" xml:space="preserve"><value>Удалить из плейлиста</value></data>
+  <data name="Ui_RemoveFromPlaylist_ToolTip.ToolTip" xml:space="preserve"><value>Удалить из плейлиста</value></data>
+  <data name="Ui_RemoveFromQueue_AutomationName.AutomationName" xml:space="preserve"><value>Удалить из очереди</value></data>
+  <data name="Ui_RemoveFromQueue_ToolTip.ToolTip" xml:space="preserve"><value>Удалить из очереди</value></data>
+  <data name="Ui_RepeatIndexing.Description" xml:space="preserve"><value>Повторите индексирование.</value></data>
+  <data name="Ui_RepeatIndexing.Header" xml:space="preserve"><value>Обновить библиотеки</value></data>
+  <data name="Ui_RepeatQueue_AutomationName.AutomationName" xml:space="preserve"><value>Повторять очередь</value></data>
+  <data name="Ui_RepeatQueue_ToolTip.ToolTip" xml:space="preserve"><value>Повторять очередь</value></data>
+  <data name="Ui_ResetSearch.Content" xml:space="preserve"><value>Сбросить поиск</value></data>
+  <data name="Ui_ResetSearch_52.Content" xml:space="preserve"><value>Сбросить поиск</value></data>
+  <data name="Ui_RestoreVideo.Content" xml:space="preserve"><value>Вернуть видео</value></data>
+  <data name="Ui_ReturnToWindow.Content" xml:space="preserve"><value>Вернуть в окно</value></data>
+  <data name="Ui_Russian.Content" xml:space="preserve"><value>Русский</value></data>
+  <data name="Ui_Scanning.Text" xml:space="preserve"><value>Сканирование…</value></data>
+  <data name="Ui_SearchLibrary.PlaceholderText" xml:space="preserve"><value>Поиск треков, исполнителей, папок (Ctrl+F)...</value></data>
+  <data name="Ui_SearchLibrary_AutomationName.AutomationName" xml:space="preserve"><value>Поиск по библиотеке</value></data>
+  <data name="Ui_SearchResults.Text" xml:space="preserve"><value>Результаты поиска</value></data>
+  <data name="Ui_Sec.Text" xml:space="preserve"><value>сек.</value></data>
+  <data name="Ui_SelectAllTracks_AutomationName.AutomationName" xml:space="preserve"><value>Выбрать все треки</value></data>
+  <data name="Ui_SelectSong_AutomationName.AutomationName" xml:space="preserve"><value>Выбрать песню</value></data>
+  <data name="Ui_SelectTrack_AutomationName.AutomationName" xml:space="preserve"><value>Выбрать трек</value></data>
+  <data name="Ui_Selected0.Text" xml:space="preserve"><value>Выбрано: 0</value></data>
+  <data name="Ui_Settings.Content" xml:space="preserve"><value>Параметры</value></data>
+  <data name="Ui_Settings_123.Text" xml:space="preserve"><value>Параметры</value></data>
+  <data name="Ui_ShowOrHideMenu_AutomationName.AutomationName" xml:space="preserve"><value>Скрыть или показать меню</value></data>
+  <data name="Ui_ShowOrHideMenu_ToolTip.ToolTip" xml:space="preserve"><value>Скрыть/показать меню</value></data>
+  <data name="Ui_Shuffle_AutomationName.AutomationName" xml:space="preserve"><value>Перемешать</value></data>
+  <data name="Ui_Shuffle_ToolTip.ToolTip" xml:space="preserve"><value>Перемешать</value></data>
+  <data name="Ui_SmartphoneControl.Text" xml:space="preserve"><value>Веб-пульт</value></data>
+  <data name="Ui_SortBy.Text" xml:space="preserve"><value>Сортировать по:</value></data>
+  <data name="Ui_SortBy_38.Text" xml:space="preserve"><value>Сортировать по:</value></data>
+  <data name="Ui_SortBy_44.Text" xml:space="preserve"><value>Сортировать по:</value></data>
+  <data name="Ui_SortFolderContents_AutomationName.AutomationName" xml:space="preserve"><value>Сортировать содержимое папки</value></data>
+  <data name="Ui_SortFolders_AutomationName.AutomationName" xml:space="preserve"><value>Сортировать папки</value></data>
+  <data name="Ui_StartAccessPoint_103.Text" xml:space="preserve"><value>Включить точку доступа</value></data>
+  <data name="Ui_StartAccessPoint_AutomationName.AutomationName" xml:space="preserve"><value>Включить точку доступа</value></data>
+  <data name="Ui_StartRemote_101.Text" xml:space="preserve"><value>Запустить пульт</value></data>
+  <data name="Ui_StartRemote_AutomationName.AutomationName" xml:space="preserve"><value>Запустить пульт</value></data>
+  <data name="Ui_StartTheRemoteOnTheRemotePage.Text" xml:space="preserve"><value>Включить пульт можно на странице «Пульт»</value></data>
+  <data name="Ui_Step1WiFiAccessPoint.Text" xml:space="preserve"><value>Шаг 1. Wi-Fi точки доступа</value></data>
+  <data name="Ui_Step2ConnectRemote.Text" xml:space="preserve"><value>Шаг 2. Подключение пульта</value></data>
+  <data name="Ui_Stop.Text" xml:space="preserve"><value>Стоп</value></data>
+  <data name="Ui_StopRemote_105.Text" xml:space="preserve"><value>Остановить пульт</value></data>
+  <data name="Ui_StopRemote_AutomationName.AutomationName" xml:space="preserve"><value>Остановить пульт</value></data>
+  <data name="Ui_Stop_3_AutomationName.AutomationName" xml:space="preserve"><value>Стоп</value></data>
+  <data name="Ui_Stop_3_ToolTip.ToolTip" xml:space="preserve"><value>Стоп</value></data>
+  <data name="Ui_TryChangingTheQuery.Text" xml:space="preserve"><value>Попробуйте изменить запрос.</value></data>
+  <data name="Ui_TurnOffTheRemoteAndAccessPointIfThereIsN.Description" xml:space="preserve"><value>Выключить пульт и точку доступа, если нет активности указанное время.</value></data>
+  <data name="Ui_TurnOffTheRemoteAndAccessPointIfThereIsN.Header" xml:space="preserve"><value>Автоотключение пульта</value></data>
+  <data name="Ui_UseSystemSettings.Content" xml:space="preserve"><value>Использовать параметры системы</value></data>
+  <data name="Ui_Versions_31_ToolTip.ToolTip" xml:space="preserve"><value>Версии</value></data>
+  <data name="Ui_Versions_ToolTip.ToolTip" xml:space="preserve"><value>Версии</value></data>
+  <data name="Ui_ViaWiFi.Text" xml:space="preserve"><value>Через Wi-Fi</value></data>
+  <data name="Ui_Video.Text" xml:space="preserve"><value>Видео</value></data>
+  <data name="Ui_VideoFolders.Text" xml:space="preserve"><value>Папки с видео</value></data>
+  <data name="Ui_VideoIsPlayingInASeparateWindow.Text" xml:space="preserve"><value>Видео воспроизводится в отдельном окне</value></data>
+  <data name="Ui_Video_49.Text" xml:space="preserve"><value>Видео</value></data>
+  <data name="Ui_VideosFromTheseFoldersAreAddedToTheLibra.Text" xml:space="preserve"><value>Видео из этих папок попадает в библиотеку и поиск.</value></data>
+  <data name="Ui_Volume_178_AutomationName.AutomationName" xml:space="preserve"><value>Громкость</value></data>
+  <data name="Ui_Volume_7_AutomationName.AutomationName" xml:space="preserve"><value>Громкость</value></data>
+  <data name="Ui_Volume_AutomationName.AutomationName" xml:space="preserve"><value>Громкость</value></data>
+  <data name="Ui_Volume_ToolTip.ToolTip" xml:space="preserve"><value>Громкость</value></data>
+  <data name="Ui_WiFiNetwork.Text" xml:space="preserve"><value>Сеть Wi-Fi</value></data>
+  <data name="Ui_YouHaveNoPlaylists.Text" xml:space="preserve"><value>У вас нет списков воспроизведения</value></data>
+<data name="Remote_TabWifi" xml:space="preserve"><value>Через Wi-Fi</value></data><data name="Remote_TabDirect" xml:space="preserve"><value>Прямое подключение (Wi-Fi Direct)</value></data><data name="Remote_IntroDirect" xml:space="preserve"><value>Подключение напрямую к компьютеру без общего роутера. Подходит, если нет общей сети Wi-Fi или устройство к ней не подключается.</value></data><data name="Remote_IntroWifi" xml:space="preserve"><value>Позволяет гостям выбирать песни и добавлять их в очередь. Управление воспроизведением и паузой доступно ведущему по PIN-коду.</value></data><data name="Remote_DeviceIpUnknown" xml:space="preserve"><value>IP-адрес устройства: не определён</value></data><data name="Remote_DeviceIp" xml:space="preserve"><value>IP-адрес устройства: {0}</value></data><data name="Remote_Ip" xml:space="preserve"><value>IP-адрес: {0}</value></data><data name="Remote_StateActive" xml:space="preserve"><value>Пульт активен</value></data><data name="Remote_ToggleStart" xml:space="preserve"><value>Запустить пульт</value></data><data name="Remote_QrStepsDirect" xml:space="preserve"><value>1. Подключитесь к сети TempoKaraoke.
+2. Наведите камеру на QR-код.</value></data><data name="Remote_QrStepsWifi" xml:space="preserve"><value>Наведите камеру устройства на QR-код для подключения.</value></data><data name="Remote_HostHint" xml:space="preserve"><value>Гости могут заказывать треки сразу. Полный доступ — по PIN-коду.</value></data><data name="Remote_HintDirectActive" xml:space="preserve"><value>Если страница не открывается, проверьте, что устройство подключено к сети TempoKaraoke.</value></data><data name="Remote_HintWifiActive" xml:space="preserve"><value>Если страница не открывается, проверьте, что устройство подключено к той же сети Wi-Fi.</value></data><data name="Remote_HintDirectInactive" xml:space="preserve"><value>После включения компьютер создаст сеть TempoKaraoke. Подключите устройство к ней и отсканируйте QR-код.</value></data><data name="Remote_HintWifiInactive" xml:space="preserve"><value>Телефон и компьютер должны быть подключены к одной Wi-Fi сети. Если общего роутера нет, перейдите на вкладку «Прямое подключение (Wi-Fi Direct)».</value></data><data name="Remote_StatusStartingRemote" xml:space="preserve"><value>Пульт работает. Включаю точку доступа…</value></data><data name="Remote_StatusStartingAp" xml:space="preserve"><value>Включаю точку доступа…</value></data><data name="Remote_ErrorStart" xml:space="preserve"><value>Не удалось запустить пульт: {0}</value></data><data name="Remote_ErrorHotspot" xml:space="preserve"><value>Не удалось включить точку доступа: {0}. Проверьте Wi-Fi адаптер или включите мобильный хотспот Windows вручную.</value></data><data name="Remote_AutoStopped" xml:space="preserve"><value>Устройства не подключались {0} мин. — пульт отключён автоматически.</value></data><data name="Remote_LinkCopied" xml:space="preserve"><value>Ссылка скопирована.</value></data><data name="Remote_LinkCopyFailed" xml:space="preserve"><value>Не удалось скопировать ссылку.</value></data><data name="Remote_NameSaved" xml:space="preserve"><value>Имя сохранено.</value></data><data name="Remote_NameRemoved" xml:space="preserve"><value>Имя удалено.</value></data><data name="Remote_DeviceNotFound" xml:space="preserve"><value>Устройство не найдено.</value></data><data name="ContextMenu_Delete" xml:space="preserve"><value>Удалить</value></data><data name="Window_VideoTitle" xml:space="preserve"><value>Tempo Karaoke — видео</value></data><data name="ContextMenu_Play.Text" xml:space="preserve"><value>Воспроизвести</value></data><data name="ContextMenu_AddTo.Text" xml:space="preserve"><value>Добавить в</value></data><data name="ContextMenu_Queue.Text" xml:space="preserve"><value>В очередь</value></data><data name="ContextMenu_NewPlaylist.Text" xml:space="preserve"><value>Новый плей-лист</value></data><data name="ContextMenu_MoveUp.Text" xml:space="preserve"><value>Вверх</value></data><data name="ContextMenu_MoveDown.Text" xml:space="preserve"><value>Вниз</value></data><data name="ContextMenu_Properties.Text" xml:space="preserve"><value>Свойства</value></data><data name="ContextMenu_Select.Text" xml:space="preserve"><value>Выбрать</value></data><data name="ContextMenu_Rename.Text" xml:space="preserve"><value>Переименовать</value></data><data name="Common_Delete.Text" xml:space="preserve"><value>Удалить</value></data><data name="Playlist_PlayAll.Content" xml:space="preserve"><value>Воспроизвести всё</value></data><data name="Playlist_AddAllToQueue.Content" xml:space="preserve"><value>Добавить все в очередь</value></data><data name="Queue_ClearLabel.Text" xml:space="preserve"><value>Очистить</value></data><data name="Queue_AddLabel.Text" xml:space="preserve"><value>Добавить в</value></data><data name="Queue_ClearSelection.Content" xml:space="preserve"><value>Очистить</value></data><data name="Queue_AddSelected.Content" xml:space="preserve"><value>Добавить в</value></data><data name="Common_Add" xml:space="preserve"><value>Добавить</value></data><data name="Common_Cancel" xml:space="preserve"><value>Отмена</value></data><data name="Common_Close" xml:space="preserve"><value>Закрыть</value></data><data name="Common_Create" xml:space="preserve"><value>Создать</value></data><data name="Common_Save" xml:space="preserve"><value>Сохранить</value></data><data name="ContextMenu_AddToPlaylist" xml:space="preserve"><value>Добавить в плейлист</value></data><data name="ContextMenu_CreatePlaylist" xml:space="preserve"><value>Создать список…</value></data><data name="ContextMenu_NewList" xml:space="preserve"><value>Новый список…</value></data><data name="Library_AddFolderHint" xml:space="preserve"><value>Добавьте папку с видео в параметрах.</value></data><data name="Library_CheckQuery" xml:space="preserve"><value>Проверьте запрос или сбросьте поиск.</value></data><data name="Library_Empty" xml:space="preserve"><value>Библиотека пуста</value></data><data name="Library_FolderEmpty" xml:space="preserve"><value>В этой папке нет видео.</value></data><data name="Library_NoVideoFiles" xml:space="preserve"><value>В папке нет видеофайлов</value></data><data name="Library_NoVideoFilesInFolder" xml:space="preserve"><value>В выбранной папке нет видеофайлов.</value></data><data name="Library_NoVideos" xml:space="preserve"><value>Нет видео</value></data><data name="Library_NoVideosConnected" xml:space="preserve"><value>В подключённых папках нет видео.</value></data><data name="Library_NoVideosInFolder" xml:space="preserve"><value>В папке нет видео.</value></data><data name="Library_NothingFound" xml:space="preserve"><value>Ничего не найдено</value></data><data name="Library_QueueAddedCount" xml:space="preserve"><value>Добавлено в очередь: {0}.</value></data><data name="Library_ReadFailed" xml:space="preserve"><value>Не удалось прочитать библиотеку: {0}</value></data><data name="Library_Reading" xml:space="preserve"><value>Читаю медиатеку…</value></data><data name="Library_Scanning" xml:space="preserve"><value>Сканирование…</value></data><data name="Library_ScanningCount" xml:space="preserve"><value>Сканирование: {0} из {1}</value></data><data name="Library_ScanningLibrary" xml:space="preserve"><value>Сканирую библиотеку…</value></data><data name="Library_ScanningLibraryCount" xml:space="preserve"><value>Сканирую библиотеку… {0} / {1}</value></data><data name="Library_VideoFolders" xml:space="preserve"><value>Папки с видео</value></data><data name="Library_VideoFoldersNamed" xml:space="preserve"><value>Папки с видео ({0})</value></data><data name="MediaInfo_Artist" xml:space="preserve"><value>Исполнитель</value></data><data name="MediaInfo_Folder" xml:space="preserve"><value>Папка</value></data><data name="MediaInfo_Format" xml:space="preserve"><value>Формат</value></data><data name="MediaInfo_Header" xml:space="preserve"><value>Информация о медиа</value></data><data name="MediaInfo_NoActive" xml:space="preserve"><value>Нет активного медиа</value></data><data name="MediaInfo_Position" xml:space="preserve"><value>Позиция: {0} / {1}</value></data><data name="MediaInfo_Title" xml:space="preserve"><value>Название</value></data><data name="Player_ChooseSong" xml:space="preserve"><value>Выберите песню двойным кликом</value></data><data name="Player_DetachFailed" xml:space="preserve"><value>Не удалось открыть отдельное окно видео</value></data><data name="Player_NothingPlaying" xml:space="preserve"><value>Ничего не играет</value></data><data name="Player_Resume" xml:space="preserve"><value>{0} · продолжить с {1}</value></data><data name="Playlist_AddedNext" xml:space="preserve"><value>Плейлист «{0}» добавлен следующим.</value></data><data name="Playlist_AddedToQueueCount" xml:space="preserve"><value>Добавлено в очередь: {0}.</value></data><data name="Playlist_CopySuffix" xml:space="preserve"><value>{0} (копия)</value></data><data name="Playlist_CurrentQueue" xml:space="preserve"><value>Текущая очередь</value></data><data name="Playlist_DeleteMessage" xml:space="preserve"><value>«{0}» будет удалён без возможности восстановления.</value></data><data name="Playlist_DeleteTitle" xml:space="preserve"><value>Удалить плейлист?</value></data><data name="Playlist_Empty" xml:space="preserve"><value>Пустой список</value></data><data name="Playlist_ExportDone" xml:space="preserve"><value>Экспортировано: {0}</value></data><data name="Playlist_ExportFailed" xml:space="preserve"><value>Не удалось экспортировать M3U</value></data><data name="Playlist_ImportFailed" xml:space="preserve"><value>Не удалось прочитать M3U</value></data><data name="Playlist_ImportNoNew" xml:space="preserve"><value>В M3U не найдено новых файлов</value></data><data name="Playlist_NamePlaceholder" xml:space="preserve"><value>Название плейлиста</value></data><data name="Playlist_New" xml:space="preserve"><value>Новый плей-лист</value></data><data name="Playlist_NewNameTitle" xml:space="preserve"><value>Имя нового плейлиста</value></data><data name="Playlist_QueueFrom" xml:space="preserve"><value>Очередь от {0:dd.MM.yyyy}</value></data><data name="Playlist_RenameTitle" xml:space="preserve"><value>Переименовать плейлист</value></data><data name="Playlist_SaveQueueMessage" xml:space="preserve"><value>В очереди воспроизведения есть треки. Хотите сохранить их как новый плейлист перед добавлением?</value></data><data name="Playlist_SaveQueuePrimary" xml:space="preserve"><value>Сохранить и добавить</value></data><data name="Playlist_SaveQueueSecondary" xml:space="preserve"><value>Добавить без сохранения</value></data><data name="Playlist_SaveQueueTitle" xml:space="preserve"><value>Сохранить текущую очередь?</value></data><data name="Playlist_StatusAddedToName" xml:space="preserve"><value>Добавлено в «{0}».</value></data><data name="Playlist_StatusAddedToQueue" xml:space="preserve"><value>Трек добавлен в очередь.</value></data><data name="Playlist_StatusAlreadyContains" xml:space="preserve"><value>«{0}» уже содержит этот трек.</value></data><data name="Playlist_StatusAlreadyInQueue" xml:space="preserve"><value>Трек уже есть в очереди.</value></data><data name="Playlist_StatusEmpty" xml:space="preserve"><value>Плейлист пуст.</value></data><data name="Playlist_StatusPlayNext" xml:space="preserve"><value>Трек будет воспроизведён следующим.</value></data><data name="Playlist_StatusRemoved" xml:space="preserve"><value>Трек удалён из плейлиста.</value></data><data name="Playlist_StatusTrackAdded" xml:space="preserve"><value>Трек добавлен в «{0}».</value></data><data name="Playlist_Untitled" xml:space="preserve"><value>Безымянный список воспроизведения</value></data><data name="Properties_Artist" xml:space="preserve"><value>Исполнитель</value></data><data name="Properties_Duration" xml:space="preserve"><value>Длительность</value></data><data name="Properties_Folder" xml:space="preserve"><value>Папка</value></data><data name="Properties_Format" xml:space="preserve"><value>Формат</value></data><data name="Properties_Header" xml:space="preserve"><value>Свойства</value></data><data name="Properties_Location" xml:space="preserve"><value>Расположение файла</value></data><data name="Properties_Modified" xml:space="preserve"><value>Изменён</value></data><data name="Properties_OpenFolder" xml:space="preserve"><value>Открыть папку с файлом</value></data><data name="Properties_Resolution" xml:space="preserve"><value>Разрешение</value></data><data name="Properties_Size" xml:space="preserve"><value>Размер</value></data><data name="Properties_TitleLabel" xml:space="preserve"><value>Название</value></data><data name="Search_ResultsFor" xml:space="preserve"><value>Результаты поиска для "{0}"</value></data><data name="Sort_AZ" xml:space="preserve"><value>А–Я</value></data><data name="Sort_Date" xml:space="preserve"><value>Дата изменения</value></data><data name="Url_Invalid" xml:space="preserve"><value>Некорректный URL</value></data><data name="Url_Title" xml:space="preserve"><value>Добавить по URL</value></data><data name="Plural_VideoCount_One" xml:space="preserve"><value>{0} видео</value></data><data name="Plural_VideoCount_Few" xml:space="preserve"><value>{0} видео</value></data><data name="Plural_VideoCount_Many" xml:space="preserve"><value>{0} видео</value></data><data name="Plural_VideoCount_Other" xml:space="preserve"><value>{0} видео</value></data><data name="Selection_Count_One" xml:space="preserve"><value>Выбран {0} элемент</value></data><data name="Selection_Count_Few" xml:space="preserve"><value>Выбрано {0} элемента</value></data><data name="Selection_Count_Many" xml:space="preserve"><value>Выбрано {0} элементов</value></data><data name="Selection_Count_Other" xml:space="preserve"><value>Выбрано {0} элементов</value></data><data name="Menu_PlayNext.Text" xml:space="preserve"><value>Воспроизвести следующим</value></data><data name="Language_English.Content" xml:space="preserve"><value>Английский</value></data><data name="Remote_StatusOnline" xml:space="preserve"><value>В сети · MAC: {0}</value></data><data name="Remote_StatusOffline" xml:space="preserve"><value>Не в сети · MAC: {0}</value></data><data name="Remote_UnknownMac" xml:space="preserve"><value>не определён</value></data><data name="Remote_Device" xml:space="preserve"><value>Устройство</value></data><data name="Queue_ClearQueueButton.Content" xml:space="preserve"><value>Очистить очередь</value></data><data name="Navigation_About.Content" xml:space="preserve"><value>О приложении</value></data><data name="About_Title.Text" xml:space="preserve"><value>О приложении</value></data><data name="About_AppName.Text" xml:space="preserve"><value>Tempo Karaoke</value></data><data name="About_Description.Text" xml:space="preserve"><value>Tempo Karaoke — плеер и пульт управления караоке. Добавьте свои видео в библиотеку, составляйте очередь и управляйте воспроизведением с компьютера или устройства.</value></data><data name="About_Version" xml:space="preserve"><value>Версия {0}</value></data><data name="About_AuthorSection.Text" xml:space="preserve"><value>Автор</value></data><data name="About_AuthorName.Text" xml:space="preserve"><value>Закурдаев Алексей</value></data><data name="About_AuthorRole.Text" xml:space="preserve"><value>Разработчик</value></data><data name="About_GitTitle.Text" xml:space="preserve"><value>Git-репозиторий</value></data><data name="About_GitSoon.Text" xml:space="preserve"><value>Ссылка на репозиторий будет добавлена позже.</value></data><data name="About_DonateTitle.Text" xml:space="preserve"><value>Поддержать проект</value></data><data name="About_DonateHint.Text" xml:space="preserve"><value>Если вам нравится Tempo Karaoke, поддержите проект чашечкой кофе.</value></data><data name="About_DonateLink.Content" xml:space="preserve"><value>☕ Поддержать чашечкой кофе</value></data><data name="QuickSearch_NoResults.Text" xml:space="preserve"><value>Ничего не найдено</value></data><data name="QuickSearch_AddToQueue.ToolTip" xml:space="preserve"><value>Добавить в очередь</value></data><data name="QuickSearch_More.ToolTip" xml:space="preserve"><value>Дополнительные действия</value></data><data name="QuickSearch_Found.Text" xml:space="preserve"><value>Найдено совпадений: {0}</value></data><data name="QuickSearch_ShowAll.Content" xml:space="preserve"><value>Показать все результаты в библиотеке →</value></data><data name="QuickSearch_Play.ToolTip" xml:space="preserve"><value>Воспроизвести</value></data><data name="Search_OpenLabel.Text" xml:space="preserve"><value>Поиск</value></data><data name="Search_OpenHint.ToolTip" xml:space="preserve"><value>Открыть поиск (Ctrl+F)</value></data><data name="Search_OpenHint.AutomationName" xml:space="preserve"><value>Открыть поиск</value></data><data name="Queue_MissingFiles" xml:space="preserve"><value>Пропущено недоступных файлов: {0}</value></data><data name="Queue_RestoreFailed" xml:space="preserve"><value>Не удалось восстановить очередь. Сохранённая очередь не изменена.</value></data><data name="Library_AutoUpdated" xml:space="preserve"><value>Библиотека обновлена: изменено путей — {0}</value></data><data name="Common_Undo.Content" xml:space="preserve"><value>Отменить</value></data><data name="Queue_UndoRemoved" xml:space="preserve"><value>Удалено из очереди: {0}</value></data><data name="Queue_UndoCleared" xml:space="preserve"><value>Очередь очищена: {0}</value></data><data name="Home_Recent.Text" xml:space="preserve"><value>Недавние</value></data><data name="Home_Favorites.Text" xml:space="preserve"><value>Избранное</value></data><data name="Home_History.Text" xml:space="preserve"><value>История</value></data><data name="Home_FavoritesTitle" xml:space="preserve"><value>Избранные песни</value></data><data name="Home_HistoryTitle" xml:space="preserve"><value>История прослушивания</value></data><data name="Home_NoFavorites" xml:space="preserve"><value>В избранном пока ничего нет. Добавьте песню через контекстное меню.</value></data><data name="Home_NoHistory" xml:space="preserve"><value>История прослушивания пока пуста.</value></data><data name="ContextMenu_AddFavorite" xml:space="preserve"><value>Добавить в избранное</value></data><data name="ContextMenu_RemoveFavorite" xml:space="preserve"><value>Убрать из избранного</value></data><data name="Search_AllFolders" xml:space="preserve"><value>Все папки</value></data><data name="Search_AllFormats" xml:space="preserve"><value>Все форматы</value></data><data name="Search_AnyDuration" xml:space="preserve"><value>Любая длительность</value></data><data name="Search_ShortDuration" xml:space="preserve"><value>До 3 мин</value></data><data name="Search_MediumDuration" xml:space="preserve"><value>3–5 мин</value></data><data name="Search_LongDuration" xml:space="preserve"><value>5+ мин</value></data><data name="Ui_AdminPIN.Text" xml:space="preserve"><value>PIN администратора</value></data><data name="Ui_AdminPINHint.Text" xml:space="preserve"><value>Для изменения лимитов, таймера и правил вечеринки без остановки воспроизведения.</value></data><data name="Queue_TrackMissing" xml:space="preserve"><value>Запрошенный трек больше недоступен.</value></data><data name="GuestRequests_Button" xml:space="preserve"><value>Заявки ({0})</value></data><data name="GuestRequests_ToolTip.ToolTip" xml:space="preserve"><value>Заявки гостей на песни</value></data><data name="GuestRequests_Title" xml:space="preserve"><value>Заявки на песни</value></data><data name="GuestRequests_From" xml:space="preserve"><value>От: {0}</value></data><data name="GuestRequests_Next" xml:space="preserve"><value>Следующим</value></data><data name="GuestRequests_Play" xml:space="preserve"><value>Сейчас</value></data><data name="GuestRequests_Reject" xml:space="preserve"><value>Отклонить</value></data><data name="Remote_HotspotUnavailableTitle" xml:space="preserve"><value>Точка доступа недоступна</value></data><data name="Remote_HotspotErrorTitle" xml:space="preserve"><value>Ошибка запуска точки доступа</value></data><data name="Remote_HotspotStarting" xml:space="preserve"><value>Запуск точки доступа...</value></data><data name="Remote_HotspotRetry.Content" xml:space="preserve"><value>Повторить</value></data><data name="PlaylistNavPlay.Text" xml:space="preserve"><value>Воспроизвести</value></data><data name="PlaylistNavQueue.Text" xml:space="preserve"><value>Добавить в очередь</value></data><data name="PlaylistNavRename.Text" xml:space="preserve"><value>Переименовать</value></data><data name="PlaylistNavDelete.Text" xml:space="preserve"><value>Удалить</value></data><data name="Remote_WaitingForPhone" xml:space="preserve"><value>Ожидание подключения устройства...</value></data><data name="Remote_OrderedSongs" xml:space="preserve"><value>Заказано песен: {0}</value></data><data name="Remote_DeviceBlocked" xml:space="preserve"><value>Устройство заблокировано.</value></data><data name="Player_AudioTrack" xml:space="preserve"><value>Аудиодорожка</value></data><data name="Player_NoAudioTracks" xml:space="preserve"><value>Нет аудиодорожек</value></data><data name="QuickSearch_Versions" xml:space="preserve"><value>{0} версии</value></data><data name="Player_ShuffleOff" xml:space="preserve"><value>Перемешивание: Выкл</value></data><data name="Player_ShuffleOn" xml:space="preserve"><value>Перемешивание: Вкл</value></data><data name="Player_RepeatOff" xml:space="preserve"><value>Повтор: Выкл</value></data><data name="Player_RepeatAll" xml:space="preserve"><value>Повторять все треки</value></data><data name="Player_RepeatOne" xml:space="preserve"><value>Повторять текущий трек</value></data><data name="Settings_ManageIndexing.Content" xml:space="preserve"><value>Управление параметрами индексирования системы</value></data><data name="Settings_LibraryPathsTitle.Text" xml:space="preserve"><value>Пути к библиотеке видео</value></data><data name="Settings_RefreshTitle.Text" xml:space="preserve"><value>Обновить библиотеки</value></data><data name="Remote_RenameClient.ToolTip" xml:space="preserve"><value>Переименовать</value></data><data name="Remote_BanClient.ToolTip" xml:space="preserve"><value>Заблокировать</value></data><data name="Ui_Equalizer.Text" xml:space="preserve"><value>Эквалайзер</value></data><data name="Ui_PlaybackRate.Text" xml:space="preserve"><value>Скорость</value></data><data name="Ui_RateNormal.Text" xml:space="preserve"><value>1x (Обычная)</value></data><data name="Equalizer_Close" xml:space="preserve"><value>Закрыть</value></data><data name="Equalizer_Preset" xml:space="preserve"><value>Предустановка</value></data><data name="Equalizer_On" xml:space="preserve"><value>Вкл.</value></data><data name="Equalizer_Off" xml:space="preserve"><value>Откл.</value></data><data name="Equalizer_LinkSliders" xml:space="preserve"><value>Перемещать находящиеся рядом ползунки вместе</value></data><data name="Equalizer_dB" xml:space="preserve"><value>дБ</value></data><data name="Equalizer_Hz" xml:space="preserve"><value>Гц</value></data><data name="Equalizer_kHz" xml:space="preserve"><value>кГц</value></data><data name="Equalizer_PresetFlat" xml:space="preserve"><value>Ровно (Flat)</value></data><data name="Equalizer_PresetClub" xml:space="preserve"><value>Клуб</value></data><data name="Equalizer_PresetDance" xml:space="preserve"><value>Танцевальная</value></data><data name="Equalizer_PresetFullBass" xml:space="preserve"><value>Полный бас</value></data><data name="Equalizer_PresetLive" xml:space="preserve"><value>Живое выступление</value></data><data name="Equalizer_PresetParty" xml:space="preserve"><value>Вечеринка</value></data><data name="Equalizer_PresetPop" xml:space="preserve"><value>Поп</value></data><data name="Equalizer_PresetRock" xml:space="preserve"><value>Рок</value></data><data name="Equalizer_PresetSoft" xml:space="preserve"><value>Мягкий</value></data><data name="Equalizer_PresetTechno" xml:space="preserve"><value>Техно</value></data><data name="Equalizer_PresetCustom" xml:space="preserve"><value>Пользовательская</value></data><data name="Ui_AddVideoFolder_130.Text" xml:space="preserve"><value>Добавить папку</value></data>  <data name="Settings_Updates.Text" xml:space="preserve"><value>Обновления</value></data>
+  <data name="Settings_UpdatesAuto.Header" xml:space="preserve"><value>Проверять обновления при запуске</value></data>
+  <data name="Settings_UpdatesAuto.Description" xml:space="preserve"><value>Приложение раз в запуск проверяет последний релиз на GitHub. Установка начинается только после подтверждения.</value></data>
+  <data name="Settings_UpdatesAutoSwitch.OnContent" xml:space="preserve"><value>Вкл</value></data>
+  <data name="Settings_UpdatesAutoSwitch.OffContent" xml:space="preserve"><value>Выкл</value></data>
+  <data name="Settings_UpdatesAutoSwitch_AutomationName.AutomationName" xml:space="preserve"><value>Автоматическая проверка обновлений</value></data>
+  <data name="Settings_UpdatesCheck.Header" xml:space="preserve"><value>Версия приложения</value></data>
+  <data name="Settings_UpdatesCheck.Description" xml:space="preserve"><value>Установщик закроет приложение, заменит файлы и запустит новую версию. Библиотека, очередь и настройки сохранятся.</value></data>
+  <data name="Settings_UpdatesCheckButton.Content" xml:space="preserve"><value>Проверить обновления</value></data>
+  <data name="Update_CurrentVersion" xml:space="preserve"><value>Версия {0}</value></data>
+  <data name="Update_Checking" xml:space="preserve"><value>Проверяю обновления…</value></data>
+  <data name="Update_UpToDate" xml:space="preserve"><value>Установлена последняя версия {0}.</value></data>
+  <data name="Update_Available" xml:space="preserve"><value>Доступна версия {0}.</value></data>
+  <data name="Update_NotConfigured" xml:space="preserve"><value>Канал обновлений не настроен.</value></data>
+  <data name="Update_Failed" xml:space="preserve"><value>Не удалось проверить обновления: {0}</value></data>
+  <data name="Update_Downloading" xml:space="preserve"><value>Скачиваю обновление… {0}</value></data>
+  <data name="Update_Installing" xml:space="preserve"><value>Запускаю установщик…</value></data>
+  <data name="Update_InstallFailed" xml:space="preserve"><value>Не удалось запустить установщик обновления.</value></data>
+  <data name="Update_BarTitle" xml:space="preserve"><value>Доступно обновление</value></data>
+  <data name="Update_BarMessage" xml:space="preserve"><value>Tempo Karaoke {0} уже можно установить.</value></data>
+  <data name="Update_InstallButton.Content" xml:space="preserve"><value>Обновить</value></data>
+</root>

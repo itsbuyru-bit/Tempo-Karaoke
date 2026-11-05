@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using LibVLCSharp.Platforms.Windows;
 using LibVLCSharp.Shared;
+using LibVLCSharp.Shared.Structures;
 using Microsoft.UI.Dispatching;
 
 namespace TempoKaraoke.Services;
@@ -26,6 +27,8 @@ public sealed class PlayerService : IDisposable
     private bool _resumeAfterAttach = true;
     private int _volume = 80;
     private int _volumeBeforeMute = 80;
+    private float _rate = 1.0f;
+    private Equalizer? _equalizer;
 
     public PlayerService(DispatcherQueue dispatcher)
     {
@@ -49,6 +52,50 @@ public sealed class PlayerService : IDisposable
     public long LengthMs => _mediaPlayer?.Length ?? _lastLengthMs;
 
     public int Volume => _volume;
+
+    /// <summary>Текущая скорость воспроизведения (1.0 = обычная).</summary>
+    public float Rate => _rate;
+
+    /// <summary>Меняет скорость воспроизведения LibVLC.</summary>
+    public void SetRate(float rate)
+    {
+        _rate = rate;
+        _mediaPlayer?.SetRate(rate);
+        RaiseStateChanged();
+    }
+
+    /// <summary>
+    /// Применяет эквалайзер LibVLC. LibVLCSharp 3.10 падает на SetEqualizer(null),
+    /// поэтому «выключено» реализуется ровным эквалайзером (все полосы 0 дБ) —
+    /// он не меняет звук. Экземпляр хранится здесь, чтобы настройки пережили
+    /// пересоздание плеера при откреплении окна.
+    /// </summary>
+    public void SetEqualizer(Equalizer? equalizer)
+    {
+        var effective = equalizer ?? new Equalizer();
+        var previous = _equalizer;
+        _equalizer = effective;
+        _mediaPlayer?.SetEqualizer(effective);
+        if (!ReferenceEquals(previous, effective))
+        {
+            previous?.Dispose();
+        }
+    }
+    public int AudioTrack => _mediaPlayer?.AudioTrack ?? -1;
+
+    public IReadOnlyList<TrackDescription> AudioTracks =>
+        _mediaPlayer?.AudioTrackDescription ?? Array.Empty<TrackDescription>();
+
+    public void SetAudioTrack(int id)
+    {
+        if (_mediaPlayer is null)
+        {
+            return;
+        }
+
+        _mediaPlayer.SetAudioTrack(id);
+        RaiseStateChanged();
+    }
 
     public void Attach(VideoView view, string[] swapChainOptions)
     {
@@ -75,6 +122,11 @@ public sealed class PlayerService : IDisposable
             _mediaPlayer.EndReached += OnEndReached;
             _mediaPlayer.EncounteredError += OnEncounteredError;
             _mediaPlayer.Volume = _volume;
+            _mediaPlayer.SetRate(_rate);
+            if (_equalizer is not null)
+            {
+                _mediaPlayer.SetEqualizer(_equalizer);
+            }
 
             view.MediaPlayer = _mediaPlayer;
             _view = view;
@@ -95,25 +147,49 @@ public sealed class PlayerService : IDisposable
         }
     }
 
-    public void Detach()
+    /// <summary>
+    /// Отключает видео от текущего VideoView, не блокируя UI-поток ожиданием VLC.
+    /// </summary>
+    public async Task DetachAsync()
     {
-        if (_mediaPlayer is not null)
+        var player = _mediaPlayer;
+        if (player is not null)
         {
-            _lastPositionMs = _mediaPlayer.Time;
-            _lastLengthMs = _mediaPlayer.Length;
-            _resumeAfterAttach = _mediaPlayer.IsPlaying;
-            _volume = _mediaPlayer.Volume;
+            _lastPositionMs = player.Time;
+            _lastLengthMs = player.Length;
+            _resumeAfterAttach = player.IsPlaying;
+            _volume = player.Volume;
 
-            _mediaPlayer.Stop();
-            Unsubscribe();
-            _mediaPlayer.Dispose();
             _mediaPlayer = null;
-
+            Unsubscribe(player);
             if (_view is not null)
             {
                 _view.MediaPlayer = null;
                 _view = null;
             }
+
+            // Stop() может ждать поток событий VLC — даём ему ограниченное время.
+            try
+            {
+                var stop = Task.Run(() =>
+                {
+                    try
+                    {
+                        player.Stop();
+                    }
+                    catch
+                    {
+                        // Плеер мог быть уже закрыт.
+                    }
+                });
+                await Task.WhenAny(stop, Task.Delay(1500)).ConfigureAwait(false);
+            }
+            catch
+            {
+                // Не удалось дождаться остановки — всё равно освобождаем ресурсы.
+            }
+
+            player.Dispose();
         }
 
         _media?.Dispose();
@@ -122,6 +198,8 @@ public sealed class PlayerService : IDisposable
         _libVlc = null;
         RaiseStateChanged();
     }
+
+    public void Detach() => DetachAsync().GetAwaiter().GetResult();
 
     public void Play(string path)
     {
@@ -169,9 +247,26 @@ public sealed class PlayerService : IDisposable
 
     public void Stop()
     {
-        _mediaPlayer?.Stop();
+        var player = _mediaPlayer;
         _lastPositionMs = 0;
         _resumeAfterAttach = false;
+
+        if (player is not null)
+        {
+            // Stop() ждёт поток событий VLC — не блокируем им UI.
+            _ = Task.Run(() =>
+            {
+                try
+                {
+                    player.Stop();
+                }
+                catch
+                {
+                    // Плеер мог быть уже закрыт.
+                }
+            });
+        }
+
         RaiseStateChanged();
     }
 
@@ -232,7 +327,8 @@ public sealed class PlayerService : IDisposable
             return;
         }
 
-        _mediaPlayer.Stop();
+        // ВАЖНО: не вызываем Stop() здесь. Stop() на UI-потоке ждёт поток событий VLC,
+        // а тот в OnPlaying выставляет Time — получается взаимная блокировка (зависание).
         _media?.Dispose();
         _media = IsRemote(path)
             ? new Media(_libVlc, path, FromType.FromLocation)
@@ -247,7 +343,17 @@ public sealed class PlayerService : IDisposable
 
         if (!play)
         {
-            _mediaPlayer.Pause();
+            _ = Task.Run(() =>
+            {
+                try
+                {
+                    _mediaPlayer?.Pause();
+                }
+                catch
+                {
+                    // Плеер мог быть уже закрыт.
+                }
+            });
         }
 
         RaiseStateChanged();
@@ -265,17 +371,38 @@ public sealed class PlayerService : IDisposable
 
     private void OnPlaying(object? sender, EventArgs e)
     {
-        if (_pendingSeekMs > 0)
-        {
-            var seek = _pendingSeekMs;
-            _pendingSeekMs = 0;
-            _mediaPlayer!.Time = seek;
-        }
+        var seek = _pendingSeekMs;
+        _pendingSeekMs = 0;
+        var resume = _resumeAfterAttach;
 
-        if (!_resumeAfterAttach)
+        // Колбэк VLC нельзя использовать для вызовов в плеер: они могут ждать
+        // остановки/смены медиа и вешать UI-поток. Откладываем на пул потоков.
+        _ = Task.Run(async () =>
         {
-            _mediaPlayer!.Pause();
-        }
+            try
+            {
+                await Task.Delay(120);
+                var player = _mediaPlayer;
+                if (player is null)
+                {
+                    return;
+                }
+
+                if (seek > 0)
+                {
+                    player.Time = seek;
+                }
+
+                if (!resume)
+                {
+                    player.Pause();
+                }
+            }
+            catch
+            {
+                // Плеер мог быть уже освобождён при выходе.
+            }
+        });
 
         RaiseStateChanged();
     }
@@ -299,19 +426,14 @@ public sealed class PlayerService : IDisposable
         _dispatcher.TryEnqueue(() => StateChanged?.Invoke(this, EventArgs.Empty));
     }
 
-    private void Unsubscribe()
+    private void Unsubscribe(MediaPlayer player)
     {
-        if (_mediaPlayer is null)
-        {
-            return;
-        }
-
-        _mediaPlayer.TimeChanged -= OnTimeChanged;
-        _mediaPlayer.LengthChanged -= OnLengthChanged;
-        _mediaPlayer.Playing -= OnPlaying;
-        _mediaPlayer.Paused -= OnPaused;
-        _mediaPlayer.Stopped -= OnStopped;
-        _mediaPlayer.EndReached -= OnEndReached;
-        _mediaPlayer.EncounteredError -= OnEncounteredError;
+        player.TimeChanged -= OnTimeChanged;
+        player.LengthChanged -= OnLengthChanged;
+        player.Playing -= OnPlaying;
+        player.Paused -= OnPaused;
+        player.Stopped -= OnStopped;
+        player.EndReached -= OnEndReached;
+        player.EncounteredError -= OnEncounteredError;
     }
 }

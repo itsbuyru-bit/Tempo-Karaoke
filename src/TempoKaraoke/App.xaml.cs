@@ -1,3 +1,6 @@
+using System;
+using System.Runtime.InteropServices;
+using System.Threading;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Data;
@@ -15,6 +18,8 @@ namespace TempoKaraoke;
 /// </summary>
 public partial class App : Application
 {
+    private static Mutex? _singleInstanceMutex;
+
     /// <summary>
     /// The main application window. Use <c>App.Window</c> from any class that needs
     /// the window reference (for dialogs, pickers, interop, etc.).
@@ -41,7 +46,46 @@ public partial class App : Application
     /// </summary>
     public App()
     {
+        // Второй процесс не должен параллельно писать media.db/playlists.json/очередь.
+        // Вместо этого активируем окно уже запущенного экземпляра.
+        try
+        {
+            _singleInstanceMutex = new Mutex(
+                initiallyOwned: true,
+                @"Local\TempoKaraoke.SingleInstance",
+                out var createdNew);
+            if (!createdNew)
+            {
+                ActivateExistingWindow();
+                Environment.Exit(0);
+            }
+        }
+        catch (Exception ex)
+        {
+            // Ограниченные окружения могут запретить именованный mutex.
+            // Лучше запуститься, чем упасть до создания окна.
+            Services.LogService.Warn($"Single-instance mutex unavailable: {ex.Message}");
+        }
+
         InitializeComponent();
+
+        // Падения пишутся в лог всегда, даже если ведение логов выключено.
+        UnhandledException += (_, e) =>
+        {
+            Services.LogService.Crash(e.Exception, "UI UnhandledException");
+            e.Handled = false;
+        };
+
+        AppDomain.CurrentDomain.UnhandledException += (_, e) =>
+            Services.LogService.Crash(e.ExceptionObject as Exception, "AppDomain");
+
+        TaskScheduler.UnobservedTaskException += (_, e) =>
+        {
+            Services.LogService.Crash(e.Exception, "UnobservedTaskException");
+            e.SetObserved();
+        };
+
+        Services.LogService.Info("Приложение запущено.");
     }
 
     /// <summary>
@@ -54,4 +98,29 @@ public partial class App : Application
         DispatcherQueue = Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
         Window.Activate();
     }
+
+    private static void ActivateExistingWindow()
+    {
+        for (var attempt = 0; attempt < 20; attempt++)
+        {
+            var handle = FindWindow(null, "Tempo Karaoke");
+            if (handle != IntPtr.Zero)
+            {
+                ShowWindow(handle, 9 /* SW_RESTORE */);
+                SetForegroundWindow(handle);
+                return;
+            }
+
+            Thread.Sleep(100);
+        }
+    }
+
+    [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+    private static extern IntPtr FindWindow(string? className, string windowName);
+
+    [DllImport("user32.dll")]
+    private static extern bool ShowWindow(IntPtr window, int command);
+
+    [DllImport("user32.dll")]
+    private static extern bool SetForegroundWindow(IntPtr window);
 }

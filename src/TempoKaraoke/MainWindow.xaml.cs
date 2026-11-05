@@ -1,3 +1,4 @@
+using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Windows.Graphics;
 
@@ -20,7 +21,7 @@ public sealed partial class MainWindow : Window
         ExtendsContentIntoTitleBar = true;
 
         AppWindow.SetIcon("Assets/AppIcon.ico");
-        AppWindow.Resize(new SizeInt32(1810, 1123));
+        ResizeToWorkArea();
 
         RootFrame.Navigated += (_, args) =>
         {
@@ -32,5 +33,14 @@ public sealed partial class MainWindow : Window
 
         // Navigate the root frame to the main page on startup.
         RootFrame.Navigate(typeof(MainPage));
+    }
+
+    private void ResizeToWorkArea()
+    {
+        var display = DisplayArea.GetFromWindowId(AppWindow.Id, DisplayAreaFallback.Primary);
+        var work = display.WorkArea;
+        var width = Math.Clamp(1810, 900, Math.Max(900, work.Width - 40));
+        var height = Math.Clamp(1123, 640, Math.Max(640, work.Height - 40));
+        AppWindow.Resize(new SizeInt32(width, height));
     }
 }
