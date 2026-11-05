@@ -6,6 +6,12 @@
 Все UX-решения: [`docs/UX-DECISIONS.md`](docs/UX-DECISIONS.md).
 Сборка MSIX и установка на ПК: [`docs/PACKAGING.md`](docs/PACKAGING.md).
 
+![Tempo Karaoke — умный караоке-плеер для ПК](poster/tempo-karaoke-poster-ru.jpg)
+
+<sub>Постеры для Store и README: [`poster/tempo-karaoke-poster-ru.jpg`](poster/tempo-karaoke-poster-ru.jpg) и
+[`poster/tempo-karaoke-poster-en.jpg`](poster/tempo-karaoke-poster-en.jpg) (2752×1536, 16:9).</sub>
+
+
 ## Задача
 
 Приложение для Windows, которое:
