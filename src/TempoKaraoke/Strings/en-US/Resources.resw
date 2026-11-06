@@ -278,7 +278,7 @@
   <data name="Selection_Count_One" xml:space="preserve"><value>{0} selected</value></data>
   <data name="Selection_Count_Other" xml:space="preserve"><value>{0} selected</value></data>
   <data name="Settings_Back_AutomationName.AutomationName" xml:space="preserve"><value>Back to settings</value></data>
-  <data name="Settings_Back_ToolTip.ToolTip" xml:space="preserve"><value>Back</value></data>
+  <data name="Settings_BreadcrumbRoot.Content" xml:space="preserve"><value>Settings</value></data>
   <data name="Settings_LibraryPathsTitle.Text" xml:space="preserve"><value>Video library paths</value></data>
   <data name="Settings_ManageIndexing.Content" xml:space="preserve"><value>Manage system indexing settings</value></data>
   <data name="Settings_PathsTitle.Description" xml:space="preserve"><value>Only video files are indexed. Music is not indexed.</value></data>
@@ -286,9 +286,6 @@
   <data name="Settings_RefreshTitle.Text" xml:space="preserve"><value>Refresh libraries</value></data>
   <data name="Settings_ResetWindow.Content" xml:space="preserve"><value>Reset window placement</value></data>
   <data name="Settings_ResetWindow_Done" xml:space="preserve"><value>Window placement reset.</value></data>
-  <data name="Settings_Search.PlaceholderText" xml:space="preserve"><value>Search settings</value></data>
-  <data name="Settings_SearchEmpty.Text" xml:space="preserve"><value>Nothing found</value></data>
-  <data name="Settings_Search_AutomationName.AutomationName" xml:space="preserve"><value>Search settings</value></data>
   <data name="Settings_Section_Diagnostics.Description" xml:space="preserve"><value>Logs, error reports, network and system status</value></data>
   <data name="Settings_Section_Diagnostics.Header" xml:space="preserve"><value>Diagnostics</value></data>
   <data name="Settings_Section_Interface.Description" xml:space="preserve"><value>Language, theme and window position</value></data>
@@ -303,6 +300,8 @@
   <data name="Settings_Section_Remote.Header" xml:space="preserve"><value>Web remote</value></data>
   <data name="Settings_Section_Security.Description" xml:space="preserve"><value>Host and admin PIN codes</value></data>
   <data name="Settings_Section_Security.Header" xml:space="preserve"><value>Security</value></data>
+  <data name="Settings_Section_Updates.Description" xml:space="preserve"><value>Check for and install new versions</value></data>
+  <data name="Settings_Section_Updates.Header" xml:space="preserve"><value>Updates</value></data>
   <data name="Settings_Updates.Text" xml:space="preserve"><value>Updates</value></data>
   <data name="Settings_UpdatesAuto.Description" xml:space="preserve"><value>The app asks GitHub for the latest release once per launch. Installation starts only after your confirmation.</value></data>
   <data name="Settings_UpdatesAuto.Header" xml:space="preserve"><value>Check for updates at startup</value></data>

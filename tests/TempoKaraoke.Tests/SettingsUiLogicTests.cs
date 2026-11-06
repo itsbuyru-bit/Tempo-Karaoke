@@ -6,19 +6,6 @@ namespace TempoKaraoke.Tests;
 public sealed class SettingsUiLogicTests
 {
     [Theory]
-    [InlineData("Интерфейс", "Язык, тема и положение окна", "", true)]
-    [InlineData("Интерфейс", "Язык, тема и положение окна", "   ", true)]
-    [InlineData("Интерфейс", "Язык, тема и положение окна", "язык", true)]
-    [InlineData("Интерфейс", "Язык, тема и положение окна", "ТЕМА", true)]
-    [InlineData("Интерфейс", "Язык, тема и положение окна", "окна", true)]
-    [InlineData("Интерфейс", "Язык, тема и положение окна", "диагностика", false)]
-    [InlineData(null, null, "тема", false)]
-    public void SearchMatchesTitleAndDescription(string? title, string? description, string query, bool expected)
-    {
-        Assert.Equal(expected, SettingsSearchFilter.Matches(title, description, query));
-    }
-
-    [Theory]
     [InlineData("1.8.23.0", "", "1.8.22.1", true)]
     [InlineData("1.8.23.0", "1.8.22.1", "1.8.22.1", true)]
     [InlineData("1.8.23.0", "1.8.23.0", "1.8.22.1", false)]

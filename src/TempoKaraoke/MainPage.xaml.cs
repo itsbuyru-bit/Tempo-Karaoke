@@ -8905,9 +8905,7 @@ public sealed partial class MainPage : Page, IRemoteHost
     // ── Каталог разделов настроек ───────────────────────────────────────────
 
     private readonly ObservableCollection<SettingsSection> _settingsSections = new();
-    private readonly ObservableCollection<SettingsSearchHit> _settingsHits = new();
     private readonly Dictionary<string, StackPanel> _settingsSectionPanels = new(StringComparer.Ordinal);
-    private DispatcherTimer? _settingsSearchTimer;
     private string? _openSettingsSectionId;
 
     /// <summary>Строит карточки каталога из SettingsCatalog с текущей локалью.</summary>
@@ -8920,6 +8918,7 @@ public sealed partial class MainPage : Page, IRemoteHost
         _settingsSectionPanels["remote"] = SectionRemote;
         _settingsSectionPanels["security"] = SectionSecurity;
         _settingsSectionPanels["diagnostics"] = SectionDiagnostics;
+        _settingsSectionPanels["updates"] = SectionUpdates;
 
         _settingsSections.Clear();
         foreach (var definition in SettingsCatalog.Sections)
@@ -8936,7 +8935,6 @@ public sealed partial class MainPage : Page, IRemoteHost
         }
 
         SettingsSectionList.ItemsSource = _settingsSections;
-        SettingsSearchHitList.ItemsSource = _settingsHits;
         RefreshSettingsSectionTitle();
     }
 
@@ -8951,11 +8949,10 @@ public sealed partial class MainPage : Page, IRemoteHost
         }
 
         _openSettingsSectionId = null;
-        ApplySettingsFilter(SettingsSearchBox.Text ?? string.Empty);
     }
 
     /// <summary>Открывает раздел; при переходе из поиска подсвечивает параметр.</summary>
-    private void OpenSettingsSection(string sectionId, string? controlName = null)
+    private void OpenSettingsSection(string sectionId)
     {
         var definition = SettingsCatalog.Find(sectionId);
         if (definition is null)
@@ -8979,26 +8976,6 @@ public sealed partial class MainPage : Page, IRemoteHost
         if (string.Equals(sectionId, "diagnostics", StringComparison.Ordinal))
         {
             RefreshDiagnosticsSummary();
-        }
-
-        if (!string.IsNullOrWhiteSpace(controlName))
-        {
-            DispatcherQueue.TryEnqueue(() => HighlightSetting(controlName));
-        }
-    }
-
-    /// <summary>Прокручивает к контролу и ставит на него фокус (переход из поиска).</summary>
-    private void HighlightSetting(string controlName)
-    {
-        if (FindName(controlName) is not FrameworkElement element)
-        {
-            return;
-        }
-
-        element.StartBringIntoView(new BringIntoViewOptions { AnimationDesired = true });
-        if (element is Control control)
-        {
-            control.Focus(FocusState.Programmatic);
         }
     }
 
@@ -9025,80 +9002,12 @@ public sealed partial class MainPage : Page, IRemoteHost
         }
     }
 
-    private void SettingsSearchHitList_ItemClick(object sender, ItemClickEventArgs e)
-    {
-        if (e.ClickedItem is SettingsSearchHit hit)
-        {
-            OpenSettingsSection(hit.SectionId, hit.ControlName);
-        }
-    }
-
-    private void SettingsSearch_TextChanged(object sender, TextChangedEventArgs e)
-    {
-        _settingsSearchTimer ??= CreateSettingsSearchTimer();
-        _settingsSearchTimer.Stop();
-        _settingsSearchTimer.Start();
-    }
-
-    private DispatcherTimer CreateSettingsSearchTimer()
-    {
-        var timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(200) };
-        timer.Tick += (_, _) =>
-        {
-            timer.Stop();
-            ApplySettingsFilter(SettingsSearchBox.Text ?? string.Empty);
-        };
-        return timer;
-    }
-
-    /// <summary>Фильтр карточек разделов и прямые ссылки на параметры.</summary>
-    private void ApplySettingsFilter(string query)
-    {
-        query = (query ?? string.Empty).Trim();
-
-        var matches = new List<SettingsSection>();
-        foreach (var section in _settingsSections)
-        {
-            if (SettingsSearchFilter.Matches(section.Title, section.Description, query))
-            {
-                matches.Add(section);
-            }
-        }
-
-        SettingsSectionList.ItemsSource = matches;
-
-        _settingsHits.Clear();
-        if (query.Length > 0)
-        {
-            foreach (var parameter in SettingsCatalog.Parameters)
-            {
-                var title = LocalizationService.Get(parameter.TitleKey);
-                if (!title.Contains(query, StringComparison.CurrentCultureIgnoreCase))
-                {
-                    continue;
-                }
-
-                var section = SettingsCatalog.Find(parameter.SectionId);
-                _settingsHits.Add(new SettingsSearchHit(
-                    parameter.SectionId,
-                    title,
-                    section is null ? string.Empty : LocalizationService.Get(section.TitleKey),
-                    parameter.ControlName));
-            }
-        }
-
-        SettingsSearchHitList.Visibility = _settingsHits.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
-        SettingsSearchEmpty.Visibility = matches.Count == 0 && _settingsHits.Count == 0
-            ? Visibility.Visible
-            : Visibility.Collapsed;
-    }
-
     // ── Бейдж и уведомление об обновлении ───────────────────────────────────
 
     /// <summary>Бейдж на «О приложении» — единый индикатор доступного обновления.</summary>
     private void UpdateBadgeVisibility()
     {
-        AboutUpdateBadge.Visibility = SettingsService.ShouldShowUpdateBadge(AppInfo.DisplayVersion)
+        SettingsUpdateBadge.Visibility = SettingsService.ShouldShowUpdateBadge(AppInfo.DisplayVersion)
             ? Visibility.Visible
             : Visibility.Collapsed;
     }
@@ -9125,7 +9034,7 @@ public sealed partial class MainPage : Page, IRemoteHost
     {
         var version = _pendingUpdate?.Version ?? SettingsService.PendingUpdateVersion;
         SettingsService.DismissUpdate(version);
-        AboutUpdateBadge.Visibility = Visibility.Collapsed;
+        SettingsUpdateBadge.Visibility = Visibility.Collapsed;
         UpdateNowButton.Visibility = Visibility.Collapsed;
         UpdateNotesLink.Visibility = Visibility.Collapsed;
         UpdateLaterButton.Visibility = Visibility.Collapsed;

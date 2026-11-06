@@ -18,5 +18,3 @@ public sealed class SettingsSection
     public string Description { get; init; } = string.Empty;
 }
 
-/// <summary>Прямая ссылка на конкретный параметр из поиска.</summary>
-public sealed record SettingsSearchHit(string SectionId, string Title, string SectionTitle, string? ControlName);
