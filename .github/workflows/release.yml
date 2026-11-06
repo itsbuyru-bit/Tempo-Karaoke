@@ -15,6 +15,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Каждый тег обязан иметь пользовательские заметки «что нового».
+      - name: Verify release notes
+        if: startsWith(github.ref, 'refs/tags/')
+        shell: pwsh
+        run: |
+          $notes = "docs/releases/${{ github.ref_name }}.md"
+          if (-not (Test-Path $notes)) {
+            throw "Release notes are required: $notes"
+          }
+          Write-Host "Release notes: $notes"
+
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
@@ -49,5 +60,8 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
+          name: Tempo Karaoke ${{ github.ref_name }}
+          # Заметки ведутся в репозитории и обязательны для каждого тега.
+          body_path: docs/releases/${{ github.ref_name }}.md
+          generate_release_notes: false
           files: artifacts/TempoKaraoke-Setup-*.exe
-          generate_release_notes: true

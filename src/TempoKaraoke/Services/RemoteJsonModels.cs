@@ -93,6 +93,11 @@ public sealed class PlaylistAddRequest
     public string Id { get; set; } = string.Empty;
 }
 
+public sealed class ClientErrorRequest
+{
+    public string Message { get; set; } = string.Empty;
+}
+
 [JsonSourceGenerationOptions(
     PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase,
     PropertyNameCaseInsensitive = true)]
@@ -123,6 +128,7 @@ public sealed class PlaylistAddRequest
 [JsonSerializable(typeof(NameRequest))]
 [JsonSerializable(typeof(PlayNowRequest))]
 [JsonSerializable(typeof(PlaylistAddRequest))]
+[JsonSerializable(typeof(ClientErrorRequest))]
 internal partial class RemoteJsonContext : JsonSerializerContext
 {
 }

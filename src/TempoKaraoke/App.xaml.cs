@@ -69,6 +69,10 @@ public partial class App : Application
 
         InitializeComponent();
 
+        // Заголовок сессии попадает в лог даже при выключенном обычном логировании:
+        // по нему видно версию, ОС, локаль и состояние сети на момент запуска.
+        Services.LogService.BeginSession(Services.DiagnosticsService.BuildSessionHeader());
+
         // Падения пишутся в лог всегда, даже если ведение логов выключено.
         UnhandledException += (_, e) =>
         {

@@ -4,7 +4,7 @@
 ;
 ; Сборка:
 ;   dotnet publish src\TempoKaraoke\TempoKaraoke.csproj -c Release -p:PublishProfile=portable-x64
-;   iscc installer\TempoKaraoke.iss /DMyAppVersion=1.8.21.0
+;   iscc installer\TempoKaraoke.iss /DMyAppVersion=1.9.0.0
 ;
 ; Сборка self-contained: Windows App SDK и .NET лежат рядом с exe, поэтому
 ; установщик ничего не доустанавливает и не требует прав администратора.
@@ -15,7 +15,7 @@
 #define MyAppId "{{8ECFDE07-71F6-4AC1-9968-53F119FF033C}"
 
 #ifndef MyAppVersion
-  #define MyAppVersion "1.8.21.0"
+  #define MyAppVersion "1.9.0.0"
 #endif
 
 #ifndef PublishDir

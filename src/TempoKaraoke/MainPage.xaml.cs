@@ -22,9 +22,11 @@ using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Media.Imaging;
+using TempoKaraoke.Diagnostics;
 using TempoKaraoke.Models;
+using TempoKaraoke.Networking;
+using TempoKaraoke.Security;
 using TempoKaraoke.Services;
-using TempoKaraoke.Text;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Foundation;
 using Windows.Globalization;
@@ -352,8 +354,50 @@ public sealed partial class MainPage : Page, IRemoteHost
         }
     }
 
+    private int _navigationEpoch;
+    private bool _pinStatusIsWarning;
+
+    /// <summary>
+    /// Single entry point for top-level navigation. Every other view is fully
+    /// collapsed before the new one becomes visible, so a nested playlist can no
+    /// longer be drawn on top of the menu the user came from.
+    /// </summary>
+    private void ShowTopLevelView(FrameworkElement target, bool keepLibraryDetail = false)
+    {
+        _navigationEpoch++;
+
+        foreach (var view in new FrameworkElement[]
+                 {
+                     HomeView,
+                     LibraryPanel,
+                     QueueView,
+                     PlaceholderView,
+                     SettingsView,
+                     PlaylistsView,
+                     PlaylistDetailView,
+                     SearchResultsView,
+                     RemoteView,
+                     RemoteParticipantsView,
+                     AboutView,
+                 })
+        {
+            if (!ReferenceEquals(view, target))
+            {
+                view.Visibility = Visibility.Collapsed;
+            }
+        }
+
+        if (!keepLibraryDetail && FolderDetailView is not null)
+        {
+            FolderDetailView.Visibility = Visibility.Collapsed;
+        }
+
+        target.Visibility = Visibility.Visible;
+    }
+
     private void ShowLibrary()
     {
+        ShowTopLevelView(LibraryPanel);
         if (NavView is not null &&
             (NavView.SelectedItem is null || ReferenceEquals(NavView.SelectedItem, SearchResultsNavItem)) &&
             LibraryNavItem is not null)
@@ -374,6 +418,7 @@ public sealed partial class MainPage : Page, IRemoteHost
 
     private void ShowSearchResults(string query)
     {
+        ShowTopLevelView(SearchResultsView);
         var matches = _searchSession.Search(query, limit: 0).Items;
         var groups = MediaGroupingService.Group(matches);
 
@@ -541,6 +586,7 @@ public sealed partial class MainPage : Page, IRemoteHost
 
     private void ShowHome()
     {
+        ShowTopLevelView(HomeView);
         HomeView.Visibility = Visibility.Visible;
         LibraryPanel.Visibility = Visibility.Collapsed;
         QueueView.Visibility = Visibility.Collapsed;
@@ -633,6 +679,7 @@ public sealed partial class MainPage : Page, IRemoteHost
 
     private void ShowQueue()
     {
+        ShowTopLevelView(QueueView);
         HomeView.Visibility = Visibility.Collapsed;
         LibraryPanel.Visibility = Visibility.Collapsed;
         QueueView.Visibility = Visibility.Visible;
@@ -658,6 +705,7 @@ public sealed partial class MainPage : Page, IRemoteHost
 
     private void ShowPlaylists()
     {
+        ShowTopLevelView(PlaylistsView);
         PlaylistDetailView.Visibility = Visibility.Collapsed;
         _openPlaylist = null;
         PlaylistItems.Clear();
@@ -678,9 +726,16 @@ public sealed partial class MainPage : Page, IRemoteHost
 
     private void ApplyLanguageDeferred(FrameworkElement view)
     {
+        var epoch = _navigationEpoch;
         Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread().TryEnqueue(
             () =>
             {
+                // Ignore a render that belongs to a screen the user already left.
+                if (epoch != _navigationEpoch && view.Visibility != Visibility.Visible)
+                {
+                    return;
+                }
+
                 LocalizationService.Apply(view, SettingsService.Language);
                 if (view is not null && ReferenceEquals(view, LibraryPanel))
                 {
@@ -707,6 +762,7 @@ public sealed partial class MainPage : Page, IRemoteHost
 
     private void ShowRemote()
     {
+        ShowTopLevelView(RemoteView);
         HomeView.Visibility = Visibility.Collapsed;
         LibraryPanel.Visibility = Visibility.Collapsed;
         QueueView.Visibility = Visibility.Collapsed;
@@ -723,6 +779,7 @@ public sealed partial class MainPage : Page, IRemoteHost
 
     private void ShowRemoteParticipants()
     {
+        ShowTopLevelView(RemoteParticipantsView);
         HomeView.Visibility = Visibility.Collapsed;
         LibraryPanel.Visibility = Visibility.Collapsed;
         QueueView.Visibility = Visibility.Collapsed;
@@ -786,7 +843,11 @@ public sealed partial class MainPage : Page, IRemoteHost
         }
 
         RemoteStatePanel.Visibility = activeInMode ? Visibility.Visible : Visibility.Collapsed;
-        RemoteStateText.Text = activeInMode ? L("Remote_StateActive") : string.Empty;
+        RemoteStateText.Text = activeInMode
+            ? directMode
+                ? LocalizationService.Get($"Wifi_State_{WiFiDirectCoordinator.State}")
+                : L("Remote_StateActive")
+            : string.Empty;
         RemoteStateIp.Text = activeInMode
             ? LocalizationService.Format("Remote_Ip", directMode ? hotspotAddress : localAddress)
             : string.Empty;
@@ -836,6 +897,7 @@ public sealed partial class MainPage : Page, IRemoteHost
             ? L(directMode ? "Remote_HintDirectActive" : "Remote_HintWifiActive")
             : L(directMode ? "Remote_HintDirectInactive" : "Remote_HintWifiInactive");
         LocalizationService.Apply(RemoteView, SettingsService.Language);
+        UpdateWifiDirectStateUi();
     }
 
     private async void RemoteHotspot_Click(object sender, RoutedEventArgs e)
@@ -891,6 +953,88 @@ public sealed partial class MainPage : Page, IRemoteHost
         RemoteHotspotInfoBar.IsOpen = true;
     }
 
+    private void OnWiFiDirectStateChanged(object? sender, EventArgs e)
+    {
+        if (DispatcherQueue.HasThreadAccess)
+        {
+            UpdateWifiDirectStateUi();
+        }
+        else
+        {
+            DispatcherQueue.TryEnqueue(UpdateWifiDirectStateUi);
+        }
+    }
+
+    /// <summary>Shows the explicit Wi-Fi Direct state instead of flashing QR vs. "not started".</summary>
+    private void UpdateWifiDirectStateUi()
+    {
+        if (RemoteWifiStateText is null)
+        {
+            return;
+        }
+
+        var state = WiFiDirectCoordinator.State;
+        var text = LocalizationService.Get($"Wifi_State_{state}");
+        if (state == WiFiDirectState.Error && !string.IsNullOrWhiteSpace(WiFiDirectCoordinator.LastError))
+        {
+            text += " — " + WiFiDirectCoordinator.LastError;
+        }
+
+        RemoteWifiStateText.Text = text;
+    }
+
+    private async void ShowWifiDirectBlocked(WiFiEnvironment environment)
+    {
+        var host = _remoteServer?.Url ?? string.Empty;
+        _ = host;
+        var dialog = new ContentDialog
+        {
+            Title = LocalizationService.Get("Ui_WifiBlockedTitle"),
+            Content = LocalizationService.Format("Ui_WifiBlockedMessage", PrivacyMasking.MaskSsid(environment.Ssid)),
+            PrimaryButtonText = LocalizationService.Get("Ui_OpenWifiSettings.Content"),
+            CloseButtonText = LocalizationService.Get("Common_Close"),
+            DefaultButton = ContentDialogButton.Close,
+            XamlRoot = XamlRoot,
+        };
+
+        try
+        {
+            if (await dialog.ShowAsync() == ContentDialogResult.Primary)
+            {
+                await Launcher.LaunchUriAsync(new Uri("ms-settings:network-wifi"));
+            }
+        }
+        catch (Exception ex)
+        {
+            LogService.Warn($"Cannot show the Wi-Fi Direct warning: {ex.Message}", "wifi-direct");
+        }
+
+        ShowHotspotError(LocalizationService.Format("Ui_WifiBlockedMessage", PrivacyMasking.MaskSsid(environment.Ssid)));
+    }
+
+    private async Task<bool> ConfirmWifiDirectRiskAsync(WiFiEnvironment environment)
+    {
+        var dialog = new ContentDialog
+        {
+            Title = LocalizationService.Get("Ui_WifiRiskTitle"),
+            Content = LocalizationService.Format("Ui_WifiRiskMessage", PrivacyMasking.MaskSsid(environment.Ssid)),
+            PrimaryButtonText = LocalizationService.Get("Ui_ContinueAnyway.Content"),
+            CloseButtonText = LocalizationService.Get("Common_Close"),
+            DefaultButton = ContentDialogButton.Close,
+            XamlRoot = XamlRoot,
+        };
+
+        try
+        {
+            return await dialog.ShowAsync() == ContentDialogResult.Primary;
+        }
+        catch (Exception ex)
+        {
+            LogService.Warn($"Cannot show the Wi-Fi Direct risk dialog: {ex.Message}", "wifi-direct");
+            return false;
+        }
+    }
+
     private static async Task SetQrImageAsync(Image target, byte[] png)
     {
         if (png.Length == 0)
@@ -927,6 +1071,31 @@ public sealed partial class MainPage : Page, IRemoteHost
             return;
         }
 
+        if (WiFiDirectCoordinator.State is WiFiDirectState.Starting
+            or WiFiDirectState.Advertising
+            or WiFiDirectState.WaitingForConnection
+            or WiFiDirectState.Connected)
+        {
+            // Idempotent: never restart an active publisher or recreate the QR code.
+            UpdateRemoteNetworkState();
+            return;
+        }
+
+        var environment = await WiFiDirectCoordinator.InspectAsync();
+        if (environment.IsConnected && SettingsService.WifiDirectSafeMode)
+        {
+            SetHotspotBusy(false);
+            ShowWifiDirectBlocked(environment);
+            UpdateWifiDirectStateUi();
+            return;
+        }
+
+        if (environment.IsConnected && !await ConfirmWifiDirectRiskAsync(environment))
+        {
+            SetHotspotBusy(false);
+            return;
+        }
+
         RemoteHotspotInfoBar.IsOpen = false;
         RemoteHotspotButton.IsEnabled = false;
         RemoteHotspotIcon.Visibility = Visibility.Collapsed;
@@ -938,7 +1107,7 @@ public sealed partial class MainPage : Page, IRemoteHost
         HotspotResult result;
         try
         {
-            result = await HotspotService.StartAsync();
+            result = await WiFiDirectCoordinator.StartAsync();
         }
         finally
         {
@@ -1249,6 +1418,7 @@ public sealed partial class MainPage : Page, IRemoteHost
         }
 
         UpdateRemoteRoleBadge();
+        WiFiDirectCoordinator.NotifyClientCount(_remoteServer?.ClientCount ?? 0);
     }
 
     private void UpdateRemoteRoleBadge()
@@ -1450,6 +1620,7 @@ public sealed partial class MainPage : Page, IRemoteHost
 
     private void OpenPlaylist(Playlist playlist, bool syncNavigation = true)
     {
+        ShowTopLevelView(PlaylistDetailView);
         ResetPlaylistSelection();
         _openPlaylist = playlist;
         PlaylistsView.Visibility = Visibility.Collapsed;
@@ -2310,6 +2481,7 @@ public sealed partial class MainPage : Page, IRemoteHost
 
     private void ShowPlaceholder(string title, string text)
     {
+        ShowTopLevelView(PlaceholderView);
         PlaceholderTitle.Text = title;
         PlaceholderText.Text = text;
         HomeView.Visibility = Visibility.Collapsed;
@@ -2323,6 +2495,7 @@ public sealed partial class MainPage : Page, IRemoteHost
 
     private void ShowSettings()
     {
+        ShowTopLevelView(SettingsView);
         HomeView.Visibility = Visibility.Collapsed;
         LibraryPanel.Visibility = Visibility.Collapsed;
         QueueView.Visibility = Visibility.Collapsed;
@@ -2336,6 +2509,7 @@ public sealed partial class MainPage : Page, IRemoteHost
 
     private void ShowAbout()
     {
+        ShowTopLevelView(AboutView);
         HomeView.Visibility = Visibility.Collapsed;
         LibraryPanel.Visibility = Visibility.Collapsed;
         QueueView.Visibility = Visibility.Collapsed;
@@ -2354,7 +2528,7 @@ public sealed partial class MainPage : Page, IRemoteHost
     {
         _isInitializingSettings = true;
         RefreshVideoRoots();
-        LanguageComboBox.SelectedIndex = SettingsService.Language.StartsWith("ru", StringComparison.OrdinalIgnoreCase) ? 1 : 0;
+        PopulateLanguageComboBox();
         ThemeComboBox.SelectedIndex = SettingsService.Theme switch
         {
             "light" => 1,
@@ -2365,7 +2539,17 @@ public sealed partial class MainPage : Page, IRemoteHost
         CountdownSecondsBox.Value = SettingsService.CountdownSeconds;
         RemoteAutoStopToggle.IsOn = SettingsService.RemoteAutoStopEnabled;
         RemoteAutoStopMinutesBox.Value = SettingsService.RemoteAutoStopMinutes;
+        if (WifiSafeModeToggle is not null)
+        {
+            WifiSafeModeToggle.IsOn = SettingsService.WifiDirectSafeMode;
+        }
+        if (PersistentPinToggle is not null)
+        {
+            PersistentPinToggle.IsOn = SettingsService.GetSecurity().UsePersistentPin;
+            UpdatePinControlsState();
+        }
         LoggingToggle.IsOn = SettingsService.LoggingEnabled;
+        _ = RefreshWifiDiagnosticsAsync();
         if (UpdateService.IsSupported)
         {
             CheckUpdatesToggle.IsOn = SettingsService.CheckUpdatesOnStartup;
@@ -2380,6 +2564,45 @@ public sealed partial class MainPage : Page, IRemoteHost
         }
         _isInitializingSettings = false;
         ApplyTheme(SettingsService.Theme);
+    }
+
+    /// <summary>Builds the language selector from localization/manifest.json.</summary>
+    private void PopulateLanguageComboBox()
+    {
+        if (LanguageComboBox is null)
+        {
+            return;
+        }
+
+        var wasInitializing = _isInitializingSettings;
+        _isInitializingSettings = true;
+        LanguageComboBox.Items.Clear();
+        foreach (var language in LocalizationService.Languages)
+        {
+            LanguageComboBox.Items.Add(new ComboBoxItem
+            {
+                Content = language.NativeName,
+                Tag = language.Tag,
+            });
+        }
+
+        SelectLanguageInComboBox(LocalizationService.CurrentLanguage);
+        _isInitializingSettings = wasInitializing;
+    }
+
+    private void SelectLanguageInComboBox(string tag)
+    {
+        if (LanguageComboBox is null)
+        {
+            return;
+        }
+
+        var wasInitializing = _isInitializingSettings;
+        _isInitializingSettings = true;
+        LanguageComboBox.SelectedItem = LanguageComboBox.Items
+            .OfType<ComboBoxItem>()
+            .FirstOrDefault(item => string.Equals(item.Tag as string, tag, StringComparison.OrdinalIgnoreCase));
+        _isInitializingSettings = wasInitializing;
     }
 
     private void ApplyTheme(string theme)
@@ -2579,22 +2802,20 @@ public sealed partial class MainPage : Page, IRemoteHost
             return;
         }
 
-        var language = (LanguageComboBox.SelectedItem as ComboBoxItem)?.Tag as string ?? "en-US";
-        SettingsService.Language = language;
+        var language = (LanguageComboBox.SelectedItem as ComboBoxItem)?.Tag as string;
+        if (string.IsNullOrWhiteSpace(language))
+        {
+            return;
+        }
+
         try
         {
-            LocalizationService.Apply(RootLayout, language);
-            LocalizationService.Apply(SettingsView, language);
-            LocalizationService.Apply(HomeView, language);
-            LocalizationService.Apply(LibraryPanel, language);
-            LocalizationService.Apply(QueueView, language);
-            LocalizationService.Apply(PlaylistsView, language);
-            LocalizationService.Apply(RemoteView, language);
-            LocalizationService.Apply(AboutView, language);
+            LocalizationService.SetLanguage(language);
             LocalizeQueueControls();
             PopulateFolders();
             ApplyFilter();
             UpdateQueueCount();
+            UpdateWifiDirectStateUi();
             AboutVersionText.Text = LocalizationService.Format("About_Version", AppInfo.DisplayVersion);
         }
         catch (Exception ex)
@@ -2635,6 +2856,8 @@ public sealed partial class MainPage : Page, IRemoteHost
         RestoreEqualizer();
         _remoteIdleTimer.Start();
         App.Window.Closed += (_, _) => _ = HotspotService.StopAsync();
+        WiFiDirectCoordinator.StateChanged += OnWiFiDirectStateChanged;
+        UpdateWifiDirectStateUi();
         _ = LoadPreviewAsync();
         if (UpdateService.IsSupported && SettingsService.CheckUpdatesOnStartup)
         {
@@ -2665,6 +2888,7 @@ public sealed partial class MainPage : Page, IRemoteHost
         StopLibraryWatchers();
         SavePlaybackPosition(force: true);
         NetworkInformation.NetworkStatusChanged -= OnNetworkStatusChanged;
+        WiFiDirectCoordinator.StateChanged -= OnWiFiDirectStateChanged;
         VideoView.Initialized -= OnVideoViewInitialized;
         _playerWindow?.Close();
         await _player.DetachAsync();
@@ -3588,6 +3812,7 @@ public sealed partial class MainPage : Page, IRemoteHost
 
     private void OpenFolderDetail(string path)
     {
+        ShowTopLevelView(LibraryPanel, keepLibraryDetail: true);
         _folderDetailPath = path;
         FoldersHomePanel.Visibility = Visibility.Collapsed;
         FolderDetailView.Visibility = Visibility.Visible;
@@ -6691,6 +6916,244 @@ public sealed partial class MainPage : Page, IRemoteHost
         SettingsService.RemoteAutoStopMinutes = (int)sender.Value;
     }
 
+    private void PersistentPinToggle_Toggled(object sender, RoutedEventArgs e)
+    {
+        UpdatePinControlsState();
+    }
+
+    private void UpdatePinControlsState()
+    {
+        if (PersistentPinToggle is null || HostPinBox is null)
+        {
+            return;
+        }
+
+        var enabled = PersistentPinToggle.IsOn;
+        HostPinBox.IsEnabled = enabled;
+        HostPinConfirmBox.IsEnabled = enabled;
+        AdminPinBox.IsEnabled = enabled;
+        AdminPinConfirmBox.IsEnabled = enabled;
+
+        var security = SettingsService.GetSecurity();
+        if (ResetPinsButton is not null)
+        {
+            ResetPinsButton.IsEnabled = security.UsePersistentPin ||
+                                        security.HostPin is not null ||
+                                        security.AdminPin is not null;
+        }
+
+        var missing = PinAuthentication.RolesMissingPersistentPin(security);
+        if (missing.Count > 0)
+        {
+            var roles = string.Join(", ", missing.Select(role => LocalizationService.Get(
+                role == PinRole.Host ? "Pin_HostRole" : "Pin_AdminRole")));
+            ShowPinStatus(LocalizationService.Format("Pin_ConfigWarning", roles), warning: true);
+        }
+        else if (_pinStatusIsWarning)
+        {
+            PinSettingsStatus.Visibility = Visibility.Collapsed;
+            _pinStatusIsWarning = false;
+        }
+    }
+
+    private void ShowPinStatus(string text, bool warning)
+    {
+        if (PinSettingsStatus is null)
+        {
+            return;
+        }
+
+        PinSettingsStatus.Text = text;
+        PinSettingsStatus.Visibility = string.IsNullOrWhiteSpace(text)
+            ? Visibility.Collapsed
+            : Visibility.Visible;
+        _pinStatusIsWarning = warning;
+    }
+
+    private async void SavePins_Click(object sender, RoutedEventArgs e)
+    {
+        if (!await ConfirmPinDialogAsync("Pin_ConfirmSave.Title", "Pin_ConfirmSave.Message", "Ui_SavePins.Content"))
+        {
+            return;
+        }
+
+        var security = SettingsService.GetSecurity();
+        security.UsePersistentPin = PersistentPinToggle.IsOn;
+        var commonPin = false;
+
+        if (security.UsePersistentPin)
+        {
+            var host = HostPinBox.Password.Trim();
+            var hostConfirm = HostPinConfirmBox.Password.Trim();
+            var admin = AdminPinBox.Password.Trim();
+            var adminConfirm = AdminPinConfirmBox.Password.Trim();
+
+            var hostResult = ValidatePin(host, hostConfirm, security.HostPin is { IsUsable: true });
+            if (hostResult.ErrorKey is not null)
+            {
+                ShowPinStatus(LocalizationService.Get(hostResult.ErrorKey), warning: false);
+                return;
+            }
+
+            var adminResult = ValidatePin(admin, adminConfirm, security.AdminPin is { IsUsable: true });
+            if (adminResult.ErrorKey is not null)
+            {
+                ShowPinStatus(LocalizationService.Get(adminResult.ErrorKey), warning: false);
+                return;
+            }
+
+            if (!hostResult.KeepExisting)
+            {
+                security.HostPin = PinHasher.Hash(host);
+                commonPin |= PinPolicy.IsCommon(host);
+            }
+
+            if (!adminResult.KeepExisting)
+            {
+                security.AdminPin = PinHasher.Hash(admin);
+                commonPin |= PinPolicy.IsCommon(admin);
+            }
+        }
+
+        SettingsService.SetSecurity(security);
+        ClearPinBoxes();
+        UpdatePinControlsState();
+        ShowPinStatus(
+            commonPin
+                ? LocalizationService.Get("Pin_Saved") + " " + LocalizationService.Get("Pin_CommonWarning")
+                : LocalizationService.Get("Pin_Saved"),
+            warning: false);
+        RefreshRemotePinDisplay();
+        LogService.Info("Access PIN settings saved (hash material only).", "security");
+    }
+
+    private async void ResetPins_Click(object sender, RoutedEventArgs e)
+    {
+        if (!await ConfirmPinDialogAsync("Pin_ConfirmReset.Title", "Pin_ConfirmReset.Message", "Ui_ResetPins.Content"))
+        {
+            return;
+        }
+
+        SettingsService.SetSecurity(new SecuritySettings());
+        if (PersistentPinToggle is not null)
+        {
+            PersistentPinToggle.IsOn = false;
+        }
+
+        ClearPinBoxes();
+        UpdatePinControlsState();
+        ShowPinStatus(LocalizationService.Get("Pin_Reset"), warning: false);
+        RefreshRemotePinDisplay();
+        LogService.Info("Persistent PIN reset; random PINs are used again.", "security");
+    }
+
+    private static (string? ErrorKey, bool KeepExisting) ValidatePin(
+        string pin,
+        string confirmation,
+        bool hasExistingPin)
+    {
+        if (pin.Length == 0 && confirmation.Length == 0)
+        {
+            // Keeping an existing record is allowed; otherwise the role would
+            // silently have no persistent PIN.
+            return hasExistingPin ? (null, true) : ("Pin_Empty", false);
+        }
+
+        if (pin.Length == 0 || confirmation.Length == 0)
+        {
+            return ("Pin_Empty", false);
+        }
+
+        if (!PinPolicy.Validate(pin).IsValid)
+        {
+            return ("Pin_Invalid", false);
+        }
+
+        if (!string.Equals(pin, confirmation, StringComparison.Ordinal))
+        {
+            return ("Pin_Mismatch", false);
+        }
+
+        return (null, false);
+    }
+
+    private async Task<bool> ConfirmPinDialogAsync(string titleKey, string messageKey, string primaryKey)
+    {
+        var dialog = new ContentDialog
+        {
+            Title = LocalizationService.Get(titleKey),
+            Content = LocalizationService.Get(messageKey),
+            PrimaryButtonText = LocalizationService.Get(primaryKey),
+            CloseButtonText = LocalizationService.Get("Common_Close"),
+            DefaultButton = ContentDialogButton.Close,
+            XamlRoot = XamlRoot,
+        };
+
+        try
+        {
+            return await dialog.ShowAsync() == ContentDialogResult.Primary;
+        }
+        catch (Exception ex)
+        {
+            LogService.Warn($"Cannot show the PIN confirmation dialog: {ex.Message}", "security");
+            return false;
+        }
+    }
+
+    private void ClearPinBoxes()
+    {
+        HostPinBox.Password = string.Empty;
+        HostPinConfirmBox.Password = string.Empty;
+        AdminPinBox.Password = string.Empty;
+        AdminPinConfirmBox.Password = string.Empty;
+    }
+
+    private void RefreshRemotePinDisplay()
+    {
+        if (_remoteServer is null)
+        {
+            return;
+        }
+
+        RemotePinValue.Text = _remoteServer.Pin;
+        RemoteAdminPinValue.Text = _remoteServer.AdminPin;
+    }
+
+    private void WifiSafeModeToggle_Toggled(object sender, RoutedEventArgs e)
+    {
+        if (_isInitializingSettings)
+        {
+            return;
+        }
+
+        SettingsService.WifiDirectSafeMode = WifiSafeModeToggle.IsOn;
+        LogService.Info($"Wi-Fi Direct safe mode: {WifiSafeModeToggle.IsOn}", "wifi-direct");
+        _ = RefreshWifiDiagnosticsAsync();
+    }
+
+    private async void RefreshWifiDiagnostics_Click(object sender, RoutedEventArgs e)
+    {
+        await RefreshWifiDiagnosticsAsync();
+    }
+
+    private async Task RefreshWifiDiagnosticsAsync()
+    {
+        if (WifiDiagnosticsText is null)
+        {
+            return;
+        }
+
+        try
+        {
+            WifiDiagnosticsText.Text = await DiagnosticsService.BuildWifiDirectDiagnosticsAsync();
+        }
+        catch (Exception ex)
+        {
+            WifiDiagnosticsText.Text = ex.Message;
+            LogService.Warn($"Cannot refresh Wi-Fi diagnostics: {ex.Message}", "wifi-direct");
+        }
+    }
+
     private void LoggingToggle_Toggled(object sender, RoutedEventArgs e)
     {
         if (_isInitializingSettings)
@@ -6869,9 +7332,18 @@ public sealed partial class MainPage : Page, IRemoteHost
 
     private void OpenLogsFolder_Click(object sender, RoutedEventArgs e)
     {
+        OpenFolder(LogService.LogDirectory, "Не удалось открыть папку логов.");
+    }
+
+    private void OpenReportsFolder_Click(object sender, RoutedEventArgs e)
+    {
+        OpenFolder(ReportService.ReportsDirectory, "Не удалось открыть папку отчётов.");
+    }
+
+    private static void OpenFolder(string directory, string errorContext)
+    {
         try
         {
-            var directory = LogService.LogDirectory;
             System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(directory)
             {
                 UseShellExecute = true,
@@ -6879,7 +7351,53 @@ public sealed partial class MainPage : Page, IRemoteHost
         }
         catch (Exception ex)
         {
-            LogService.Crash(ex, "Не удалось открыть папку логов.");
+            LogService.Crash(ex, errorContext);
+        }
+    }
+
+    private async void CreateReport_Click(object sender, RoutedEventArgs e)
+    {
+        if (CreateReportButton is not null)
+        {
+            CreateReportButton.IsEnabled = false;
+        }
+
+        try
+        {
+            var path = await ReportService.CreateAsync();
+            var dialog = new ContentDialog
+            {
+                Title = LocalizationService.Get("Ui_ReportCreatedTitle"),
+                Content = LocalizationService.Format("Ui_ReportCreatedMessage", path),
+                PrimaryButtonText = LocalizationService.Get("Ui_OpenReportsFolder.Content"),
+                CloseButtonText = LocalizationService.Get("Common_Close"),
+                DefaultButton = ContentDialogButton.Close,
+                XamlRoot = XamlRoot,
+            };
+
+            if (await dialog.ShowAsync() == ContentDialogResult.Primary)
+            {
+                OpenFolder(ReportService.ReportsDirectory, "Не удалось открыть папку отчётов.");
+            }
+        }
+        catch (Exception ex)
+        {
+            LogService.Crash(ex, "Не удалось собрать отчёт об ошибке.");
+            var dialog = new ContentDialog
+            {
+                Title = LocalizationService.Get("Ui_ReportFailedTitle"),
+                Content = LocalizationService.Format("Ui_ReportFailedMessage", ex.Message),
+                CloseButtonText = LocalizationService.Get("Common_Close"),
+                XamlRoot = XamlRoot,
+            };
+            await dialog.ShowAsync();
+        }
+        finally
+        {
+            if (CreateReportButton is not null)
+            {
+                CreateReportButton.IsEnabled = true;
+            }
         }
     }
 
@@ -8143,20 +8661,14 @@ public sealed partial class MainPage : Page, IRemoteHost
     {
         try
         {
-            ApplicationLanguages.PrimaryLanguageOverride = language;
-            Language = language;
-            LocalizationService.Apply(RootLayout, language);
+            LocalizationService.SetLanguage(language);
             LocalizeQueueControls();
             PopulateFolders();
             ApplyFilter();
             UpdateQueueCount();
+            UpdateWifiDirectStateUi();
             AboutVersionText.Text = LocalizationService.Format("About_Version", AppInfo.DisplayVersion);
-            if (LanguageComboBox is not null)
-            {
-                _isInitializingSettings = true;
-                LanguageComboBox.SelectedIndex = language.StartsWith("ru", StringComparison.OrdinalIgnoreCase) ? 1 : 0;
-                _isInitializingSettings = false;
-            }
+            SelectLanguageInComboBox(LocalizationService.CurrentLanguage);
 
             if (ThemeComboBox is not null)
             {

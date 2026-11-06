@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using TempoKaraoke.Security;
 using Windows.Storage;
 
 namespace TempoKaraoke.Services;
@@ -17,8 +18,11 @@ public sealed class SettingsData
 
     public string Theme { get; set; } = "system";
 
-    /// <summary>Язык интерфейса в формате BCP 47: en-US по умолчанию или ru-RU.</summary>
+    /// <summary>Язык интерфейса: полный BCP 47-тег из localization/manifest.json.</summary>
     public string Language { get; set; } = "en-US";
+
+    /// <summary>True after the user (or the first launch resolver) stored a language.</summary>
+    public bool LanguageConfigured { get; set; }
 
     public string LastTrackPath { get; set; } = string.Empty;
 
@@ -32,11 +36,17 @@ public sealed class SettingsData
 
     public int RemoteAutoStopMinutes { get; set; } = 10;
 
+    /// <summary>Блокировать Wi-Fi Direct при активном Wi-Fi-подключении (снижает риск BSOD).</summary>
+    public bool WifiDirectSafeMode { get; set; } = true;
+
     public int RequestLimitPerGuest { get; set; } = 2;
 
     public int MaxPendingRequests { get; set; } = 20;
 
     public bool LoggingEnabled { get; set; }
+
+    /// <summary>Постоянные PIN ведущего/администратора. Хранятся только хеши.</summary>
+    public SecuritySettings Security { get; set; } = new();
 
     /// <summary>Проверять обновления при запуске (портативная сборка).</summary>
     public bool CheckUpdatesOnStartup { get; set; } = true;
@@ -114,14 +124,16 @@ public static class SettingsService
 
     public static string Language
     {
-        get => NormalizeLanguage(Data.Language);
-        set => Update(data => data.Language = NormalizeLanguage(value));
+        get => Data.Language;
+        set => Update(data =>
+        {
+            // The manifest resolves tags; settings only persist the user's choice.
+            data.Language = value?.Trim() ?? string.Empty;
+            data.LanguageConfigured = true;
+        });
     }
 
-    private static string NormalizeLanguage(string? value)
-    {
-        return value?.StartsWith("ru", StringComparison.OrdinalIgnoreCase) == true ? "ru-RU" : "en-US";
-    }
+    public static bool LanguageConfigured => Data.LanguageConfigured;
 
     /// <summary>Файл, который играл при закрытии: его позиция восстанавливается на паузе.</summary>
     public static string LastTrackPath
@@ -162,6 +174,13 @@ public static class SettingsService
         set => Update(data => data.RemoteAutoStopMinutes = Math.Clamp(value, 1, 240));
     }
 
+    /// <summary>Не запускать Wi-Fi Direct поверх активного Wi-Fi без явного подтверждения.</summary>
+    public static bool WifiDirectSafeMode
+    {
+        get => Data.WifiDirectSafeMode;
+        set => Update(data => data.WifiDirectSafeMode = value);
+    }
+
     public static int RequestLimitPerGuest
     {
         get => Math.Clamp(Data.RequestLimitPerGuest, 1, 20);
@@ -179,6 +198,22 @@ public static class SettingsService
     {
         get => Data.LoggingEnabled;
         set => Update(data => data.LoggingEnabled = value);
+    }
+
+    /// <summary>Возвращает копию: вызывающий код не может случайно изменить кэш.</summary>
+    public static SecuritySettings GetSecurity()
+    {
+        lock (Sync)
+        {
+            var data = _data ??= LoadCore();
+            data.Security ??= new SecuritySettings();
+            return data.Security.Clone();
+        }
+    }
+
+    public static void SetSecurity(SecuritySettings settings)
+    {
+        Update(data => data.Security = settings?.Clone() ?? new SecuritySettings());
     }
 
     public static bool CheckUpdatesOnStartup
@@ -226,13 +261,10 @@ public static class SettingsService
         var loaded = JsonFile.Read(AppStorage.PathFor(FileName), AppJsonContext.Default.SettingsData);
         if (loaded is not null)
         {
-            var normalizedLanguage = NormalizeLanguage(loaded.Language);
-            if (!string.Equals(loaded.Language, normalizedLanguage, StringComparison.Ordinal))
-            {
-                loaded.Language = normalizedLanguage;
-                Save(loaded);
-            }
-
+            // Files written by older versions always carry a language value, so
+            // treat it as an explicit choice; a fresh install stays unconfigured
+            // and follows the Windows language on first launch.
+            loaded.LanguageConfigured = !string.IsNullOrWhiteSpace(loaded.Language);
             loaded.VideoRootsConfigured = true;
             return loaded;
         }

@@ -238,10 +238,7 @@ input,textarea{user-select:text;font-size:16px}
   <header>
     <div class="brand"><img class="brand-icon" src="/appicon.png" alt="Tempo Karaoke"><span>TempoKaraoke</span></div>
     <div class="header-tools">
-      <select class="lang-select" id="langSelect" onchange="changeLanguage(this.value)" aria-label="Language">
-        <option value="en-US">EN</option>
-        <option value="ru-RU">RU</option>
-      </select>
+      <select class="lang-select" id="langSelect" onchange="changeLanguage(this.value)" aria-label="Language"></select>
       <button class="icon-btn requests-btn" id="requestsToggleBtn" type="button" title="Song requests" aria-label="Song requests" onclick="openRequests(event)">
         <svg class="icon-bell" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg>
         <span class="notification-badge" id="requestsCountBadge" hidden>0</span>
@@ -410,10 +407,7 @@ input,textarea{user-select:text;font-size:16px}
       </select>
     </label>
     <label class="profile-label"><span data-i18n="admin_language">Language</span>
-      <select class="profile-input" id="adminLanguage">
-        <option value="ru-RU">Русский</option>
-        <option value="en-US">English</option>
-      </select>
+      <select class="profile-input" id="adminLanguage"></select>
     </label>
     <button class="profile-save" data-i18n="common_save" onclick="saveAdminSettings()">Save</button>
     <button class="profile-close" data-i18n="common_close" onclick="closeAdmin()">Close</button>
@@ -425,8 +419,10 @@ input,textarea{user-select:text;font-size:16px}
 <script>
 const token = new URLSearchParams(location.search).get('token') || '';
 const $ = id => document.getElementById(id);
-const SUPPORTED_LANGUAGES = ['en-US', 'ru-RU'];
-let language = normalizeLanguage(localStorage.getItem('lang') || navigator.language);
+let languageOptions = [{ tag: 'en-US', nativeName: 'English' }];
+let fallbackTag = 'en-US';
+let fallbackMessages = {};
+let language = localStorage.getItem('lang') || navigator.language;
 let messages = {};
 const FALLBACK_MESSAGES = {
   "header_host": "Host",
@@ -559,30 +555,79 @@ let lastQueueSignature = null;
 let guestName = (localStorage.getItem('guest_name') || '').trim();
 
 function normalizeLanguage(value) {
-  const tag = String(value || '').toLowerCase();
-  if (tag.startsWith('ru')) return 'ru-RU';
-  return 'en-US';
+  const raw = String(value || '').trim().toLowerCase();
+  if (!raw) return fallbackTag;
+  const exact = languageOptions.find(option => option.tag.toLowerCase() === raw);
+  if (exact) return exact.tag;
+  const primary = raw.split('-')[0];
+  const group = languageOptions.find(option => option.tag.toLowerCase().split('-')[0] === primary);
+  return group ? group.tag : fallbackTag;
+}
+
+async function loadLocaleManifest() {
+  try {
+    const response = await fetch('/locale-manifest.json', { cache: 'no-cache' });
+    if (!response.ok) throw new Error(String(response.status));
+    const manifest = await response.json();
+    if (Array.isArray(manifest.languages) && manifest.languages.length > 0) {
+      languageOptions = manifest.languages.map(entry => ({
+        tag: entry.tag,
+        nativeName: entry.nativeName || entry.tag
+      }));
+      fallbackTag = manifest.fallback || 'en-US';
+    }
+  } catch {
+    // Keep the built-in English entry; the remote still works.
+  }
+  populateLanguageSelectors();
+}
+
+function populateLanguageSelectors() {
+  ['langSelect', 'adminLanguage'].forEach(id => {
+    const select = $(id);
+    if (!select) return;
+    const previous = select.value;
+    select.innerHTML = '';
+    languageOptions.forEach(option => {
+      const element = document.createElement('option');
+      element.value = option.tag;
+      element.textContent = option.nativeName;
+      select.appendChild(element);
+    });
+    select.value = previous && languageOptions.some(option => option.tag === previous)
+      ? previous
+      : language;
+  });
+}
+
+async function fetchCatalog(tag) {
+  try {
+    const response = await fetch('/locales/' + encodeURIComponent(tag) + '.json', { cache: 'no-cache' });
+    if (!response.ok) throw new Error(String(response.status));
+    return await response.json();
+  } catch {
+    return {};
+  }
 }
 
 async function loadLanguage(value, persist) {
   language = normalizeLanguage(value);
   if (persist) localStorage.setItem('lang', language);
-  try {
-    const response = await fetch('/locales/' + language + '.json', { cache: 'no-cache' });
-    if (!response.ok) throw new Error(String(response.status));
-    messages = await response.json();
-  } catch {
-    messages = FALLBACK_MESSAGES;
-  }
+  const english = await fetchCatalog(fallbackTag);
+  const current = language === fallbackTag ? english : await fetchCatalog(language);
+  fallbackMessages = english;
+  messages = Object.assign({}, english, current);
   document.documentElement.lang = language;
   document.title = t('page_title');
   const select = $('langSelect');
   if (select) select.value = language;
+  const adminSelect = $('adminLanguage');
+  if (adminSelect) adminSelect.value = language;
   applyStaticTranslations();
 }
 
 function t(key, params) {
-  let value = messages[key] ?? FALLBACK_MESSAGES[key];
+  let value = messages[key] ?? fallbackMessages[key] ?? FALLBACK_MESSAGES[key];
   if (typeof value !== 'string' || value.length === 0) {
     value = key;
   }
@@ -611,6 +656,8 @@ function applyStaticTranslations() {
   });
   const search = $('clearSearch');
   if (search) search.setAttribute('aria-label', t('search_clear'));
+  const languageSelect = $('langSelect');
+  if (languageSelect) languageSelect.setAttribute('aria-label', t('admin_language'));
   const bell = $('requestsToggleBtn');
   if (bell) bell.setAttribute('title', t('header_requests'));
   const settings = $('openPartySettingsBtn');
@@ -1293,7 +1340,7 @@ async function openAdmin() {
     $('adminGuestLimit').value = settings.maxRequestsPerGuest;
     $('adminTotalLimit').value = settings.maxPendingRequests;
     $('adminTheme').value = settings.theme || 'system';
-    $('adminLanguage').value = settings.language || 'ru-RU';
+    $('adminLanguage').value = settings.language || language;
   } catch {
     toast(t('admin_load_failed'), '⚠');
   }
@@ -1313,7 +1360,7 @@ async function saveAdminSettings() {
         maxRequestsPerGuest: Number($('adminGuestLimit').value) || 2,
         maxPendingRequests: Number($('adminTotalLimit').value) || 20,
         theme: $('adminTheme').value || 'system',
-        language: $('adminLanguage').value || 'ru-RU'
+        language: $('adminLanguage').value || language
       })
     });
     if (!result.ok) throw new Error('failed');
@@ -1545,7 +1592,25 @@ document.addEventListener('keydown', event => {
   }
 });
 
+function reportClientError(message) {
+  try {
+    fetch('/api/client-error?token=' + encodeURIComponent(token), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: String(message || 'unknown').slice(0, 500) })
+    }).catch(() => {});
+  } catch {
+    // Diagnostics must never break the remote.
+  }
+}
+
+window.addEventListener('error', event => reportClientError(event.message));
+window.addEventListener('unhandledrejection', event => {
+  reportClientError(event.reason && event.reason.message ? event.reason.message : event.reason);
+});
+
 (async function start() {
+  await loadLocaleManifest();
   await loadLanguage(language, false);
   await refresh();
   connectSocket();

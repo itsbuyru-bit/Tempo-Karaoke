@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "fallback": "en-US",
+  "languages": [
+    {
+      "tag": "en-US",
+      "file": "en-US.json",
+      "nativeName": "English",
+      "englishName": "English",
+      "enabled": true
+    },
+    {
+      "tag": "ru-RU",
+      "file": "ru-RU.json",
+      "nativeName": "Русский",
+      "englishName": "Russian",
+      "enabled": true
+    }
+  ]
+}

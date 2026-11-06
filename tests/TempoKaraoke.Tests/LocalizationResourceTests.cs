@@ -94,6 +94,26 @@ public sealed class LocalizationResourceTests
         }
     }
 
+    [Fact]
+    public void EveryXamlUidHasAtLeastOneResource()
+    {
+        var keys = ReadResw("en-US").Keys.ToList();
+        foreach (var file in new[] { "MainPage.xaml", "PlayerWindow.xaml" })
+        {
+            var xaml = File.ReadAllText(Path.Combine(Root, "src", "TempoKaraoke", file));
+            var uids = Regex.Matches(xaml, @"x:Uid=""([^""]+)""")
+                .Select(match => match.Groups[1].Value)
+                .Distinct(StringComparer.Ordinal);
+
+            foreach (var uid in uids)
+            {
+                Assert.True(
+                    keys.Any(key => key.StartsWith(uid + ".", StringComparison.Ordinal)),
+                    $"{file}: x:Uid=\"{uid}\" has no matching resource");
+            }
+        }
+    }
+
     private static string FindRepositoryRoot()
     {
         var directory = new DirectoryInfo(AppContext.BaseDirectory);

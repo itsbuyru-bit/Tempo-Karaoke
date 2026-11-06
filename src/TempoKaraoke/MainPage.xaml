@@ -1952,6 +1952,11 @@
                                     </StackPanel>
                                 </Button>
                             </StackPanel>
+                            <TextBlock
+                                x:Name="RemoteWifiStateText"
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                Style="{StaticResource CaptionTextBlockStyle}"
+                                TextWrapping="Wrap" />
                         </StackPanel>
 
                         <!--  StateConnected: сервер активен  -->
@@ -2563,10 +2568,7 @@
                                 <FontIcon Glyph="&#xE8C1;" />
                             </toolkit:SettingsCard.HeaderIcon>
                             <ComboBox
- x:Name="LanguageComboBox" MinWidth="180" SelectionChanged="LanguageComboBox_SelectionChanged" loc:Localization.AutomationNameKey="Ui_InterfaceLanguage_AutomationName.AutomationName">
-                                <ComboBoxItem Tag="en-US" x:Uid="Language_English" loc:Localization.Key="Language_English.Content" />
-                                <ComboBoxItem Tag="ru-RU" x:Uid="Ui_Russian" loc:Localization.Key="Ui_Russian.Content" />
-                            </ComboBox>
+ x:Name="LanguageComboBox" MinWidth="180" SelectionChanged="LanguageComboBox_SelectionChanged" loc:Localization.AutomationNameKey="Ui_InterfaceLanguage_AutomationName.AutomationName" />
                         </toolkit:SettingsCard>
 
                         <toolkit:SettingsCard
@@ -2795,6 +2797,85 @@
                         </StackPanel>
                     </toolkit:SettingsCard>
 
+                    <toolkit:SettingsCard
+ x:Uid="Ui_WifiSafeMode" loc:Localization.Key="Ui_WifiSafeMode.Description" loc:Localization.SecondaryKey="Ui_WifiSafeMode.Header">
+                        <toolkit:SettingsCard.HeaderIcon>
+                            <FontIcon Glyph="&#xE701;" />
+                        </toolkit:SettingsCard.HeaderIcon>
+                        <ToggleSwitch
+ x:Name="WifiSafeModeToggle" MinWidth="0" Toggled="WifiSafeModeToggle_Toggled" loc:Localization.AutomationNameKey="Ui_WifiSafeMode.Header" />
+                    </toolkit:SettingsCard>
+
+                    <TextBlock
+ Style="{StaticResource SettingsSectionHeaderTextBlockStyle}" x:Uid="Ui_SecuritySection" loc:Localization.Key="Ui_SecuritySection.Text" />
+
+                    <toolkit:SettingsCard
+ x:Uid="Ui_AccessPins" loc:Localization.Key="Ui_AccessPins.Description" loc:Localization.SecondaryKey="Ui_AccessPins.Header">
+                        <toolkit:SettingsCard.HeaderIcon>
+                            <FontIcon Glyph="&#xE72E;" />
+                        </toolkit:SettingsCard.HeaderIcon>
+                        <ToggleSwitch
+ x:Name="PersistentPinToggle" MinWidth="0" Toggled="PersistentPinToggle_Toggled" x:Uid="Ui_PersistentPin" loc:Localization.Key="Ui_PersistentPin.OffContent" loc:Localization.SecondaryKey="Ui_PersistentPin.OnContent" loc:Localization.AutomationNameKey="Ui_AccessPins.Header" />
+                    </toolkit:SettingsCard>
+
+                    <toolkit:SettingsCard
+ x:Uid="Ui_HostPin" loc:Localization.Key="Ui_AccessPins.Description" loc:Localization.SecondaryKey="Ui_HostPin.Header">
+                        <toolkit:SettingsCard.HeaderIcon>
+                            <FontIcon Glyph="&#xE7EF;" />
+                        </toolkit:SettingsCard.HeaderIcon>
+                        <StackPanel
+                            MinWidth="220"
+                            VerticalAlignment="Center"
+                            Spacing="6">
+                            <PasswordBox
+ x:Name="HostPinBox" MaxLength="8" PasswordRevealMode="Hidden" loc:Localization.Key="Ui_HostPin.Header" />
+                            <PasswordBox
+ x:Name="HostPinConfirmBox" MaxLength="8" PasswordRevealMode="Hidden" loc:Localization.Key="Ui_HostPinConfirm.Header" />
+                        </StackPanel>
+                    </toolkit:SettingsCard>
+
+                    <toolkit:SettingsCard
+ x:Uid="Ui_AdminPin" loc:Localization.Key="Ui_AccessPins.Description" loc:Localization.SecondaryKey="Ui_AdminPin.Header">
+                        <toolkit:SettingsCard.HeaderIcon>
+                            <FontIcon Glyph="&#xE7EF;" />
+                        </toolkit:SettingsCard.HeaderIcon>
+                        <StackPanel
+                            MinWidth="220"
+                            VerticalAlignment="Center"
+                            Spacing="6">
+                            <PasswordBox
+ x:Name="AdminPinBox" MaxLength="8" PasswordRevealMode="Hidden" loc:Localization.Key="Ui_AdminPin.Header" />
+                            <PasswordBox
+ x:Name="AdminPinConfirmBox" MaxLength="8" PasswordRevealMode="Hidden" loc:Localization.Key="Ui_AdminPinConfirm.Header" />
+                        </StackPanel>
+                    </toolkit:SettingsCard>
+
+                    <toolkit:SettingsCard
+ loc:Localization.Key="Ui_AccessPins.Description" loc:Localization.SecondaryKey="Ui_AccessPins.Header">
+                        <toolkit:SettingsCard.HeaderIcon>
+                            <FontIcon Glyph="&#xE8FB;" />
+                        </toolkit:SettingsCard.HeaderIcon>
+                        <StackPanel
+                            VerticalAlignment="Center"
+                            Spacing="8">
+                            <StackPanel
+                                Orientation="Horizontal"
+                                Spacing="8">
+                                <Button
+ x:Name="SavePinsButton" Click="SavePins_Click" Style="{StaticResource AccentButtonStyle}" x:Uid="Ui_SavePins" loc:Localization.Key="Ui_SavePins.Content" />
+                                <Button
+ x:Name="ResetPinsButton" Click="ResetPins_Click" x:Uid="Ui_ResetPins" loc:Localization.Key="Ui_ResetPins.Content" />
+                            </StackPanel>
+                            <TextBlock
+                                x:Name="PinSettingsStatus"
+                                MaxWidth="520"
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                Style="{StaticResource CaptionTextBlockStyle}"
+                                TextWrapping="Wrap"
+                                Visibility="Collapsed" />
+                        </StackPanel>
+                    </toolkit:SettingsCard>
+
                     <TextBlock
  Style="{StaticResource SettingsSectionHeaderTextBlockStyle}" x:Uid="Ui_Diagnostics" loc:Localization.Key="Ui_Diagnostics.Text" />
 
@@ -2810,6 +2891,46 @@
                             <Button Click="OpenLogsFolder_Click" x:Uid="Ui_OpenLogsFolder" loc:Localization.Key="Ui_OpenLogsFolder.Content" />
                             <ToggleSwitch
  x:Name="LoggingToggle" MinWidth="0" Toggled="LoggingToggle_Toggled" x:Uid="Ui_Logging" loc:Localization.Key="Ui_Logging.OffContent" loc:Localization.SecondaryKey="Ui_Logging.OnContent" loc:Localization.AutomationNameKey="Ui_Logging_AutomationName.AutomationName" />
+                        </StackPanel>
+                    </toolkit:SettingsCard>
+
+                    <toolkit:SettingsCard
+ x:Uid="Ui_ErrorReport" loc:Localization.Key="Ui_ErrorReport.Description" loc:Localization.SecondaryKey="Ui_ErrorReport.Header">
+                        <toolkit:SettingsCard.HeaderIcon>
+                            <FontIcon Glyph="&#xE78C;" />
+                        </toolkit:SettingsCard.HeaderIcon>
+                        <StackPanel
+                            VerticalAlignment="Center"
+                            Orientation="Horizontal"
+                            Spacing="12">
+                            <Button
+ x:Name="CreateReportButton" Click="CreateReport_Click" Style="{StaticResource AccentButtonStyle}" x:Uid="Ui_CreateErrorReport" loc:Localization.Key="Ui_CreateErrorReport.Content" />
+                            <Button Click="OpenReportsFolder_Click" x:Uid="Ui_OpenReportsFolder" loc:Localization.Key="Ui_OpenReportsFolder.Content" />
+                        </StackPanel>
+                    </toolkit:SettingsCard>
+
+                    <toolkit:SettingsCard
+ x:Uid="Ui_WifiDiagnostics" loc:Localization.Key="Ui_WifiDiagnostics.Description" loc:Localization.SecondaryKey="Ui_WifiDiagnostics.Header">
+                        <toolkit:SettingsCard.HeaderIcon>
+                            <FontIcon Glyph="&#xE968;" />
+                        </toolkit:SettingsCard.HeaderIcon>
+                        <StackPanel
+                            VerticalAlignment="Center"
+                            Spacing="8">
+                            <TextBlock
+                                x:Name="WifiDiagnosticsText"
+                                MaxWidth="520"
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                Style="{StaticResource CaptionTextBlockStyle}"
+                                TextWrapping="Wrap" />
+                            <StackPanel
+                                Orientation="Horizontal"
+                                Spacing="8">
+                                <Button
+ Click="RefreshWifiDiagnostics_Click" x:Uid="Ui_Refresh" loc:Localization.Key="Ui_Refresh.Content" />
+                                <Button
+ Click="CreateReport_Click" loc:Localization.Key="Ui_CreateErrorReport.Content" />
+                            </StackPanel>
                         </StackPanel>
                     </toolkit:SettingsCard>
 

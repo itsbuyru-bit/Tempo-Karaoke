@@ -9,7 +9,7 @@
       Package.appxmanifest: MSIX берёт версию из манифеста, портативная сборка —
       из assembly (её читает AppInfo и установщик Inno при обновлении).
     -->
-    <Version>1.8.22.3</Version>
+    <Version>1.9.0.0</Version>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon Condition="Exists('Assets\AppIcon.ico')">Assets\AppIcon.ico</ApplicationIcon>
     <Platforms>x86;x64;ARM64</Platforms>
@@ -46,6 +46,16 @@
     </Content>
     <Content Include="Assets\Wide310x150Logo*.png" />
     <Content Include="public\locales\*.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="public\locale-manifest.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <!--
+      Единый источник локализации. Файлы копируются рядом с приложением, чтобы
+      LocalizationService мог добавлять языки без пересборки desktop-части.
+    -->
+    <Content Include="..\..\localization\*.json" Link="localization\%(Filename)%(Extension)">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

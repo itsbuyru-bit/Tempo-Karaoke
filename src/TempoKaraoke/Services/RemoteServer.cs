@@ -20,6 +20,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using QRCoder;
+using TempoKaraoke.Security;
 using Windows.Networking.Connectivity;
 
 namespace TempoKaraoke.Services;
@@ -47,6 +48,7 @@ public sealed class RemoteServer : IAsyncDisposable
     private readonly ConcurrentDictionary<string, string> _fallbackNames = new(StringComparer.Ordinal);
     private readonly PinAttempt _pinAttempt = new();
     private readonly PinAttempt _adminPinAttempt = new();
+    private readonly PinService _pins;
     private int _guestCounter;
     private WebApplication? _app;
     private Task? _broadcast;
@@ -57,16 +59,20 @@ public sealed class RemoteServer : IAsyncDisposable
         _host = host;
         _clients = clients;
         Token = Convert.ToHexString(RandomNumberGenerator.GetBytes(16)).ToLowerInvariant();
-        Pin = RandomNumberGenerator.GetInt32(1000, 10000).ToString();
-        AdminPin = RandomNumberGenerator.GetInt32(1000, 10000).ToString();
+        _pins = new PinService(
+            RandomNumberGenerator.GetInt32(1000, 10000).ToString(),
+            RandomNumberGenerator.GetInt32(1000, 10000).ToString());
     }
 
     public string Token { get; }
 
-    /// <summary>Четырёхзначный PIN. Защита от перебора — ниже, в TryVerifyPin.</summary>
-    public string Pin { get; }
+    /// <summary>PIN ведущего или маска, если настроен постоянный PIN.</summary>
+    public string Pin => _pins.DisplayHostPin;
 
-    public string AdminPin { get; }
+    /// <summary>PIN администратора или маска, если настроен постоянный PIN.</summary>
+    public string AdminPin => _pins.DisplayAdminPin;
+
+    public bool HostPinIsPersistent => _pins.HostUsesPersistentPin;
 
     public int Port { get; private set; }
 
@@ -133,12 +139,35 @@ public sealed class RemoteServer : IAsyncDisposable
                 await context.Response.SendFileAsync(path);
             });
 
+            app.MapGet("/locale-manifest.json", async context =>
+            {
+                var path = Path.Combine(AppContext.BaseDirectory, "public", "locale-manifest.json");
+                if (!File.Exists(path))
+                {
+                    context.Response.StatusCode = StatusCodes.Status404NotFound;
+                    return;
+                }
+
+                context.Response.ContentType = "application/json; charset=utf-8";
+                context.Response.Headers["Cache-Control"] = "no-cache";
+                await context.Response.SendFileAsync(path);
+            });
+
             app.MapGet("/locales/{lang}.json", async context =>
             {
-                var lang = context.Request.RouteValues["lang"]?.ToString();
-                lang = lang?.StartsWith("ru", StringComparison.OrdinalIgnoreCase) == true ? "ru-RU" : "en-US";
-                var path = Path.Combine(AppContext.BaseDirectory, "public", "locales", $"{lang}.json");
-                if (!File.Exists(path))
+                var lang = context.Request.RouteValues["lang"]?.ToString() ?? string.Empty;
+                // Only full BCP 47 tags can be served; this also blocks path traversal.
+                if (!lang.All(character => char.IsLetterOrDigit(character) || character == '-') ||
+                    !lang.Contains('-', StringComparison.Ordinal) ||
+                    lang.Length > 24)
+                {
+                    context.Response.StatusCode = StatusCodes.Status404NotFound;
+                    return;
+                }
+
+                var localesRoot = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "public", "locales"));
+                var path = Path.GetFullPath(Path.Combine(localesRoot, $"{lang}.json"));
+                if (!path.StartsWith(localesRoot, StringComparison.OrdinalIgnoreCase) || !File.Exists(path))
                 {
                     context.Response.StatusCode = StatusCodes.Status404NotFound;
                     return;
@@ -181,6 +210,26 @@ public sealed class RemoteServer : IAsyncDisposable
                         _clients.GetAliasName(clientId) ?? string.Empty,
                         _clients.GetFallbackName(clientId) ?? string.Empty),
                     RemoteJsonContext.Default.StateResponse);
+            });
+
+            app.MapPost("/api/client-error", async context =>
+            {
+                var clientId = await PrepareClientAsync(context, requireHost: false);
+                if (clientId is null)
+                {
+                    return;
+                }
+
+                var request = await ReadJsonAsync(context, RemoteJsonContext.Default.ClientErrorRequest);
+                if (request is not null && !string.IsNullOrWhiteSpace(request.Message))
+                {
+                    var message = request.Message.Length > 400
+                        ? request.Message[..400]
+                        : request.Message;
+                    LogService.Warn($"Web remote error: {message}", "web");
+                }
+
+                await WriteJsonAsync(context, new OkResponse(true), RemoteJsonContext.Default.OkResponse);
             });
 
             app.MapGet("/api/search", async context =>
@@ -286,7 +335,7 @@ public sealed class RemoteServer : IAsyncDisposable
                 var role = string.Empty;
                 if (request is not null)
                 {
-                    if (string.Equals(request.Pin, AdminPin, StringComparison.Ordinal))
+                    if (VerifyAdminPinQuiet(request.Pin))
                     {
                         _adminClients[clientId] = true;
                         _hostClients[clientId] = true;
@@ -302,8 +351,8 @@ public sealed class RemoteServer : IAsyncDisposable
                     else
                     {
                         // Count the failed attempt against the administrator
-                        // lockout as well; the Host verifier above already
-                        // counted the host-side attempt.
+                        // lockout only when neither role matched. A successful
+                        // host sign-in must not consume admin attempts.
                         TryVerifyAdminPin(clientId, request.Pin);
                     }
                 }
@@ -1042,6 +1091,31 @@ public sealed class RemoteServer : IAsyncDisposable
         return clientId;
     }
 
+    /// <summary>
+    /// Checks an administrator PIN without counting an attempt. Used by
+    /// /api/auth so a successful host sign-in does not slowly lock the admin
+    /// role; the separated /api/admin endpoint counts its own attempts.
+    /// </summary>
+    private bool VerifyAdminPinQuiet(string pin)
+    {
+        lock (_adminPinAttempt)
+        {
+            if (DateTime.UtcNow < _adminPinAttempt.LockedUntilUtc)
+            {
+                return false;
+            }
+
+            if (_pins.Verify(PinRole.Admin, pin).Success)
+            {
+                _adminPinAttempt.Failures = 0;
+                _adminPinAttempt.LockedUntilUtc = default;
+                return true;
+            }
+
+            return false;
+        }
+    }
+
     private bool TryVerifyPin(string clientId, string pin)
     {
         if (_hostClients.ContainsKey(clientId))
@@ -1054,10 +1128,11 @@ public sealed class RemoteServer : IAsyncDisposable
         {
             if (DateTime.UtcNow < _pinAttempt.LockedUntilUtc)
             {
+                LogService.Warn("Host PIN rejected: lockout is active.", "security");
                 return false;
             }
 
-            if (string.Equals(pin, Pin, StringComparison.Ordinal))
+            if (_pins.Verify(PinRole.Host, pin).Success)
             {
                 _pinAttempt.Failures = 0;
                 _pinAttempt.LockedUntilUtc = default;
@@ -1065,10 +1140,14 @@ public sealed class RemoteServer : IAsyncDisposable
             }
 
             _pinAttempt.Failures++;
+            LogService.Warn(
+                $"Host PIN rejected (attempt {_pinAttempt.Failures}/{MaxPinAttempts}).",
+                "security");
             if (_pinAttempt.Failures >= MaxPinAttempts)
             {
                 _pinAttempt.Failures = 0;
                 _pinAttempt.LockedUntilUtc = DateTime.UtcNow.Add(PinLockout);
+                LogService.Warn($"Host PIN locked for {PinLockout.TotalMinutes:0} minutes.", "security");
             }
 
             return false;
@@ -1086,10 +1165,11 @@ public sealed class RemoteServer : IAsyncDisposable
         {
             if (DateTime.UtcNow < _adminPinAttempt.LockedUntilUtc)
             {
+                LogService.Warn("Administrator PIN rejected: lockout is active.", "security");
                 return false;
             }
 
-            if (string.Equals(pin, AdminPin, StringComparison.Ordinal))
+            if (_pins.Verify(PinRole.Admin, pin).Success)
             {
                 _adminPinAttempt.Failures = 0;
                 _adminPinAttempt.LockedUntilUtc = default;
@@ -1097,10 +1177,14 @@ public sealed class RemoteServer : IAsyncDisposable
             }
 
             _adminPinAttempt.Failures++;
+            LogService.Warn(
+                $"Administrator PIN rejected (attempt {_adminPinAttempt.Failures}/{MaxPinAttempts}).",
+                "security");
             if (_adminPinAttempt.Failures >= MaxPinAttempts)
             {
                 _adminPinAttempt.Failures = 0;
                 _adminPinAttempt.LockedUntilUtc = DateTime.UtcNow.Add(PinLockout);
+                LogService.Warn($"Administrator PIN locked for {PinLockout.TotalMinutes:0} minutes.", "security");
             }
 
             return false;
