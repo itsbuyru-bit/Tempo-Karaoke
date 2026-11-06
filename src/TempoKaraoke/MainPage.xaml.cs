@@ -2865,6 +2865,7 @@ public sealed partial class MainPage : Page, IRemoteHost
             UpdateQueueCount();
             UpdateWifiDirectStateUi();
             AboutVersionText.Text = LocalizationService.Format("About_Version", AppInfo.DisplayVersion);
+            BuildSettingsCatalog();
         }
         catch (Exception ex)
         {
@@ -8943,6 +8944,7 @@ public sealed partial class MainPage : Page, IRemoteHost
     {
         SettingsCatalogView.Visibility = Visibility.Visible;
         SettingsSectionHost.Visibility = Visibility.Collapsed;
+        SettingsPageTitle.Visibility = Visibility.Visible;
         foreach (var panel in _settingsSectionPanels.Values)
         {
             panel.Visibility = Visibility.Collapsed;
@@ -8969,6 +8971,7 @@ public sealed partial class MainPage : Page, IRemoteHost
 
         _openSettingsSectionId = sectionId;
         SettingsSectionTitle.Text = LocalizationService.Get(definition.TitleKey);
+        SettingsPageTitle.Visibility = Visibility.Collapsed;
         SettingsCatalogView.Visibility = Visibility.Collapsed;
         SettingsSectionHost.Visibility = Visibility.Visible;
         SettingsSectionScroll.ScrollTo(0, 0);

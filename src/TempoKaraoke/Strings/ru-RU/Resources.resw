@@ -277,7 +277,6 @@
   <data name="Selection_Count_Many" xml:space="preserve"><value>Выбрано {0} элементов</value></data>
   <data name="Selection_Count_One" xml:space="preserve"><value>Выбран {0} элемент</value></data>
   <data name="Selection_Count_Other" xml:space="preserve"><value>Выбрано {0} элементов</value></data>
-  <data name="Settings_Back_AutomationName.AutomationName" xml:space="preserve"><value>Назад к настройкам</value></data>
   <data name="Settings_BreadcrumbRoot.Content" xml:space="preserve"><value>Параметры</value></data>
   <data name="Settings_LibraryPathsTitle.Text" xml:space="preserve"><value>Пути к библиотеке видео</value></data>
   <data name="Settings_ManageIndexing.Content" xml:space="preserve"><value>Управление параметрами индексирования системы</value></data>

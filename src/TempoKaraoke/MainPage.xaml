@@ -2553,6 +2553,7 @@
                 </Grid.RowDefinitions>
 
                 <TextBlock
+ x:Name="SettingsPageTitle"
  MaxWidth="1064" Margin="36,24,36,0" HorizontalAlignment="Left" AutomationProperties.HeadingLevel="Level1" Style="{StaticResource TitleTextBlockStyle}" x:Uid="Ui_Settings_123" loc:Localization.Key="Ui_Settings_123.Text" />
 
                                 <!--  Каталог разделов настроек: карточки открывают вложенный раздел  -->
@@ -2570,6 +2571,13 @@
                                 SelectionMode="None">
                                 <ListView.ItemContainerStyle>
                                     <Style TargetType="ListViewItem">
+                                        <Setter Property="Background" Value="{ThemeResource CardBackgroundFillColorDefaultBrush}" />
+                                        <Setter Property="BorderBrush" Value="{ThemeResource CardStrokeColorDefaultBrush}" />
+                                        <Setter Property="BorderThickness" Value="1" />
+                                        <Setter Property="CornerRadius" Value="{ThemeResource ControlCornerRadius}" />
+                                        <Setter Property="Padding" Value="16,14" />
+                                        <Setter Property="Margin" Value="0,0,0,8" />
+                                        <Setter Property="MinHeight" Value="64" />
                                         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                                         <Setter Property="AutomationProperties.Name" Value="{Binding Title}" />
                                         <Setter Property="AutomationProperties.HelpText" Value="{Binding Description}" />
@@ -2577,7 +2585,10 @@
                                 </ListView.ItemContainerStyle>
                                 <ListView.ItemTemplate>
                                     <DataTemplate x:DataType="models:SettingsSection">
-                                        <Grid Padding="16,14" ColumnSpacing="16">
+                                        <Grid
+                                            AutomationProperties.HelpText="{x:Bind Description}"
+                                            AutomationProperties.Name="{x:Bind Title}"
+                                            ColumnSpacing="16">
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="Auto" />
                                                 <ColumnDefinition Width="*" />
@@ -2585,21 +2596,24 @@
                                             </Grid.ColumnDefinitions>
                                             <FontIcon
                                                 Grid.Column="0"
+                                                AutomationProperties.AccessibilityView="Raw"
                                                 VerticalAlignment="Center"
                                                 FontSize="20"
                                                 Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                                 Glyph="{x:Bind Icon}" />
                                             <StackPanel Grid.Column="1" Spacing="2">
-                                                <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="{x:Bind Title}" />
+                                                <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="{x:Bind Title}" TextTrimming="CharacterEllipsis" />
                                                 <TextBlock
                                                     MaxWidth="520"
                                                     Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                                     Style="{StaticResource CaptionTextBlockStyle}"
                                                     Text="{x:Bind Description}"
-                                                    TextWrapping="Wrap" />
+                                                    TextTrimming="CharacterEllipsis"
+                                                    TextWrapping="NoWrap" />
                                             </StackPanel>
                                             <FontIcon
                                                 Grid.Column="2"
+                                                AutomationProperties.AccessibilityView="Raw"
                                                 VerticalAlignment="Center"
                                                 FontSize="14"
                                                 Foreground="{ThemeResource TextFillColorSecondaryBrush}"
@@ -2619,26 +2633,30 @@
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
                     <StackPanel
-                        Margin="36,8,36,8"
-                        VerticalAlignment="Center"
+                        Margin="36,16,36,8"
+                        VerticalAlignment="Bottom"
                         Orientation="Horizontal"
                         Spacing="8">
                         <HyperlinkButton
                             x:Name="SettingsBreadcrumbRoot"
+                            Margin="0,0,0,6"
+                            VerticalAlignment="Bottom"
                             AutomationProperties.AutomationId="SettingsBreadcrumbRoot"
                             Click="SettingsBack_Click"
                             loc:Localization.Key="Settings_BreadcrumbRoot.Content"
-                            loc:Localization.AutomationNameKey="Settings_Back_AutomationName.AutomationName" />
-                        <FontIcon
-                            VerticalAlignment="Center"
-                            FontSize="12"
+                            loc:Localization.AutomationNameKey="Settings_BreadcrumbRoot.Content" />
+                        <TextBlock
+                            Margin="0,0,0,6"
+                            VerticalAlignment="Bottom"
+                            AutomationProperties.AccessibilityView="Raw"
+                            FontSize="14"
                             Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                            Glyph="&#xE76C;" />
+                            Text="&#x203A;" />
                         <TextBlock
                             x:Name="SettingsSectionTitle"
-                            VerticalAlignment="Center"
+                            VerticalAlignment="Bottom"
                             AutomationProperties.HeadingLevel="Level1"
-                            Style="{StaticResource SubtitleTextBlockStyle}" />
+                            Style="{StaticResource TitleTextBlockStyle}" />
                     </StackPanel>
                     <ScrollView
                         x:Name="SettingsSectionScroll"

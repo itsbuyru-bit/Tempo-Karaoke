@@ -277,7 +277,6 @@
   <data name="Selection_Count_Many" xml:space="preserve"><value>{0} selected</value></data>
   <data name="Selection_Count_One" xml:space="preserve"><value>{0} selected</value></data>
   <data name="Selection_Count_Other" xml:space="preserve"><value>{0} selected</value></data>
-  <data name="Settings_Back_AutomationName.AutomationName" xml:space="preserve"><value>Back to settings</value></data>
   <data name="Settings_BreadcrumbRoot.Content" xml:space="preserve"><value>Settings</value></data>
   <data name="Settings_LibraryPathsTitle.Text" xml:space="preserve"><value>Video library paths</value></data>
   <data name="Settings_ManageIndexing.Content" xml:space="preserve"><value>Manage system indexing settings</value></data>
