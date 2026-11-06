@@ -8935,7 +8935,7 @@ public sealed partial class MainPage : Page, IRemoteHost
             });
         }
 
-        SettingsSectionList.ItemsSource = _settingsSections;
+        SettingsSectionItems.ItemsSource = _settingsSections;
         RefreshSettingsSectionTitle();
     }
 
@@ -8997,9 +8997,9 @@ public sealed partial class MainPage : Page, IRemoteHost
 
     private void SettingsBack_Click(object sender, RoutedEventArgs e) => ShowSettingsCatalog();
 
-    private void SettingsSectionList_ItemClick(object sender, ItemClickEventArgs e)
+    private void SettingsSectionCard_Click(object sender, RoutedEventArgs e)
     {
-        if (e.ClickedItem is SettingsSection section)
+        if ((sender as FrameworkElement)?.DataContext is SettingsSection section)
         {
             OpenSettingsSection(section.Id);
         }

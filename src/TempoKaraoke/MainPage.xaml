@@ -2568,78 +2568,78 @@
                             MaxWidth="1000"
                             HorizontalAlignment="Stretch"
                             Spacing="0">
-                            <ListView
-                                x:Name="SettingsSectionList"
-                                AutomationProperties.AutomationId="SettingsSectionList"
-                                HorizontalAlignment="Stretch"
-                                HorizontalContentAlignment="Stretch"
-                                IsItemClickEnabled="True"
-                                ItemClick="SettingsSectionList_ItemClick"
-                                ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                                ScrollViewer.HorizontalScrollMode="Disabled"
-                                SelectionMode="None">
-                                <ListView.ItemContainerStyle>
-                                    <Style TargetType="ListViewItem">
-                                        <Setter Property="Background" Value="{ThemeResource CardBackgroundFillColorDefaultBrush}" />
-                                        <Setter Property="BorderBrush" Value="{ThemeResource CardStrokeColorDefaultBrush}" />
-                                        <Setter Property="BorderThickness" Value="1" />
-                                        <Setter Property="CornerRadius" Value="{ThemeResource ControlCornerRadius}" />
-                                        <Setter Property="Padding" Value="16,12" />
-                                        <Setter Property="Margin" Value="0,0,0,8" />
-                                        <Setter Property="MinHeight" Value="68" />
-                                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                                        <Setter Property="AutomationProperties.Name" Value="{Binding Title}" />
-                                        <Setter Property="AutomationProperties.HelpText" Value="{Binding Description}" />
-                                    </Style>
-                                </ListView.ItemContainerStyle>
-                                <ListView.ItemTemplate>
+                            <ItemsControl
+                                x:Name="SettingsSectionItems"
+                                HorizontalAlignment="Stretch">
+                                <ItemsControl.ItemTemplate>
                                     <DataTemplate x:DataType="models:SettingsSection">
-                                        <Grid
+                                        <Button
+                                            MinHeight="68"
+                                            Margin="0,0,0,8"
+                                            Padding="16,14"
+                                            HorizontalAlignment="Stretch"
+                                            HorizontalContentAlignment="Stretch"
+                                            VerticalContentAlignment="Center"
                                             AutomationProperties.HelpText="{x:Bind Description}"
                                             AutomationProperties.Name="{x:Bind Title}"
-                                            ColumnSpacing="0">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="Auto" />
-                                                <ColumnDefinition Width="*" />
-                                                <ColumnDefinition Width="Auto" />
-                                            </Grid.ColumnDefinitions>
-                                            <FontIcon
-                                                Grid.Column="0"
-                                                Margin="0,0,16,0"
-                                                AutomationProperties.AccessibilityView="Raw"
-                                                VerticalAlignment="Center"
-                                                FontSize="20"
-                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                                Glyph="{x:Bind Icon}" />
-                                            <StackPanel
-                                                Grid.Column="1"
-                                                HorizontalAlignment="Left"
-                                                Spacing="2">
-                                                <TextBlock
-                                                    Style="{StaticResource BodyStrongTextBlockStyle}"
-                                                    Text="{x:Bind Title}"
-                                                    TextAlignment="Left"
-                                                    TextTrimming="CharacterEllipsis" />
-                                                <TextBlock
-                                                    MaxWidth="520"
+                                            Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                                            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                                            BorderThickness="1"
+                                            Click="SettingsSectionCard_Click"
+                                            CornerRadius="8">
+                                            <Button.Resources>
+                                                <SolidColorBrush x:Key="ButtonBackground" Color="{ThemeResource CardBackgroundFillColorDefault}" />
+                                                <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="{ThemeResource CardBackgroundFillColorSecondary}" />
+                                                <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="{ThemeResource CardBackgroundFillColorDefault}" />
+                                                <SolidColorBrush x:Key="ButtonBackgroundDisabled" Color="{ThemeResource CardBackgroundFillColorDefault}" />
+                                                <SolidColorBrush x:Key="ButtonBorderBrush" Color="{ThemeResource CardStrokeColorDefault}" />
+                                                <SolidColorBrush x:Key="ButtonBorderBrushPointerOver" Color="{ThemeResource CardStrokeColorDefault}" />
+                                                <SolidColorBrush x:Key="ButtonBorderBrushPressed" Color="{ThemeResource CardStrokeColorDefault}" />
+                                            </Button.Resources>
+                                            <Grid ColumnSpacing="0">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <FontIcon
+                                                    Grid.Column="0"
+                                                    Margin="0,0,16,0"
+                                                    AutomationProperties.AccessibilityView="Raw"
+                                                    VerticalAlignment="Center"
+                                                    FontSize="20"
                                                     Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                                    Style="{StaticResource CaptionTextBlockStyle}"
-                                                    Text="{x:Bind Description}"
-                                                    TextAlignment="Left"
-                                                    TextTrimming="CharacterEllipsis"
-                                                    TextWrapping="NoWrap" />
-                                            </StackPanel>
-                                            <FontIcon
-                                                Grid.Column="2"
-                                                AutomationProperties.AccessibilityView="Raw"
-                                                VerticalAlignment="Center"
-                                                FontSize="14"
-                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                                Glyph="&#xE76C;" />
-                                        </Grid>
+                                                    Glyph="{x:Bind Icon}" />
+                                                <StackPanel
+                                                    Grid.Column="1"
+                                                    HorizontalAlignment="Left"
+                                                    Spacing="2">
+                                                    <TextBlock
+                                                        Style="{StaticResource BodyStrongTextBlockStyle}"
+                                                        Text="{x:Bind Title}"
+                                                        TextAlignment="Left"
+                                                        TextTrimming="CharacterEllipsis" />
+                                                    <TextBlock
+                                                        MaxWidth="520"
+                                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                        Style="{StaticResource CaptionTextBlockStyle}"
+                                                        Text="{x:Bind Description}"
+                                                        TextAlignment="Left"
+                                                        TextTrimming="CharacterEllipsis"
+                                                        TextWrapping="NoWrap" />
+                                                </StackPanel>
+                                                <FontIcon
+                                                    Grid.Column="2"
+                                                    AutomationProperties.AccessibilityView="Raw"
+                                                    VerticalAlignment="Center"
+                                                    FontSize="14"
+                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                    Glyph="&#xE76C;" />
+                                            </Grid>
+                                        </Button>
                                     </DataTemplate>
-                                </ListView.ItemTemplate>
-                            </ListView>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
                         </StackPanel>
                     </ScrollView>
                 </Grid>
@@ -2659,15 +2659,29 @@
                             x:Name="SettingsBreadcrumbRoot"
                             MinHeight="0"
                             MinWidth="0"
-                            Padding="4,2"
+                            Padding="0"
+                            Margin="0"
                             VerticalAlignment="Center"
                             AutomationProperties.AutomationId="SettingsBreadcrumbRoot"
                             Click="SettingsBack_Click"
+                            Background="Transparent"
+                            BorderThickness="0"
                             FontSize="28"
                             FontWeight="SemiBold"
-                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                             loc:Localization.Key="Settings_BreadcrumbRoot.Content"
-                            loc:Localization.AutomationNameKey="Settings_BreadcrumbRoot.Content" />
+                            loc:Localization.AutomationNameKey="Settings_BreadcrumbRoot.Content">
+                            <HyperlinkButton.Resources>
+                                <SolidColorBrush x:Key="HyperlinkButtonBackground" Color="Transparent" />
+                                <SolidColorBrush x:Key="HyperlinkButtonBackgroundPointerOver" Color="Transparent" />
+                                <SolidColorBrush x:Key="HyperlinkButtonBackgroundPressed" Color="Transparent" />
+                                <SolidColorBrush x:Key="HyperlinkButtonBorderBrush" Color="Transparent" />
+                                <SolidColorBrush x:Key="HyperlinkButtonBorderBrushPointerOver" Color="Transparent" />
+                                <SolidColorBrush x:Key="HyperlinkButtonBorderBrushPressed" Color="Transparent" />
+                                <SolidColorBrush x:Key="HyperlinkButtonForeground" Color="{ThemeResource TextFillColorSecondary}" />
+                                <SolidColorBrush x:Key="HyperlinkButtonForegroundPointerOver" Color="{ThemeResource TextFillColorPrimary}" />
+                                <SolidColorBrush x:Key="HyperlinkButtonForegroundPressed" Color="{ThemeResource TextFillColorTertiary}" />
+                            </HyperlinkButton.Resources>
+                        </HyperlinkButton>
                         <FontIcon
                             Margin="0,4,0,0"
                             VerticalAlignment="Center"
