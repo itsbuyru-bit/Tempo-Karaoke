@@ -2701,7 +2701,7 @@
                     <ScrollView
                         x:Name="SettingsSectionScroll"
                         Grid.Row="1"
-                        Padding="36,0,36,36"
+                        Padding="36,24,36,36"
                         HorizontalContentAlignment="Stretch"
                         VerticalScrollBarVisibility="Auto">
                         <Border>
