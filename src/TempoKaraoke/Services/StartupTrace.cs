@@ -38,6 +38,20 @@ public static class StartupTrace
                 return;
             }
 
+            LogService.Startup(BuildTimelineText());
+        }
+    }
+
+    /// <summary>Сводка таймингов для раздела «Диагностика» (без записи в лог).</summary>
+    public static string BuildTimelineText()
+    {
+        lock (Gate)
+        {
+            if (Marks.Count == 0)
+            {
+                return string.Empty;
+            }
+
             var builder = new StringBuilder();
             builder.AppendLine("Startup timeline:");
             long previous = 0;
@@ -48,7 +62,7 @@ public static class StartupTrace
             }
 
             builder.Append($"  Total: {previous} ms");
-            LogService.Startup(builder.ToString());
+            return builder.ToString();
         }
     }
 }

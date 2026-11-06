@@ -523,18 +523,20 @@
                     <NavigationViewItem.Icon>
                         <SymbolIcon Symbol="Setting" />
                     </NavigationViewItem.Icon>
-                    <NavigationViewItem.InfoBadge>
-                        <InfoBadge
-                            x:Name="SettingsUpdateBadge"
-                            AutomationProperties.AutomationId="SettingsUpdateBadge"
-                            Style="{StaticResource InformationalDotInfoBadgeStyle}"
-                            Visibility="Collapsed" />
-                    </NavigationViewItem.InfoBadge>
                 </NavigationViewItem>
                 <NavigationViewItem x:Name="AboutNavItem" Tag="about" x:Uid="Navigation_About" loc:Localization.Key="Navigation_About.Content">
                     <NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xE946;" />
                     </NavigationViewItem.Icon>
+                    <NavigationViewItem.InfoBadge>
+                        <InfoBadge
+                            x:Name="AboutUpdateBadge"
+                            AutomationProperties.AutomationId="AboutUpdateBadge"
+                            Style="{StaticResource InformationalDotInfoBadgeStyle}"
+                            Visibility="Collapsed"
+                            loc:Localization.AutomationNameKey="Update_Badge_AutomationName.AutomationName"
+                            loc:Localization.ToolTipKey="Update_Badge_ToolTip.ToolTip" />
+                    </NavigationViewItem.InfoBadge>
                 </NavigationViewItem>
             </NavigationView.FooterMenuItems>
 
@@ -2516,7 +2518,48 @@
                                     loc:Localization.Key="About_DonateLink.Content" />
                             </StackPanel>
                         </Border>
-                    </StackPanel>
+                        <StackPanel
+                            x:Name="SectionUpdates"
+                            Spacing="{StaticResource SettingsCardSpacing}"
+                            Visibility="Collapsed">
+    <toolkit:SettingsCard
+     x:Name="UpdatesAutoCard" x:Uid="Settings_UpdatesAuto" loc:Localization.Key="Settings_UpdatesAuto.Description" loc:Localization.SecondaryKey="Settings_UpdatesAuto.Header">
+                        <toolkit:SettingsCard.HeaderIcon>
+                            <FontIcon Glyph="&#xE895;" />
+                        </toolkit:SettingsCard.HeaderIcon>
+                        <ToggleSwitch
+     x:Name="CheckUpdatesToggle" MinWidth="0" AutomationProperties.AutomationId="CheckUpdatesToggle" Toggled="CheckUpdatesToggle_Toggled" x:Uid="Settings_UpdatesAutoSwitch" loc:Localization.Key="Settings_UpdatesAutoSwitch.OffContent" loc:Localization.SecondaryKey="Settings_UpdatesAutoSwitch.OnContent" loc:Localization.AutomationNameKey="Settings_UpdatesAutoSwitch_AutomationName.AutomationName" />
+                    </toolkit:SettingsCard>
+    
+                    <toolkit:SettingsCard
+     x:Name="UpdatesCheckCard" x:Uid="Settings_UpdatesCheck" loc:Localization.Key="Settings_UpdatesCheck.Description" loc:Localization.SecondaryKey="Settings_UpdatesCheck.Header">
+                        <toolkit:SettingsCard.HeaderIcon>
+                            <FontIcon Glyph="&#xE896;" />
+                        </toolkit:SettingsCard.HeaderIcon>
+                        <StackPanel
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Right"
+                            Orientation="Vertical"
+                            Spacing="8">
+                            <TextBlock
+     x:Name="UpdateStatusText" HorizontalAlignment="Right" VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" />
+                            <StackPanel
+                                HorizontalAlignment="Right"
+                                Orientation="Horizontal"
+                                Spacing="8">
+                                <HyperlinkButton
+     x:Name="UpdateNotesLink" AutomationProperties.AutomationId="UpdateNotesLink" Click="OpenUpdateNotes_Click" Visibility="Collapsed" x:Uid="Settings_UpdatesNotes" loc:Localization.Key="Settings_UpdatesNotes.Content" />
+                                <HyperlinkButton
+     x:Name="UpdateLaterButton" AutomationProperties.AutomationId="UpdateLaterButton" Click="UpdateLater_Click" Visibility="Collapsed" x:Uid="Settings_UpdatesLater" loc:Localization.Key="Settings_UpdatesLater.Content" />
+                                <Button
+     x:Name="UpdateNowButton" AutomationProperties.AutomationId="UpdateNowButton" Click="InstallUpdate_Click" Visibility="Collapsed" Style="{StaticResource AccentButtonStyle}" />
+                                <Button
+     x:Name="CheckUpdatesButton" AutomationProperties.AutomationId="CheckUpdatesButton" Click="CheckUpdates_Click" x:Uid="Settings_UpdatesCheckButton" loc:Localization.Key="Settings_UpdatesCheckButton.Content" />
+                            </StackPanel>
+                        </StackPanel>
+                    </toolkit:SettingsCard>
+                        </StackPanel>
+</StackPanel>
                 </ScrollView>
             </Grid>
 
@@ -2549,20 +2592,132 @@
                 <TextBlock
  MaxWidth="1064" Margin="36,24,36,0" HorizontalAlignment="Left" AutomationProperties.HeadingLevel="Level1" Style="{StaticResource TitleTextBlockStyle}" x:Uid="Ui_Settings_123" loc:Localization.Key="Ui_Settings_123.Text" />
 
-                <ScrollView
-                    Grid.Row="1"
-                    Padding="36,0,36,0"
-                    HorizontalContentAlignment="Stretch"
-                    VerticalScrollBarVisibility="Auto"
-                    VerticalScrollMode="Auto">
-                    <Border>
+                                <!--  Каталог разделов настроек: карточки открывают вложенный раздел  -->
+                <Grid x:Name="SettingsCatalogView" Grid.Row="1">
+                    <ScrollView Padding="36,0,36,0" VerticalScrollBarVisibility="Auto">
                         <StackPanel
-                            MaxWidth="1064"
-                            Spacing="{StaticResource SettingsCardSpacing}">
-                        <TextBlock
- Style="{StaticResource SettingsSectionHeaderTextBlockStyle}" x:Uid="Ui_Interface" loc:Localization.Key="Ui_Interface.Text" />
+                            MaxWidth="720"
+                            HorizontalAlignment="Left"
+                            Spacing="12">
+                            <TextBox
+                                x:Name="SettingsSearchBox"
+                                AutomationProperties.AutomationId="SettingsSearchBox"
+                                TextChanged="SettingsSearch_TextChanged"
+                                loc:Localization.Key="Settings_Search.PlaceholderText"
+                                loc:Localization.AutomationNameKey="Settings_Search_AutomationName.AutomationName" />
+                            <ListView
+                                x:Name="SettingsSectionList"
+                                AutomationProperties.AutomationId="SettingsSectionList"
+                                IsItemClickEnabled="True"
+                                ItemClick="SettingsSectionList_ItemClick"
+                                SelectionMode="None">
+                                <ListView.ItemTemplate>
+                                    <DataTemplate x:DataType="models:SettingsSection">
+                                        <Grid Padding="16,14" ColumnSpacing="16">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <FontIcon
+                                                Grid.Column="0"
+                                                VerticalAlignment="Center"
+                                                FontSize="20"
+                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                Glyph="{x:Bind Icon}" />
+                                            <StackPanel Grid.Column="1" Spacing="2">
+                                                <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="{x:Bind Title}" />
+                                                <TextBlock
+                                                    MaxWidth="520"
+                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                    Style="{StaticResource CaptionTextBlockStyle}"
+                                                    Text="{x:Bind Description}"
+                                                    TextWrapping="Wrap" />
+                                            </StackPanel>
+                                            <FontIcon
+                                                Grid.Column="2"
+                                                VerticalAlignment="Center"
+                                                FontSize="14"
+                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                Glyph="&#xE76C;" />
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
+                            <ListView
+                                x:Name="SettingsSearchHitList"
+                                AutomationProperties.AutomationId="SettingsSearchHitList"
+                                IsItemClickEnabled="True"
+                                ItemClick="SettingsSearchHitList_ItemClick"
+                                SelectionMode="None"
+                                Visibility="Collapsed">
+                                <ListView.ItemTemplate>
+                                    <DataTemplate x:DataType="models:SettingsSearchHit">
+                                        <Grid Padding="16,10" ColumnSpacing="12">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" Text="{x:Bind Title}" TextTrimming="CharacterEllipsis" />
+                                            <TextBlock
+                                                Grid.Column="1"
+                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                Style="{StaticResource CaptionTextBlockStyle}"
+                                                Text="{x:Bind SectionTitle}" />
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
+                            <TextBlock
+                                x:Name="SettingsSearchEmpty"
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                Style="{StaticResource BodyTextBlockStyle}"
+                                Visibility="Collapsed"
+                                loc:Localization.Key="Settings_SearchEmpty.Text" />
+                        </StackPanel>
+                    </ScrollView>
+                </Grid>
 
-                        <toolkit:SettingsCard
+                <!--  Вложенный раздел: заголовок с кнопкой «Назад» и карточки раздела  -->
+                <Grid x:Name="SettingsSectionHost" Grid.Row="1" Visibility="Collapsed">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <StackPanel
+                        Margin="36,8,36,8"
+                        Orientation="Horizontal"
+                        Spacing="12">
+                        <Button
+                            x:Name="SettingsBackButton"
+                            AutomationProperties.AutomationId="SettingsBackButton"
+                            Click="SettingsBack_Click"
+                            Style="{StaticResource IconButtonStyle}"
+                            loc:Localization.AutomationNameKey="Settings_Back_AutomationName.AutomationName"
+                            loc:Localization.ToolTipKey="Settings_Back_ToolTip.ToolTip">
+                            <FontIcon FontSize="14" Glyph="&#xE72B;" />
+                        </Button>
+                        <TextBlock
+                            x:Name="SettingsSectionTitle"
+                            VerticalAlignment="Center"
+                            AutomationProperties.HeadingLevel="Level1"
+                            Style="{StaticResource TitleTextBlockStyle}" />
+                    </StackPanel>
+                    <ScrollView
+                        x:Name="SettingsSectionScroll"
+                        Grid.Row="1"
+                        Padding="36,0,36,0"
+                        HorizontalContentAlignment="Stretch"
+                        VerticalScrollBarVisibility="Auto">
+                        <Border>
+                            <StackPanel
+                                MaxWidth="1064"
+                                Spacing="{StaticResource SettingsCardSpacing}">
+                        <StackPanel
+                            x:Name="SectionInterface"
+                            Spacing="{StaticResource SettingsCardSpacing}"
+                            Visibility="Collapsed">
+<toolkit:SettingsCard
  x:Uid="Ui_EnglishIsSelectedOnFirstLaunchYouCanSwit" loc:Localization.Key="Ui_EnglishIsSelectedOnFirstLaunchYouCanSwit.Description" loc:Localization.SecondaryKey="Ui_EnglishIsSelectedOnFirstLaunchYouCanSwit.Header">
                             <toolkit:SettingsCard.HeaderIcon>
                                 <FontIcon Glyph="&#xE8C1;" />
@@ -2598,11 +2753,13 @@
  x:Uid="Settings_ResetWindow"
  loc:Localization.Key="Settings_ResetWindow.Content" />
                         </toolkit:SettingsCard>
+                        </StackPanel>
 
-                        <TextBlock
- Style="{StaticResource SettingsSectionHeaderTextBlockStyle}" x:Uid="Ui_Libraries" loc:Localization.Key="Ui_Libraries.Text" />
-
-                    <Expander
+                        <StackPanel
+                            x:Name="SectionLibraries"
+                            Spacing="{StaticResource SettingsCardSpacing}"
+                            Visibility="Collapsed">
+<Expander
                         IsExpanded="True"
                         Padding="0"
                         HorizontalAlignment="Stretch"
@@ -2759,10 +2916,13 @@
                                 loc:Localization.Key="Ui_Refresh.Content" />
                         </StackPanel>
                     </toolkit:SettingsCard>
-                    <TextBlock
- Style="{StaticResource SettingsSectionHeaderTextBlockStyle}" x:Uid="Ui_Playback" loc:Localization.Key="Ui_Playback.Text" />
+                        </StackPanel>
 
-                    <toolkit:SettingsCard
+                        <StackPanel
+                            x:Name="SectionPlayback"
+                            Spacing="{StaticResource SettingsCardSpacing}"
+                            Visibility="Collapsed">
+<toolkit:SettingsCard
  x:Uid="Ui_CountdownOnVideoBeforeTheNextSongInTheQu" loc:Localization.Key="Ui_CountdownOnVideoBeforeTheNextSongInTheQu.Description" loc:Localization.SecondaryKey="Ui_CountdownOnVideoBeforeTheNextSongInTheQu.Header">
                         <toolkit:SettingsCard.HeaderIcon>
                             <FontIcon Glyph="&#xE916;" />
@@ -2779,11 +2939,13 @@
  x:Name="CountdownToggle" MinWidth="0" Toggled="CountdownToggle_Toggled" x:Uid="Ui_CountdownBeforeNextTrack" loc:Localization.Key="Ui_CountdownBeforeNextTrack.OffContent" loc:Localization.SecondaryKey="Ui_CountdownBeforeNextTrack.OnContent" loc:Localization.AutomationNameKey="Ui_CountdownBeforeNextTrack_AutomationName.AutomationName" />
                         </StackPanel>
                     </toolkit:SettingsCard>
+                        </StackPanel>
 
-                    <TextBlock
- Style="{StaticResource SettingsSectionHeaderTextBlockStyle}" x:Uid="Navigation_Remote_143" loc:Localization.Key="Navigation_Remote_143.Text" />
-
-                    <toolkit:SettingsCard
+                        <StackPanel
+                            x:Name="SectionRemote"
+                            Spacing="{StaticResource SettingsCardSpacing}"
+                            Visibility="Collapsed">
+<toolkit:SettingsCard
  x:Uid="Ui_QRCodeAndPINAreValidOnlyUntilTheRemoteIs" loc:Localization.Key="Ui_QRCodeAndPINAreValidOnlyUntilTheRemoteIs.Description" loc:Localization.SecondaryKey="Ui_QRCodeAndPINAreValidOnlyUntilTheRemoteIs.Header">
                         <toolkit:SettingsCard.HeaderIcon>
                             <FontIcon Glyph="&#xED14;" />
@@ -2818,11 +2980,13 @@
                         <ToggleSwitch
  x:Name="WifiSafeModeToggle" MinWidth="0" Toggled="WifiSafeModeToggle_Toggled" loc:Localization.AutomationNameKey="Ui_WifiSafeMode.Header" />
                     </toolkit:SettingsCard>
+                        </StackPanel>
 
-                    <TextBlock
- Style="{StaticResource SettingsSectionHeaderTextBlockStyle}" x:Uid="Ui_SecuritySection" loc:Localization.Key="Ui_SecuritySection.Text" />
-
-                    <toolkit:SettingsCard
+                        <StackPanel
+                            x:Name="SectionSecurity"
+                            Spacing="{StaticResource SettingsCardSpacing}"
+                            Visibility="Collapsed">
+<toolkit:SettingsCard
  x:Uid="Ui_AccessPins" loc:Localization.Key="Ui_AccessPins.Description" loc:Localization.SecondaryKey="Ui_AccessPins.Header">
                         <toolkit:SettingsCard.HeaderIcon>
                             <FontIcon Glyph="&#xE72E;" />
@@ -2888,11 +3052,51 @@
                                 Visibility="Collapsed" />
                         </StackPanel>
                     </toolkit:SettingsCard>
+                        </StackPanel>
 
-                    <TextBlock
- Style="{StaticResource SettingsSectionHeaderTextBlockStyle}" x:Uid="Ui_Diagnostics" loc:Localization.Key="Ui_Diagnostics.Text" />
+                        <StackPanel
+                            x:Name="SectionDiagnostics"
+                            Spacing="{StaticResource SettingsCardSpacing}"
+                            Visibility="Collapsed">
+                        <toolkit:SettingsCard
+ x:Uid="Diagnostics_Startup" loc:Localization.Key="Diagnostics_Startup.Description" loc:Localization.SecondaryKey="Diagnostics_Startup.Header">
+                            <toolkit:SettingsCard.HeaderIcon>
+                                <FontIcon Glyph="&#xE823;" />
+                            </toolkit:SettingsCard.HeaderIcon>
+                            <TextBlock
+                                x:Name="StartupTimingsText"
+                                MaxWidth="520"
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                Style="{StaticResource CaptionTextBlockStyle}"
+                                TextWrapping="Wrap" />
+                        </toolkit:SettingsCard>
 
-                    <toolkit:SettingsCard
+                        <toolkit:SettingsCard
+ x:Uid="Diagnostics_System" loc:Localization.Key="Diagnostics_System.Description" loc:Localization.SecondaryKey="Diagnostics_System.Header">
+                            <toolkit:SettingsCard.HeaderIcon>
+                                <FontIcon Glyph="&#xE770;" />
+                            </toolkit:SettingsCard.HeaderIcon>
+                            <TextBlock
+                                x:Name="SystemInfoText"
+                                MaxWidth="520"
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                Style="{StaticResource CaptionTextBlockStyle}"
+                                TextWrapping="Wrap" />
+                        </toolkit:SettingsCard>
+
+                        <toolkit:SettingsCard
+ x:Uid="Diagnostics_Integrity" loc:Localization.Key="Diagnostics_Integrity.Description" loc:Localization.SecondaryKey="Diagnostics_Integrity.Header">
+                            <toolkit:SettingsCard.HeaderIcon>
+                                <FontIcon Glyph="&#xE9D5;" />
+                            </toolkit:SettingsCard.HeaderIcon>
+                            <TextBlock
+                                x:Name="ConfigIntegrityText"
+                                MaxWidth="520"
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                Style="{StaticResource CaptionTextBlockStyle}"
+                                TextWrapping="Wrap" />
+                        </toolkit:SettingsCard>
+<toolkit:SettingsCard
  x:Uid="Ui_RegularEventsAreLoggedOnlyWhenEnabledCra" loc:Localization.Key="Ui_RegularEventsAreLoggedOnlyWhenEnabledCra.Description" loc:Localization.SecondaryKey="Ui_RegularEventsAreLoggedOnlyWhenEnabledCra.Header">
                         <toolkit:SettingsCard.HeaderIcon>
                             <FontIcon Glyph="&#xE9F9;" />
@@ -2946,47 +3150,13 @@
                             </StackPanel>
                         </StackPanel>
                     </toolkit:SettingsCard>
+                        </StackPanel>
 
-                    <TextBlock
- x:Name="UpdatesSectionHeader" Style="{StaticResource SettingsSectionHeaderTextBlockStyle}" x:Uid="Settings_Updates" loc:Localization.Key="Settings_Updates.Text" />
-
-                    <toolkit:SettingsCard
- x:Name="UpdatesAutoCard" x:Uid="Settings_UpdatesAuto" loc:Localization.Key="Settings_UpdatesAuto.Description" loc:Localization.SecondaryKey="Settings_UpdatesAuto.Header">
-                        <toolkit:SettingsCard.HeaderIcon>
-                            <FontIcon Glyph="&#xE895;" />
-                        </toolkit:SettingsCard.HeaderIcon>
-                        <ToggleSwitch
- x:Name="CheckUpdatesToggle" MinWidth="0" AutomationProperties.AutomationId="CheckUpdatesToggle" Toggled="CheckUpdatesToggle_Toggled" x:Uid="Settings_UpdatesAutoSwitch" loc:Localization.Key="Settings_UpdatesAutoSwitch.OffContent" loc:Localization.SecondaryKey="Settings_UpdatesAutoSwitch.OnContent" loc:Localization.AutomationNameKey="Settings_UpdatesAutoSwitch_AutomationName.AutomationName" />
-                    </toolkit:SettingsCard>
-
-                    <toolkit:SettingsCard
- x:Name="UpdatesCheckCard" x:Uid="Settings_UpdatesCheck" loc:Localization.Key="Settings_UpdatesCheck.Description" loc:Localization.SecondaryKey="Settings_UpdatesCheck.Header">
-                        <toolkit:SettingsCard.HeaderIcon>
-                            <FontIcon Glyph="&#xE896;" />
-                        </toolkit:SettingsCard.HeaderIcon>
-                        <StackPanel
-                            VerticalAlignment="Center"
-                            HorizontalAlignment="Right"
-                            Orientation="Vertical"
-                            Spacing="8">
-                            <TextBlock
- x:Name="UpdateStatusText" HorizontalAlignment="Right" VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" />
-                            <StackPanel
-                                HorizontalAlignment="Right"
-                                Orientation="Horizontal"
-                                Spacing="8">
-                                <HyperlinkButton
- x:Name="UpdateNotesLink" AutomationProperties.AutomationId="UpdateNotesLink" Click="OpenUpdateNotes_Click" Visibility="Collapsed" x:Uid="Settings_UpdatesNotes" loc:Localization.Key="Settings_UpdatesNotes.Content" />
-                                <Button
- x:Name="UpdateNowButton" AutomationProperties.AutomationId="UpdateNowButton" Click="InstallUpdate_Click" Visibility="Collapsed" Style="{StaticResource AccentButtonStyle}" />
-                                <Button
- x:Name="CheckUpdatesButton" AutomationProperties.AutomationId="CheckUpdatesButton" Click="CheckUpdates_Click" x:Uid="Settings_UpdatesCheckButton" loc:Localization.Key="Settings_UpdatesCheckButton.Content" />
+                        
                             </StackPanel>
-                        </StackPanel>
-                    </toolkit:SettingsCard>
-                        </StackPanel>
-                    </Border>
-                </ScrollView>
+                        </Border>
+                    </ScrollView>
+                </Grid>
         </Grid>
             </Grid>
             </Grid>

@@ -18,7 +18,7 @@ public sealed class MediaMetadataService : IDisposable
 
     public MediaMetadataService()
     {
-        Core.Initialize();
+        LibVLCSharp.Shared.Core.Initialize();
         _libVlc = new LibVLC("--quiet");
     }
 

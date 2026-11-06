@@ -26,6 +26,7 @@ using TempoKaraoke.Diagnostics;
 using TempoKaraoke.Models;
 using TempoKaraoke.Networking;
 using TempoKaraoke.Security;
+using TempoKaraoke.Core.Services;
 using TempoKaraoke.Services;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Foundation;
@@ -204,6 +205,7 @@ public sealed partial class MainPage : Page, IRemoteHost
         Loaded += OnPageLoaded;
         Unloaded += OnPageUnloaded;
         NetworkInformation.NetworkStatusChanged += OnNetworkStatusChanged;
+        NotificationService.UpdateActionInvoked += OnUpdateNotificationAction;
         InitializeSettings();
         NavView.PaneOpened += (_, _) => UpdateHeader();
         NavView.PaneClosed += (_, _) => UpdateHeader();
@@ -2550,6 +2552,8 @@ public sealed partial class MainPage : Page, IRemoteHost
         SearchResultsView.Visibility = Visibility.Collapsed;
         RemoteParticipantsView.Visibility = Visibility.Collapsed;
         ApplyLanguageDeferred(SettingsView);
+        BuildSettingsCatalog();
+        ShowSettingsCatalog();
     }
 
     private void ShowAbout()
@@ -2598,14 +2602,13 @@ public sealed partial class MainPage : Page, IRemoteHost
         if (UpdateService.IsSupported)
         {
             CheckUpdatesToggle.IsOn = SettingsService.CheckUpdatesOnStartup;
+            UpdateBadgeVisibility();
             UpdateStatusText.Text = LocalizationService.Format("Update_UpToDate", AppInfo.DisplayVersion);
         }
         else
         {
             // MSIX-сборка обновляется средствами Windows/Store, установщик не нужен.
-            UpdatesSectionHeader.Visibility = Visibility.Collapsed;
-            UpdatesAutoCard.Visibility = Visibility.Collapsed;
-            UpdatesCheckCard.Visibility = Visibility.Collapsed;
+            SectionUpdates.Visibility = Visibility.Collapsed;
         }
         _isInitializingSettings = false;
         ApplyTheme(SettingsService.Theme);
@@ -7341,14 +7344,19 @@ public sealed partial class MainPage : Page, IRemoteHost
                         result.Info.Version);
                     UpdateNowButton.Visibility = Visibility.Visible;
                     UpdateNotesLink.Visibility = Visibility.Visible;
-                    SettingsUpdateBadge.Visibility = Visibility.Visible;
+                    UpdateLaterButton.Visibility = Visibility.Visible;
+                    SettingsService.PendingUpdateVersion = result.Info.Version;
+                    UpdateBadgeVisibility();
+                    ShowUpdateNotification(result.Info.Version);
                     break;
 
                 case UpdateCheckStatus.UpToDate:
                     _pendingUpdate = null;
                     UpdateNowButton.Visibility = Visibility.Collapsed;
                     UpdateNotesLink.Visibility = Visibility.Collapsed;
-                    SettingsUpdateBadge.Visibility = Visibility.Collapsed;
+                    UpdateLaterButton.Visibility = Visibility.Collapsed;
+                    SettingsService.PendingUpdateVersion = string.Empty;
+                    UpdateBadgeVisibility();
                     UpdateStatusText.Text = LocalizationService.Format(
                         "Update_UpToDate",
                         AppInfo.DisplayVersion);
@@ -8892,6 +8900,320 @@ public sealed partial class MainPage : Page, IRemoteHost
 
         var span = TimeSpan.FromMilliseconds(milliseconds);
         return $"{(int)span.TotalHours}:{span.Minutes:00}:{span.Seconds:00}";
+    }
+
+    // ── Каталог разделов настроек ───────────────────────────────────────────
+
+    private readonly ObservableCollection<SettingsSection> _settingsSections = new();
+    private readonly ObservableCollection<SettingsSearchHit> _settingsHits = new();
+    private readonly Dictionary<string, StackPanel> _settingsSectionPanels = new(StringComparer.Ordinal);
+    private DispatcherTimer? _settingsSearchTimer;
+    private string? _openSettingsSectionId;
+
+    /// <summary>Строит карточки каталога из SettingsCatalog с текущей локалью.</summary>
+    private void BuildSettingsCatalog()
+    {
+        _settingsSectionPanels.Clear();
+        _settingsSectionPanels["interface"] = SectionInterface;
+        _settingsSectionPanels["libraries"] = SectionLibraries;
+        _settingsSectionPanels["playback"] = SectionPlayback;
+        _settingsSectionPanels["remote"] = SectionRemote;
+        _settingsSectionPanels["security"] = SectionSecurity;
+        _settingsSectionPanels["diagnostics"] = SectionDiagnostics;
+
+        _settingsSections.Clear();
+        foreach (var definition in SettingsCatalog.Sections)
+        {
+            _settingsSections.Add(new SettingsSection
+            {
+                Id = definition.Id,
+                Icon = definition.Icon,
+                TitleKey = definition.TitleKey,
+                DescriptionKey = definition.DescriptionKey,
+                Title = LocalizationService.Get(definition.TitleKey),
+                Description = LocalizationService.Get(definition.DescriptionKey),
+            });
+        }
+
+        SettingsSectionList.ItemsSource = _settingsSections;
+        SettingsSearchHitList.ItemsSource = _settingsHits;
+        RefreshSettingsSectionTitle();
+    }
+
+    /// <summary>Главный экран «Параметров»: только каталог разделов.</summary>
+    private void ShowSettingsCatalog()
+    {
+        SettingsCatalogView.Visibility = Visibility.Visible;
+        SettingsSectionHost.Visibility = Visibility.Collapsed;
+        foreach (var panel in _settingsSectionPanels.Values)
+        {
+            panel.Visibility = Visibility.Collapsed;
+        }
+
+        _openSettingsSectionId = null;
+        ApplySettingsFilter(SettingsSearchBox.Text ?? string.Empty);
+    }
+
+    /// <summary>Открывает раздел; при переходе из поиска подсвечивает параметр.</summary>
+    private void OpenSettingsSection(string sectionId, string? controlName = null)
+    {
+        var definition = SettingsCatalog.Find(sectionId);
+        if (definition is null)
+        {
+            return;
+        }
+
+        foreach (var (id, panel) in _settingsSectionPanels)
+        {
+            panel.Visibility = string.Equals(id, sectionId, StringComparison.Ordinal)
+                ? Visibility.Visible
+                : Visibility.Collapsed;
+        }
+
+        _openSettingsSectionId = sectionId;
+        SettingsSectionTitle.Text = LocalizationService.Get(definition.TitleKey);
+        SettingsCatalogView.Visibility = Visibility.Collapsed;
+        SettingsSectionHost.Visibility = Visibility.Visible;
+        SettingsSectionScroll.ScrollTo(0, 0);
+
+        if (string.Equals(sectionId, "diagnostics", StringComparison.Ordinal))
+        {
+            RefreshDiagnosticsSummary();
+        }
+
+        if (!string.IsNullOrWhiteSpace(controlName))
+        {
+            DispatcherQueue.TryEnqueue(() => HighlightSetting(controlName));
+        }
+    }
+
+    /// <summary>Прокручивает к контролу и ставит на него фокус (переход из поиска).</summary>
+    private void HighlightSetting(string controlName)
+    {
+        if (FindName(controlName) is not FrameworkElement element)
+        {
+            return;
+        }
+
+        element.StartBringIntoView(new BringIntoViewOptions { AnimationDesired = true });
+        if (element is Control control)
+        {
+            control.Focus(FocusState.Programmatic);
+        }
+    }
+
+    private void RefreshSettingsSectionTitle()
+    {
+        if (_openSettingsSectionId is null)
+        {
+            return;
+        }
+
+        if (SettingsCatalog.Find(_openSettingsSectionId) is { } definition)
+        {
+            SettingsSectionTitle.Text = LocalizationService.Get(definition.TitleKey);
+        }
+    }
+
+    private void SettingsBack_Click(object sender, RoutedEventArgs e) => ShowSettingsCatalog();
+
+    private void SettingsSectionList_ItemClick(object sender, ItemClickEventArgs e)
+    {
+        if (e.ClickedItem is SettingsSection section)
+        {
+            OpenSettingsSection(section.Id);
+        }
+    }
+
+    private void SettingsSearchHitList_ItemClick(object sender, ItemClickEventArgs e)
+    {
+        if (e.ClickedItem is SettingsSearchHit hit)
+        {
+            OpenSettingsSection(hit.SectionId, hit.ControlName);
+        }
+    }
+
+    private void SettingsSearch_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        _settingsSearchTimer ??= CreateSettingsSearchTimer();
+        _settingsSearchTimer.Stop();
+        _settingsSearchTimer.Start();
+    }
+
+    private DispatcherTimer CreateSettingsSearchTimer()
+    {
+        var timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(200) };
+        timer.Tick += (_, _) =>
+        {
+            timer.Stop();
+            ApplySettingsFilter(SettingsSearchBox.Text ?? string.Empty);
+        };
+        return timer;
+    }
+
+    /// <summary>Фильтр карточек разделов и прямые ссылки на параметры.</summary>
+    private void ApplySettingsFilter(string query)
+    {
+        query = (query ?? string.Empty).Trim();
+
+        var matches = new List<SettingsSection>();
+        foreach (var section in _settingsSections)
+        {
+            if (SettingsSearchFilter.Matches(section.Title, section.Description, query))
+            {
+                matches.Add(section);
+            }
+        }
+
+        SettingsSectionList.ItemsSource = matches;
+
+        _settingsHits.Clear();
+        if (query.Length > 0)
+        {
+            foreach (var parameter in SettingsCatalog.Parameters)
+            {
+                var title = LocalizationService.Get(parameter.TitleKey);
+                if (!title.Contains(query, StringComparison.CurrentCultureIgnoreCase))
+                {
+                    continue;
+                }
+
+                var section = SettingsCatalog.Find(parameter.SectionId);
+                _settingsHits.Add(new SettingsSearchHit(
+                    parameter.SectionId,
+                    title,
+                    section is null ? string.Empty : LocalizationService.Get(section.TitleKey),
+                    parameter.ControlName));
+            }
+        }
+
+        SettingsSearchHitList.Visibility = _settingsHits.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+        SettingsSearchEmpty.Visibility = matches.Count == 0 && _settingsHits.Count == 0
+            ? Visibility.Visible
+            : Visibility.Collapsed;
+    }
+
+    // ── Бейдж и уведомление об обновлении ───────────────────────────────────
+
+    /// <summary>Бейдж на «О приложении» — единый индикатор доступного обновления.</summary>
+    private void UpdateBadgeVisibility()
+    {
+        AboutUpdateBadge.Visibility = SettingsService.ShouldShowUpdateBadge(AppInfo.DisplayVersion)
+            ? Visibility.Visible
+            : Visibility.Collapsed;
+    }
+
+    /// <summary>Системное уведомление справа снизу; при недоступности остаётся бейдж.</summary>
+    private void ShowUpdateNotification(string version)
+    {
+        if (!SettingsService.ShouldShowUpdateBadge(AppInfo.DisplayVersion))
+        {
+            return;
+        }
+
+        var shown = NotificationService.TryShowUpdate(
+            LocalizationService.Get("Update_ToastTitle"),
+            LocalizationService.Format("Update_ToastBody", version),
+            LocalizationService.Get("Update_ToastInstall.Content"),
+            LocalizationService.Get("Update_ToastLater.Content"));
+
+        LogService.Info($"[update] notification shown={shown} version={version}");
+    }
+
+    /// <summary>«Напомнить позже»: убирает бейдж до следующего релиза.</summary>
+    private void UpdateLater_Click(object sender, RoutedEventArgs e)
+    {
+        var version = _pendingUpdate?.Version ?? SettingsService.PendingUpdateVersion;
+        SettingsService.DismissUpdate(version);
+        AboutUpdateBadge.Visibility = Visibility.Collapsed;
+        UpdateNowButton.Visibility = Visibility.Collapsed;
+        UpdateNotesLink.Visibility = Visibility.Collapsed;
+        UpdateLaterButton.Visibility = Visibility.Collapsed;
+        UpdateStatusText.Text = LocalizationService.Get("Update_Dismissed");
+    }
+
+    /// <summary>Кнопки в системном уведомлении: установить или отложить.</summary>
+    private void OnUpdateNotificationAction(string action)
+    {
+        DispatcherQueue.TryEnqueue(() =>
+        {
+            if (string.Equals(action, "install", StringComparison.OrdinalIgnoreCase))
+            {
+                InstallUpdate_Click(this, new RoutedEventArgs());
+            }
+            else if (string.Equals(action, "later", StringComparison.OrdinalIgnoreCase))
+            {
+                UpdateLater_Click(this, new RoutedEventArgs());
+            }
+        });
+    }
+
+    // ── Диагностика ─────────────────────────────────────────────────────────
+
+    /// <summary>Ленивая сводка: тайминги запуска, система/дисплеи, целостность.</summary>
+    private void RefreshDiagnosticsSummary()
+    {
+        StartupTimingsText.Text = StartupTrace.BuildTimelineText();
+        SystemInfoText.Text = BuildSystemInfoText();
+        ConfigIntegrityText.Text = BuildConfigIntegrityText();
+    }
+
+    private static string BuildSystemInfoText()
+    {
+        var builder = new StringBuilder();
+        builder.AppendLine($"Tempo Karaoke {AppInfo.DisplayVersion} · {(AppInfo.IsPackaged ? "MSIX" : "portable")}");
+        builder.AppendLine($"{System.Runtime.InteropServices.RuntimeInformation.OSDescription} · {System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture}");
+
+        foreach (var display in WindowPlacementService.GetDisplays())
+        {
+            builder.AppendLine(
+                $"{(display.IsPrimary ? "*" : "-")} {display.DisplayId}: {display.WorkArea.Width}x{display.WorkArea.Height} @{display.Scale:0.##}");
+        }
+
+        if (App.Window is MainWindow window)
+        {
+            var appWindow = window.AppWindow;
+            builder.Append($"Window: {appWindow.Position.X},{appWindow.Position.Y} {appWindow.Size.Width}x{appWindow.Size.Height}");
+        }
+
+        return builder.ToString().TrimEnd();
+    }
+
+    private static string BuildConfigIntegrityText()
+    {
+        var builder = new StringBuilder();
+        var settings = AppStorage.PathFor("settings.json");
+        builder.AppendLine($"settings.json: {DescribeFile(settings)}");
+
+        var catalog = LocalizationPaths.FindCatalogDirectory();
+        var manifest = catalog is null ? null : Path.Combine(catalog, "manifest.json");
+        builder.AppendLine($"localization/manifest.json: {DescribeFile(manifest)}");
+
+        if (catalog is not null)
+        {
+            var languages = Directory.GetFiles(catalog, "*.json").Length - 1;
+            builder.Append($"Языков в каталоге: {Math.Max(languages, 0)}");
+        }
+
+        return builder.ToString().TrimEnd();
+    }
+
+    private static string DescribeFile(string? path)
+    {
+        if (string.IsNullOrWhiteSpace(path) || !File.Exists(path))
+        {
+            return "не найден";
+        }
+
+        try
+        {
+            var info = new FileInfo(path);
+            return $"есть, {info.Length} Б, изменён {info.LastWriteTime:dd.MM.yyyy HH:mm}";
+        }
+        catch
+        {
+            return "есть";
+        }
     }
 }
 

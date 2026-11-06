@@ -106,7 +106,7 @@ public sealed class PlayerService : IDisposable
 
         try
         {
-            Core.Initialize();
+            LibVLCSharp.Shared.Core.Initialize();
 
             var options = swapChainOptions
                 .Concat(new[] { "--no-video-title-show", "--quiet" })

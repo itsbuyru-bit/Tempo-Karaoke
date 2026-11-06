@@ -46,6 +46,12 @@
   <data name="ContextMenu_RemoveFavorite" xml:space="preserve"><value>Убрать из избранного</value></data>
   <data name="ContextMenu_Rename.Text" xml:space="preserve"><value>Переименовать</value></data>
   <data name="ContextMenu_Select.Text" xml:space="preserve"><value>Выбрать</value></data>
+  <data name="Diagnostics_Integrity.Description" xml:space="preserve"><value>Состояние settings.json и каталога локализации</value></data>
+  <data name="Diagnostics_Integrity.Header" xml:space="preserve"><value>Целостность конфигурации</value></data>
+  <data name="Diagnostics_Startup.Description" xml:space="preserve"><value>Последние замеры этапов от старта процесса до интерактивного интерфейса</value></data>
+  <data name="Diagnostics_Startup.Header" xml:space="preserve"><value>Время запуска</value></data>
+  <data name="Diagnostics_System.Description" xml:space="preserve"><value>Версия, режим запуска, мониторы, DPI и размеры окна</value></data>
+  <data name="Diagnostics_System.Header" xml:space="preserve"><value>Система и дисплеи</value></data>
   <data name="Equalizer_Close" xml:space="preserve"><value>Закрыть</value></data>
   <data name="Equalizer_Hz" xml:space="preserve"><value>Гц</value></data>
   <data name="Equalizer_LinkSliders" xml:space="preserve"><value>Перемещать находящиеся рядом ползунки вместе</value></data>
@@ -271,6 +277,8 @@
   <data name="Selection_Count_Many" xml:space="preserve"><value>Выбрано {0} элементов</value></data>
   <data name="Selection_Count_One" xml:space="preserve"><value>Выбран {0} элемент</value></data>
   <data name="Selection_Count_Other" xml:space="preserve"><value>Выбрано {0} элементов</value></data>
+  <data name="Settings_Back_AutomationName.AutomationName" xml:space="preserve"><value>Назад к настройкам</value></data>
+  <data name="Settings_Back_ToolTip.ToolTip" xml:space="preserve"><value>Назад</value></data>
   <data name="Settings_LibraryPathsTitle.Text" xml:space="preserve"><value>Пути к библиотеке видео</value></data>
   <data name="Settings_ManageIndexing.Content" xml:space="preserve"><value>Управление параметрами индексирования системы</value></data>
   <data name="Settings_PathsTitle.Description" xml:space="preserve"><value>Индексируются только видеофайлы. Музыка не индексируется.</value></data>
@@ -278,6 +286,23 @@
   <data name="Settings_RefreshTitle.Text" xml:space="preserve"><value>Обновить библиотеки</value></data>
   <data name="Settings_ResetWindow.Content" xml:space="preserve"><value>Сбросить положение окна</value></data>
   <data name="Settings_ResetWindow_Done" xml:space="preserve"><value>Положение окна сброшено.</value></data>
+  <data name="Settings_Search.PlaceholderText" xml:space="preserve"><value>Поиск по настройкам</value></data>
+  <data name="Settings_SearchEmpty.Text" xml:space="preserve"><value>Ничего не найдено</value></data>
+  <data name="Settings_Search_AutomationName.AutomationName" xml:space="preserve"><value>Поиск по настройкам</value></data>
+  <data name="Settings_Section_Diagnostics.Description" xml:space="preserve"><value>Логи, отчёты об ошибках, состояние сети и системы</value></data>
+  <data name="Settings_Section_Diagnostics.Header" xml:space="preserve"><value>Диагностика</value></data>
+  <data name="Settings_Section_Interface.Description" xml:space="preserve"><value>Язык, тема и положение окна</value></data>
+  <data name="Settings_Section_Interface.Header" xml:space="preserve"><value>Интерфейс</value></data>
+  <data name="Settings_Section_Interface_Language.Header" xml:space="preserve"><value>Язык интерфейса</value></data>
+  <data name="Settings_Section_Libraries.Description" xml:space="preserve"><value>Папки с видео и индексирование медиатеки</value></data>
+  <data name="Settings_Section_Libraries.Header" xml:space="preserve"><value>Библиотеки</value></data>
+  <data name="Settings_Section_Libraries_Refresh.Header" xml:space="preserve"><value>Обновить библиотеки</value></data>
+  <data name="Settings_Section_Playback.Description" xml:space="preserve"><value>Отсчёт перед следующим треком</value></data>
+  <data name="Settings_Section_Playback.Header" xml:space="preserve"><value>Воспроизведение</value></data>
+  <data name="Settings_Section_Remote.Description" xml:space="preserve"><value>Доступ с устройств, автоотключение и Wi-Fi Direct</value></data>
+  <data name="Settings_Section_Remote.Header" xml:space="preserve"><value>Веб-пульт</value></data>
+  <data name="Settings_Section_Security.Description" xml:space="preserve"><value>PIN-коды ведущего и администратора</value></data>
+  <data name="Settings_Section_Security.Header" xml:space="preserve"><value>Безопасность</value></data>
   <data name="Settings_Updates.Text" xml:space="preserve"><value>Обновления</value></data>
   <data name="Settings_UpdatesAuto.Description" xml:space="preserve"><value>Приложение раз в запуск проверяет последний релиз на GitHub. Установка начинается только после подтверждения.</value></data>
   <data name="Settings_UpdatesAuto.Header" xml:space="preserve"><value>Проверять обновления при запуске</value></data>
@@ -288,6 +313,7 @@
   <data name="Settings_UpdatesCheck.Header" xml:space="preserve"><value>Версия приложения</value></data>
   <data name="Settings_UpdatesCheckButton.Content" xml:space="preserve"><value>Проверить обновления</value></data>
   <data name="Settings_UpdatesInstallButton.Content" xml:space="preserve"><value>Обновить до v{0}</value></data>
+  <data name="Settings_UpdatesLater.Content" xml:space="preserve"><value>Напомнить позже</value></data>
   <data name="Settings_UpdatesNotes.Content" xml:space="preserve"><value>Что нового</value></data>
   <data name="Settings_WindowPlacement.Description" xml:space="preserve"><value>Если окно открылось не по центру или уехало за экран, верните его к размеру по умолчанию.</value></data>
   <data name="Settings_WindowPlacement.Header" xml:space="preserve"><value>Положение окна</value></data>
@@ -574,12 +600,19 @@
   <data name="Ui_WifiSafeMode.Header" xml:space="preserve"><value>Безопасный режим Wi-Fi Direct</value></data>
   <data name="Ui_YouHaveNoPlaylists.Text" xml:space="preserve"><value>У вас нет списков воспроизведения</value></data>
   <data name="Update_Available" xml:space="preserve"><value>Доступно обновление v{0} (текущая: v{1})</value></data>
+  <data name="Update_Badge_AutomationName.AutomationName" xml:space="preserve"><value>Доступно обновление</value></data>
+  <data name="Update_Badge_ToolTip.ToolTip" xml:space="preserve"><value>Доступно обновление</value></data>
   <data name="Update_Checking" xml:space="preserve"><value>Проверка обновлений…</value></data>
+  <data name="Update_Dismissed.Text" xml:space="preserve"><value>Напоминание скрыто до следующего релиза</value></data>
   <data name="Update_Downloading" xml:space="preserve"><value>Скачиваю обновление… {0}</value></data>
   <data name="Update_Failed" xml:space="preserve"><value>Не удалось проверить обновления: {0}</value></data>
   <data name="Update_InstallFailed" xml:space="preserve"><value>Не удалось запустить установщик обновления.</value></data>
   <data name="Update_Installing" xml:space="preserve"><value>Запускаю установщик…</value></data>
   <data name="Update_NotConfigured" xml:space="preserve"><value>Канал обновлений не настроен.</value></data>
+  <data name="Update_ToastBody.Text" xml:space="preserve"><value>Версия {0} готова к установке</value></data>
+  <data name="Update_ToastInstall.Content" xml:space="preserve"><value>Установить</value></data>
+  <data name="Update_ToastLater.Content" xml:space="preserve"><value>Позже</value></data>
+  <data name="Update_ToastTitle.Text" xml:space="preserve"><value>Доступно новое обновление</value></data>
   <data name="Update_UpToDate" xml:space="preserve"><value>Установлена последняя версия v{0}</value></data>
   <data name="Url_Invalid" xml:space="preserve"><value>Некорректный URL</value></data>
   <data name="Url_Title" xml:space="preserve"><value>Добавить по URL</value></data>

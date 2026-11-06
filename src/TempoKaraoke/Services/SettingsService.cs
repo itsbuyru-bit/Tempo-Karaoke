@@ -51,6 +51,12 @@ public sealed class SettingsData
     /// <summary>Проверять обновления при запуске (портативная сборка).</summary>
     public bool CheckUpdatesOnStartup { get; set; } = true;
 
+    /// <summary>Версия, о которой пользователь уведомлён (для бейджа после перезапуска).</summary>
+    public string PendingUpdateVersion { get; set; } = string.Empty;
+
+    /// <summary>Версия, которую пользователь отложил: не напоминать о ней.</summary>
+    public string DismissedUpdateVersion { get; set; } = string.Empty;
+
     /// <summary>Положение и размер главного окна (в DIP, относительно рабочей области).</summary>
     public WindowPlacementData Window { get; set; } = new();
 
@@ -224,6 +230,31 @@ public static class SettingsService
         get => Data.CheckUpdatesOnStartup;
         set => Update(data => data.CheckUpdatesOnStartup = value);
     }
+
+    /// <summary>Версия, о которой пользователь уведомлён, но ещё не установил.</summary>
+    public static string PendingUpdateVersion
+    {
+        get => Data.PendingUpdateVersion;
+        set => Update(data => data.PendingUpdateVersion = value ?? string.Empty);
+    }
+
+    /// <summary>Версия, которую пользователь отложил: бейдж скрыт до следующего релиза.</summary>
+    public static string DismissedUpdateVersion
+    {
+        get => Data.DismissedUpdateVersion;
+        set => Update(data => data.DismissedUpdateVersion = value ?? string.Empty);
+    }
+
+    /// <summary>Показывать ли бейдж «есть обновление» для установленной версии.</summary>
+    public static bool ShouldShowUpdateBadge(string installedVersion) =>
+        TempoKaraoke.Core.Services.UpdateBadgePolicy.ShouldShow(
+            Data.PendingUpdateVersion,
+            Data.DismissedUpdateVersion,
+            installedVersion);
+
+    /// <summary>Пользователь отложил обновление: бейдж скрыт до следующей версии.</summary>
+    public static void DismissUpdate(string version) =>
+        DismissedUpdateVersion = version ?? string.Empty;
 
     /// <summary>Копия сохранённого положения окна (менять её можно свободно).</summary>
     public static WindowPlacementData GetWindowPlacement() => Data.Window?.Clone() ?? new WindowPlacementData();
