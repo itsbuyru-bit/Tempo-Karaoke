@@ -2558,16 +2558,25 @@
 
                                 <!--  Каталог разделов настроек: карточки открывают вложенный раздел  -->
                 <Grid x:Name="SettingsCatalogView" Grid.Row="1">
-                    <ScrollView Padding="36,0,36,0" VerticalScrollBarVisibility="Auto">
+                    <ScrollView
+                        Padding="36,24,36,36"
+                        HorizontalContentAlignment="Stretch"
+                        HorizontalScrollBarVisibility="Hidden"
+                        HorizontalScrollMode="Disabled"
+                        VerticalScrollBarVisibility="Auto">
                         <StackPanel
-                            MaxWidth="720"
-                            HorizontalAlignment="Left"
-                            Spacing="12">
+                            MaxWidth="1000"
+                            HorizontalAlignment="Stretch"
+                            Spacing="0">
                             <ListView
                                 x:Name="SettingsSectionList"
                                 AutomationProperties.AutomationId="SettingsSectionList"
+                                HorizontalAlignment="Stretch"
+                                HorizontalContentAlignment="Stretch"
                                 IsItemClickEnabled="True"
                                 ItemClick="SettingsSectionList_ItemClick"
+                                ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                ScrollViewer.HorizontalScrollMode="Disabled"
                                 SelectionMode="None">
                                 <ListView.ItemContainerStyle>
                                     <Style TargetType="ListViewItem">
@@ -2575,9 +2584,9 @@
                                         <Setter Property="BorderBrush" Value="{ThemeResource CardStrokeColorDefaultBrush}" />
                                         <Setter Property="BorderThickness" Value="1" />
                                         <Setter Property="CornerRadius" Value="{ThemeResource ControlCornerRadius}" />
-                                        <Setter Property="Padding" Value="16,14" />
+                                        <Setter Property="Padding" Value="16,12" />
                                         <Setter Property="Margin" Value="0,0,0,8" />
-                                        <Setter Property="MinHeight" Value="64" />
+                                        <Setter Property="MinHeight" Value="68" />
                                         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                                         <Setter Property="AutomationProperties.Name" Value="{Binding Title}" />
                                         <Setter Property="AutomationProperties.HelpText" Value="{Binding Description}" />
@@ -2588,7 +2597,7 @@
                                         <Grid
                                             AutomationProperties.HelpText="{x:Bind Description}"
                                             AutomationProperties.Name="{x:Bind Title}"
-                                            ColumnSpacing="16">
+                                            ColumnSpacing="0">
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="Auto" />
                                                 <ColumnDefinition Width="*" />
@@ -2596,18 +2605,27 @@
                                             </Grid.ColumnDefinitions>
                                             <FontIcon
                                                 Grid.Column="0"
+                                                Margin="0,0,16,0"
                                                 AutomationProperties.AccessibilityView="Raw"
                                                 VerticalAlignment="Center"
                                                 FontSize="20"
                                                 Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                                 Glyph="{x:Bind Icon}" />
-                                            <StackPanel Grid.Column="1" Spacing="2">
-                                                <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Text="{x:Bind Title}" TextTrimming="CharacterEllipsis" />
+                                            <StackPanel
+                                                Grid.Column="1"
+                                                HorizontalAlignment="Left"
+                                                Spacing="2">
+                                                <TextBlock
+                                                    Style="{StaticResource BodyStrongTextBlockStyle}"
+                                                    Text="{x:Bind Title}"
+                                                    TextAlignment="Left"
+                                                    TextTrimming="CharacterEllipsis" />
                                                 <TextBlock
                                                     MaxWidth="520"
                                                     Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                                     Style="{StaticResource CaptionTextBlockStyle}"
                                                     Text="{x:Bind Description}"
+                                                    TextAlignment="Left"
                                                     TextTrimming="CharacterEllipsis"
                                                     TextWrapping="NoWrap" />
                                             </StackPanel>
@@ -2633,40 +2651,49 @@
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
                     <StackPanel
-                        Margin="36,16,36,8"
-                        VerticalAlignment="Bottom"
+                        Margin="36,24,36,0"
+                        VerticalAlignment="Center"
                         Orientation="Horizontal"
-                        Spacing="8">
+                        Spacing="10">
                         <HyperlinkButton
                             x:Name="SettingsBreadcrumbRoot"
-                            Margin="0,0,0,6"
-                            VerticalAlignment="Bottom"
+                            MinHeight="0"
+                            MinWidth="0"
+                            Padding="4,2"
+                            VerticalAlignment="Center"
                             AutomationProperties.AutomationId="SettingsBreadcrumbRoot"
                             Click="SettingsBack_Click"
+                            FontSize="28"
+                            FontWeight="SemiBold"
+                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                             loc:Localization.Key="Settings_BreadcrumbRoot.Content"
                             loc:Localization.AutomationNameKey="Settings_BreadcrumbRoot.Content" />
-                        <TextBlock
-                            Margin="0,0,0,6"
-                            VerticalAlignment="Bottom"
+                        <FontIcon
+                            Margin="0,4,0,0"
+                            VerticalAlignment="Center"
                             AutomationProperties.AccessibilityView="Raw"
-                            FontSize="14"
-                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                            Text="&#x203A;" />
+                            FontSize="16"
+                            Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                            Glyph="&#xE76C;" />
                         <TextBlock
                             x:Name="SettingsSectionTitle"
-                            VerticalAlignment="Bottom"
+                            VerticalAlignment="Center"
                             AutomationProperties.HeadingLevel="Level1"
-                            Style="{StaticResource TitleTextBlockStyle}" />
+                            FontSize="28"
+                            FontWeight="SemiBold"
+                            Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                            TextTrimming="CharacterEllipsis" />
                     </StackPanel>
                     <ScrollView
                         x:Name="SettingsSectionScroll"
                         Grid.Row="1"
-                        Padding="36,0,36,0"
+                        Padding="36,0,36,36"
                         HorizontalContentAlignment="Stretch"
                         VerticalScrollBarVisibility="Auto">
                         <Border>
                             <StackPanel
-                                MaxWidth="1064"
+                                MaxWidth="1000"
+                                HorizontalAlignment="Stretch"
                                 Spacing="{StaticResource SettingsCardSpacing}">
                         <StackPanel
                             x:Name="SectionInterface"
@@ -2951,39 +2978,39 @@
                     </toolkit:SettingsCard>
 
                     <toolkit:SettingsCard
- x:Uid="Ui_HostPin" loc:Localization.Key="Ui_AccessPins.Description" loc:Localization.SecondaryKey="Ui_HostPin.Header">
+ x:Uid="Ui_HostPin" loc:Localization.Key="Ui_HostPin.Description" loc:Localization.SecondaryKey="Ui_HostPin.Header">
                         <toolkit:SettingsCard.HeaderIcon>
                             <FontIcon Glyph="&#xE7EF;" />
                         </toolkit:SettingsCard.HeaderIcon>
                         <StackPanel
-                            MinWidth="220"
                             VerticalAlignment="Center"
-                            Spacing="6">
+                            Orientation="Horizontal"
+                            Spacing="8">
                             <PasswordBox
- x:Name="HostPinBox" MaxLength="8" PasswordRevealMode="Hidden" loc:Localization.Key="Ui_HostPin.Header" />
+ x:Name="HostPinBox" Width="160" MaxLength="8" PasswordRevealMode="Hidden" loc:Localization.Key="Ui_HostPin_Placeholder.PlaceholderText" loc:Localization.AutomationNameKey="Ui_HostPin.Header" />
                             <PasswordBox
- x:Name="HostPinConfirmBox" MaxLength="8" PasswordRevealMode="Hidden" loc:Localization.Key="Ui_HostPinConfirm.Header" />
+ x:Name="HostPinConfirmBox" Width="160" MaxLength="8" PasswordRevealMode="Hidden" loc:Localization.Key="Ui_HostPinConfirm_Placeholder.PlaceholderText" loc:Localization.AutomationNameKey="Ui_HostPinConfirm.Header" />
                         </StackPanel>
                     </toolkit:SettingsCard>
 
                     <toolkit:SettingsCard
- x:Uid="Ui_AdminPin" loc:Localization.Key="Ui_AccessPins.Description" loc:Localization.SecondaryKey="Ui_AdminPin.Header">
+ x:Uid="Ui_AdminPin" loc:Localization.Key="Ui_AdminPin.Description" loc:Localization.SecondaryKey="Ui_AdminPin.Header">
                         <toolkit:SettingsCard.HeaderIcon>
                             <FontIcon Glyph="&#xE7EF;" />
                         </toolkit:SettingsCard.HeaderIcon>
                         <StackPanel
-                            MinWidth="220"
                             VerticalAlignment="Center"
-                            Spacing="6">
+                            Orientation="Horizontal"
+                            Spacing="8">
                             <PasswordBox
- x:Name="AdminPinBox" MaxLength="8" PasswordRevealMode="Hidden" loc:Localization.Key="Ui_AdminPin.Header" />
+ x:Name="AdminPinBox" Width="160" MaxLength="8" PasswordRevealMode="Hidden" loc:Localization.Key="Ui_AdminPin_Placeholder.PlaceholderText" loc:Localization.AutomationNameKey="Ui_AdminPin.Header" />
                             <PasswordBox
- x:Name="AdminPinConfirmBox" MaxLength="8" PasswordRevealMode="Hidden" loc:Localization.Key="Ui_AdminPinConfirm.Header" />
+ x:Name="AdminPinConfirmBox" Width="160" MaxLength="8" PasswordRevealMode="Hidden" loc:Localization.Key="Ui_AdminPinConfirm_Placeholder.PlaceholderText" loc:Localization.AutomationNameKey="Ui_AdminPinConfirm.Header" />
                         </StackPanel>
                     </toolkit:SettingsCard>
 
                     <toolkit:SettingsCard
- loc:Localization.Key="Ui_AccessPins.Description" loc:Localization.SecondaryKey="Ui_AccessPins.Header">
+ x:Uid="Ui_PinActions" loc:Localization.Key="Ui_PinActions.Description" loc:Localization.SecondaryKey="Ui_PinActions.Header">
                         <toolkit:SettingsCard.HeaderIcon>
                             <FontIcon Glyph="&#xE8FB;" />
                         </toolkit:SettingsCard.HeaderIcon>

@@ -326,7 +326,7 @@
   <data name="Ui_AZ_28.Text" xml:space="preserve"><value>A–Z</value></data>
   <data name="Ui_AZ_40.Content" xml:space="preserve"><value>A–Z</value></data>
   <data name="Ui_AZ_46.Content" xml:space="preserve"><value>A–Z</value></data>
-  <data name="Ui_AccessPins.Description" xml:space="preserve"><value>Set a permanent PIN for the host and administrator. Without it, a random PIN is generated for every remote session.</value></data>
+  <data name="Ui_AccessPins.Description" xml:space="preserve"><value>Persistent codes instead of a random PIN for every remote session.</value></data>
   <data name="Ui_AccessPins.Header" xml:space="preserve"><value>Access PIN codes</value></data>
   <data name="Ui_AddASongFromTheLibraryOrFilesFromDisk.Text" xml:space="preserve"><value>Add a song from the library or files from disk.</value></data>
   <data name="Ui_AddAllToQueue.Text" xml:space="preserve"><value>Add all to queue</value></data>
@@ -350,9 +350,12 @@
   <data name="Ui_AddVideoFolder_AutomationName.AutomationName" xml:space="preserve"><value>Add video folder</value></data>
   <data name="Ui_AddVideosOrImportM3U.Text" xml:space="preserve"><value>Add videos or import M3U.</value></data>
   <data name="Ui_AdminPINHint.Text" xml:space="preserve"><value>For changing limits, countdown and party rules without interrupting playback.</value></data>
+  <data name="Ui_AdminPin.Description" xml:space="preserve"><value>Everything the host can do, plus program settings.</value></data>
   <data name="Ui_AdminPin.Header" xml:space="preserve"><value>Administrator PIN</value></data>
   <data name="Ui_AdminPinCaption.Text" xml:space="preserve"><value>Administrator PIN</value></data>
   <data name="Ui_AdminPinConfirm.Header" xml:space="preserve"><value>Repeat administrator PIN</value></data>
+  <data name="Ui_AdminPinConfirm_Placeholder.PlaceholderText" xml:space="preserve"><value>Repeat PIN</value></data>
+  <data name="Ui_AdminPin_Placeholder.PlaceholderText" xml:space="preserve"><value>Enter PIN</value></data>
   <data name="Ui_AllVideos.Text" xml:space="preserve"><value>All videos</value></data>
   <data name="Ui_BackToFolders_AutomationName.AutomationName" xml:space="preserve"><value>Back to folders</value></data>
   <data name="Ui_BackToFolders_ToolTip.ToolTip" xml:space="preserve"><value>Back</value></data>
@@ -415,9 +418,12 @@
   <data name="Ui_FullScreen_AutomationName.AutomationName" xml:space="preserve"><value>Full screen</value></data>
   <data name="Ui_FullScreen_ToolTip.ToolTip" xml:space="preserve"><value>Full screen</value></data>
   <data name="Ui_Guest.Text" xml:space="preserve"><value>Guest</value></data>
+  <data name="Ui_HostPin.Description" xml:space="preserve"><value>Control the player, the queue and guest requests.</value></data>
   <data name="Ui_HostPin.Header" xml:space="preserve"><value>Host PIN</value></data>
   <data name="Ui_HostPinCaption.Text" xml:space="preserve"><value>Host PIN</value></data>
   <data name="Ui_HostPinConfirm.Header" xml:space="preserve"><value>Repeat host PIN</value></data>
+  <data name="Ui_HostPinConfirm_Placeholder.PlaceholderText" xml:space="preserve"><value>Repeat PIN</value></data>
+  <data name="Ui_HostPin_Placeholder.PlaceholderText" xml:space="preserve"><value>Enter PIN</value></data>
   <data name="Ui_IfThePageDoesNotOpenCheckThatThePhoneIsC.Text" xml:space="preserve"><value>If the page does not open, check that the device is connected to the same Wi-Fi network.</value></data>
   <data name="Ui_ImportM3U.Text" xml:space="preserve"><value>Import M3U</value></data>
   <data name="Ui_Interface.Text" xml:space="preserve"><value>Interface</value></data>
@@ -469,6 +475,8 @@
   <data name="Ui_PersistentPin.OffContent" xml:space="preserve"><value>Random PIN</value></data>
   <data name="Ui_PersistentPin.OnContent" xml:space="preserve"><value>Permanent PIN</value></data>
   <data name="Ui_Personalization.Text" xml:space="preserve"><value>Personalization</value></data>
+  <data name="Ui_PinActions.Description" xml:space="preserve"><value>Changes take effect after saving.</value></data>
+  <data name="Ui_PinActions.Header" xml:space="preserve"><value>Saving PIN codes</value></data>
   <data name="Ui_Play.Content" xml:space="preserve"><value>Play</value></data>
   <data name="Ui_PlayAll.Content" xml:space="preserve"><value>▶ Play all</value></data>
   <data name="Ui_PlayAll_36.Text" xml:space="preserve"><value>Play all</value></data>

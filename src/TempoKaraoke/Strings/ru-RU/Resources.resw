@@ -326,7 +326,7 @@
   <data name="Ui_AZ_28.Text" xml:space="preserve"><value>А–Я</value></data>
   <data name="Ui_AZ_40.Content" xml:space="preserve"><value>А–Я</value></data>
   <data name="Ui_AZ_46.Content" xml:space="preserve"><value>А–Я</value></data>
-  <data name="Ui_AccessPins.Description" xml:space="preserve"><value>Задайте постоянный PIN для ведущего и администратора. Без него для каждой сессии пульта создаётся случайный PIN.</value></data>
+  <data name="Ui_AccessPins.Description" xml:space="preserve"><value>Постоянные коды вместо случайных для каждой сессии пульта.</value></data>
   <data name="Ui_AccessPins.Header" xml:space="preserve"><value>PIN-коды доступа</value></data>
   <data name="Ui_AddASongFromTheLibraryOrFilesFromDisk.Text" xml:space="preserve"><value>Добавьте песню из библиотеки или файлы с диска.</value></data>
   <data name="Ui_AddAllToQueue.Text" xml:space="preserve"><value>Добавить все в очередь</value></data>
@@ -350,9 +350,12 @@
   <data name="Ui_AddVideoFolder_AutomationName.AutomationName" xml:space="preserve"><value>Добавить папку с видео</value></data>
   <data name="Ui_AddVideosOrImportM3U.Text" xml:space="preserve"><value>Добавьте видео или импортируйте M3U.</value></data>
   <data name="Ui_AdminPINHint.Text" xml:space="preserve"><value>Для изменения лимитов, таймера и правил вечеринки без остановки воспроизведения.</value></data>
+  <data name="Ui_AdminPin.Description" xml:space="preserve"><value>Полный доступ ведущего плюс управление настройками программы.</value></data>
   <data name="Ui_AdminPin.Header" xml:space="preserve"><value>PIN администратора</value></data>
   <data name="Ui_AdminPinCaption.Text" xml:space="preserve"><value>PIN администратора</value></data>
   <data name="Ui_AdminPinConfirm.Header" xml:space="preserve"><value>Повторите PIN администратора</value></data>
+  <data name="Ui_AdminPinConfirm_Placeholder.PlaceholderText" xml:space="preserve"><value>Повторите PIN</value></data>
+  <data name="Ui_AdminPin_Placeholder.PlaceholderText" xml:space="preserve"><value>Введите PIN</value></data>
   <data name="Ui_AllVideos.Text" xml:space="preserve"><value>Все видео</value></data>
   <data name="Ui_BackToFolders_AutomationName.AutomationName" xml:space="preserve"><value>Назад к папкам</value></data>
   <data name="Ui_BackToFolders_ToolTip.ToolTip" xml:space="preserve"><value>Назад</value></data>
@@ -415,9 +418,12 @@
   <data name="Ui_FullScreen_AutomationName.AutomationName" xml:space="preserve"><value>Полный экран</value></data>
   <data name="Ui_FullScreen_ToolTip.ToolTip" xml:space="preserve"><value>Полный экран</value></data>
   <data name="Ui_Guest.Text" xml:space="preserve"><value>Гость</value></data>
+  <data name="Ui_HostPin.Description" xml:space="preserve"><value>Доступ к управлению плеером, очередью и заявками гостей.</value></data>
   <data name="Ui_HostPin.Header" xml:space="preserve"><value>PIN ведущего</value></data>
   <data name="Ui_HostPinCaption.Text" xml:space="preserve"><value>PIN ведущего</value></data>
   <data name="Ui_HostPinConfirm.Header" xml:space="preserve"><value>Повторите PIN ведущего</value></data>
+  <data name="Ui_HostPinConfirm_Placeholder.PlaceholderText" xml:space="preserve"><value>Повторите PIN</value></data>
+  <data name="Ui_HostPin_Placeholder.PlaceholderText" xml:space="preserve"><value>Введите PIN</value></data>
   <data name="Ui_IfThePageDoesNotOpenCheckThatThePhoneIsC.Text" xml:space="preserve"><value>Если страница не открывается, проверьте, подключён ли телефон к той же сети.</value></data>
   <data name="Ui_ImportM3U.Text" xml:space="preserve"><value>Импорт M3U</value></data>
   <data name="Ui_Interface.Text" xml:space="preserve"><value>Интерфейс</value></data>
@@ -469,6 +475,8 @@
   <data name="Ui_PersistentPin.OffContent" xml:space="preserve"><value>Случайный PIN</value></data>
   <data name="Ui_PersistentPin.OnContent" xml:space="preserve"><value>Постоянный PIN</value></data>
   <data name="Ui_Personalization.Text" xml:space="preserve"><value>Персонализация</value></data>
+  <data name="Ui_PinActions.Description" xml:space="preserve"><value>Изменения вступают в силу после сохранения.</value></data>
+  <data name="Ui_PinActions.Header" xml:space="preserve"><value>Сохранение PIN-кодов</value></data>
   <data name="Ui_Play.Content" xml:space="preserve"><value>Играть</value></data>
   <data name="Ui_PlayAll.Content" xml:space="preserve"><value>▶ Воспроизвести все</value></data>
   <data name="Ui_PlayAll_36.Text" xml:space="preserve"><value>Воспроизвести все</value></data>
