@@ -276,6 +276,8 @@
   <data name="Settings_PathsTitle.Description" xml:space="preserve"><value>Only video files are indexed. Music is not indexed.</value></data>
   <data name="Settings_PathsTitle.Header" xml:space="preserve"><value>Video library paths</value></data>
   <data name="Settings_RefreshTitle.Text" xml:space="preserve"><value>Refresh libraries</value></data>
+  <data name="Settings_ResetWindow.Content" xml:space="preserve"><value>Reset window placement</value></data>
+  <data name="Settings_ResetWindow_Done" xml:space="preserve"><value>Window placement reset.</value></data>
   <data name="Settings_Updates.Text" xml:space="preserve"><value>Updates</value></data>
   <data name="Settings_UpdatesAuto.Description" xml:space="preserve"><value>The app asks GitHub for the latest release once per launch. Installation starts only after your confirmation.</value></data>
   <data name="Settings_UpdatesAuto.Header" xml:space="preserve"><value>Check for updates at startup</value></data>
@@ -287,8 +289,11 @@
   <data name="Settings_UpdatesCheckButton.Content" xml:space="preserve"><value>Check for updates</value></data>
   <data name="Settings_UpdatesInstallButton.Content" xml:space="preserve"><value>Update to v{0}</value></data>
   <data name="Settings_UpdatesNotes.Content" xml:space="preserve"><value>What's new</value></data>
+  <data name="Settings_WindowPlacement.Description" xml:space="preserve"><value>If the window opens off-center or off-screen, return it to the default size and position.</value></data>
+  <data name="Settings_WindowPlacement.Header" xml:space="preserve"><value>Window placement</value></data>
   <data name="Sort_AZ" xml:space="preserve"><value>A–Z</value></data>
   <data name="Sort_Date" xml:space="preserve"><value>Date modified</value></data>
+  <data name="Startup_Loading" xml:space="preserve"><value>Loading…</value></data>
   <data name="Ui_0Songs.Text" xml:space="preserve"><value>0 songs</value></data>
   <data name="Ui_0Songs_54.Text" xml:space="preserve"><value>0 songs</value></data>
   <data name="Ui_10Seconds.Text" xml:space="preserve"><value>−10 seconds</value></data>
@@ -320,9 +325,9 @@
   <data name="Ui_AddVideoFolder_130_AutomationName.AutomationName" xml:space="preserve"><value>Add video folder</value></data>
   <data name="Ui_AddVideoFolder_AutomationName.AutomationName" xml:space="preserve"><value>Add video folder</value></data>
   <data name="Ui_AddVideosOrImportM3U.Text" xml:space="preserve"><value>Add videos or import M3U.</value></data>
-  <data name="Ui_AdminPIN.Text" xml:space="preserve"><value>Administrator PIN</value></data>
   <data name="Ui_AdminPINHint.Text" xml:space="preserve"><value>For changing limits, countdown and party rules without interrupting playback.</value></data>
   <data name="Ui_AdminPin.Header" xml:space="preserve"><value>Administrator PIN</value></data>
+  <data name="Ui_AdminPinCaption.Text" xml:space="preserve"><value>Administrator PIN</value></data>
   <data name="Ui_AdminPinConfirm.Header" xml:space="preserve"><value>Repeat administrator PIN</value></data>
   <data name="Ui_AllVideos.Text" xml:space="preserve"><value>All videos</value></data>
   <data name="Ui_BackToFolders_AutomationName.AutomationName" xml:space="preserve"><value>Back to folders</value></data>
@@ -386,8 +391,8 @@
   <data name="Ui_FullScreen_AutomationName.AutomationName" xml:space="preserve"><value>Full screen</value></data>
   <data name="Ui_FullScreen_ToolTip.ToolTip" xml:space="preserve"><value>Full screen</value></data>
   <data name="Ui_Guest.Text" xml:space="preserve"><value>Guest</value></data>
-  <data name="Ui_HostPIN.Text" xml:space="preserve"><value>Host PIN</value></data>
   <data name="Ui_HostPin.Header" xml:space="preserve"><value>Host PIN</value></data>
+  <data name="Ui_HostPinCaption.Text" xml:space="preserve"><value>Host PIN</value></data>
   <data name="Ui_HostPinConfirm.Header" xml:space="preserve"><value>Repeat host PIN</value></data>
   <data name="Ui_IfThePageDoesNotOpenCheckThatThePhoneIsC.Text" xml:space="preserve"><value>If the page does not open, check that the device is connected to the same Wi-Fi network.</value></data>
   <data name="Ui_ImportM3U.Text" xml:space="preserve"><value>Import M3U</value></data>

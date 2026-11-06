@@ -174,23 +174,7 @@ public sealed partial class MainPage : Page, IRemoteHost
         LibrarySelector.SelectedItem = AllVideosTab;
         _suppressLibrarySelection = false;
 
-        foreach (var playlist in PlaylistService.Load())
-        {
-            if (playlist.Name.Contains("плейлись", StringComparison.CurrentCultureIgnoreCase))
-            {
-                playlist.Name = playlist.Name.Replace(
-                    "плейлись",
-                    "плейлист",
-                    StringComparison.CurrentCultureIgnoreCase);
-            }
-
-            Playlists.Add(playlist);
-        }
-
-        PlaylistService.Save(Playlists);
-
-        Playlists.CollectionChanged += Playlists_CollectionChanged;
-        RebuildPlaylistsNav();
+        StartupTrace.Mark("MainPage ctor");
 
         _player = new PlayerService(Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread());
         _player.StateChanged += (_, _) =>
@@ -221,14 +205,75 @@ public sealed partial class MainPage : Page, IRemoteHost
         Unloaded += OnPageUnloaded;
         NetworkInformation.NetworkStatusChanged += OnNetworkStatusChanged;
         InitializeSettings();
-        RestoreQueue();
-        Queue.CollectionChanged += (_, _) => SaveQueue();
-        RestoreRecent();
-        Recent.CollectionChanged += (_, _) => UpdateRecentEmpty();
         NavView.PaneOpened += (_, _) => UpdateHeader();
         NavView.PaneClosed += (_, _) => UpdateHeader();
         ShowLibrary();
-        RefreshRemoteClients();
+        StartupTrace.Mark("MainPage ctor done");
+    }
+
+    /// <summary>
+    /// Всё, что читает диск и сеть, выполняется после первого кадра: пользователь
+    /// уже видит интерфейс, а не чёрное окно. Ошибки не должны ломать запуск.
+    /// </summary>
+    private void InitializeAfterFirstRender()
+    {
+        StartupTrace.Mark("Deferred init start");
+
+        try
+        {
+            var loaded = PlaylistService.Load();
+            foreach (var playlist in loaded)
+            {
+                if (playlist.Name.Contains("плейлись", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    playlist.Name = playlist.Name.Replace(
+                        "плейлись",
+                        "плейлист",
+                        StringComparison.CurrentCultureIgnoreCase);
+                }
+
+                Playlists.Add(playlist);
+            }
+
+            PlaylistService.Save(Playlists);
+            Playlists.CollectionChanged += Playlists_CollectionChanged;
+            RebuildPlaylistsNav();
+        }
+        catch (Exception ex)
+        {
+            LogService.Crash(ex, "Не удалось загрузить плейлисты при старте.");
+        }
+
+        try
+        {
+            RestoreQueue();
+            Queue.CollectionChanged += (_, _) => SaveQueue();
+        }
+        catch (Exception ex)
+        {
+            LogService.Crash(ex, "Не удалось восстановить очередь при старте.");
+        }
+
+        try
+        {
+            RestoreRecent();
+            Recent.CollectionChanged += (_, _) => UpdateRecentEmpty();
+        }
+        catch (Exception ex)
+        {
+            LogService.Crash(ex, "Не удалось восстановить недавние при старте.");
+        }
+
+        try
+        {
+            RefreshRemoteClients();
+        }
+        catch (Exception ex)
+        {
+            LogService.Crash(ex, "Не удалось обновить список устройств пульта.");
+        }
+
+        StartupTrace.Mark("Deferred init done");
     }
 
     private void NavView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
@@ -2863,6 +2908,19 @@ public sealed partial class MainPage : Page, IRemoteHost
         {
             _ = CheckForUpdatesAsync(userInitiated: false);
         }
+
+        StartupTrace.Mark("MainPage loaded");
+
+        // Даём UI отрисовать первый кадр, затем догружаем плейлисты/очередь/пульт.
+        Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread().TryEnqueue(
+            Microsoft.UI.Dispatching.DispatcherQueuePriority.Low,
+            () =>
+            {
+                StartupTrace.Mark("First render");
+                InitializeAfterFirstRender();
+                StartupTrace.Mark("UI interactive");
+                StartupTrace.DumpTimeline();
+            });
     }
 
     private void OnNetworkStatusChanged(object sender)
@@ -7327,6 +7385,20 @@ public sealed partial class MainPage : Page, IRemoteHost
         {
             _isCheckingUpdates = false;
             CheckUpdatesButton.IsEnabled = true;
+        }
+    }
+
+    private void ResetWindowPlacement_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            (App.Window as MainWindow)?.ResetPlacement();
+            BarSubtitle.Text = LocalizationService.Get("Settings_ResetWindow_Done");
+            LogService.Info("Положение окна сброшено пользователем.");
+        }
+        catch (Exception ex)
+        {
+            LogService.Crash(ex, "Не удалось сбросить положение окна.");
         }
     }
 

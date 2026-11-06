@@ -14,9 +14,19 @@ public static class Program
     [STAThread]
     public static int Main(string[] args)
     {
+        StartupTrace.Mark("ProcessStart");
+
         if (Array.Exists(args, arg => string.Equals(arg, "--wifi-direct-helper", StringComparison.OrdinalIgnoreCase)))
         {
             return WiFiDirectHelperRuntime.Run(args);
+        }
+
+        StartupTrace.ResetWindowRequested = Array.Exists(
+            args,
+            arg => string.Equals(arg, "--reset-window", StringComparison.OrdinalIgnoreCase));
+        if (StartupTrace.ResetWindowRequested)
+        {
+            LogService.Startup("[window] --reset-window requested");
         }
 
         if (!AppInfo.IsPackaged)

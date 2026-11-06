@@ -66,6 +66,13 @@ public static class LogService
     public static void Info(string message, string category = "app") =>
         Write("INFO", message, null, always: false, category: category);
 
+    /// <summary>
+    /// Строка диагностики запуска: пишется даже при выключенном ведении логов,
+    /// чтобы по логу можно было разобрать медленный старт и размещение окна.
+    /// </summary>
+    public static void Startup(string message) =>
+        Write("INFO", message, null, always: true, category: "startup");
+
     public static void Warn(string message, string category = "app") =>
         Write("WARN", message, null, always: false, category: category);
 

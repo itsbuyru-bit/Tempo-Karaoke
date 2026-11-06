@@ -311,8 +311,17 @@ public sealed class LocalizationService : DependencyObject
 
     public static void RegisterXamlElement(DependencyObject element)
     {
-        Register(element);
-        ApplyElement(element);
+        try
+        {
+            Register(element);
+            ApplyElement(element);
+        }
+        catch (Exception ex)
+        {
+            // Ошибка локализации не должна ломать загрузку XAML: элемент просто
+            // останется с текстом из разметки, а причина попадёт в лог.
+            LogService.Crash(ex, "Localization.ApplyElement");
+        }
     }
 
     private static void Register(DependencyObject element)

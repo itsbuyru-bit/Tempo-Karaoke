@@ -10,6 +10,7 @@
 * Стек: **WinUI 3 (Windows App SDK, .NET) + LibVLCSharp + SQLite**
 * Архитектура и UX: [`docs/UX-DECISIONS.md`](docs/UX-DECISIONS.md)
 * Сборка и упаковка: [`docs/PACKAGING.md`](docs/PACKAGING.md)
+* Окно, DPI и запуск: [`docs/WINDOW-PLACEMENT.md`](docs/WINDOW-PLACEMENT.md)
 * Что нового: [`CHANGELOG.md`](CHANGELOG.md)
 * Руководство по переводу: [`LOCALIZATION_GUIDE.md`](LOCALIZATION_GUIDE.md)
 

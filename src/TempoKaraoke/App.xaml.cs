@@ -90,6 +90,7 @@ public partial class App : Application
         };
 
         Services.LogService.Info("Приложение запущено.");
+        Services.StartupTrace.Mark("App ctor done");
     }
 
     /// <summary>
@@ -98,9 +99,11 @@ public partial class App : Application
     /// <param name="args">Details about the launch request and process.</param>
     protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
     {
+        Services.StartupTrace.Mark("OnLaunched");
         Window = new MainWindow();
         DispatcherQueue = Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
         Window.Activate();
+        Services.StartupTrace.Mark("Window activated");
     }
 
     private static void ActivateExistingWindow()

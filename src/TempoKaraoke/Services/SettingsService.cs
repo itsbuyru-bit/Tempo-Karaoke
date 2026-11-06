@@ -51,6 +51,9 @@ public sealed class SettingsData
     /// <summary>Проверять обновления при запуске (портативная сборка).</summary>
     public bool CheckUpdatesOnStartup { get; set; } = true;
 
+    /// <summary>Положение и размер главного окна (в DIP, относительно рабочей области).</summary>
+    public WindowPlacementData Window { get; set; } = new();
+
     /// <summary>Эквалайзер включён.</summary>
     public bool EqualizerEnabled { get; set; }
 
@@ -220,6 +223,26 @@ public static class SettingsService
     {
         get => Data.CheckUpdatesOnStartup;
         set => Update(data => data.CheckUpdatesOnStartup = value);
+    }
+
+    /// <summary>Копия сохранённого положения окна (менять её можно свободно).</summary>
+    public static WindowPlacementData GetWindowPlacement() => Data.Window?.Clone() ?? new WindowPlacementData();
+
+    public static void SaveWindowPlacement(WindowPlacementData placement)
+    {
+        if (placement is null)
+        {
+            return;
+        }
+
+        var copy = placement.Clone();
+        Update(data => data.Window = copy);
+    }
+
+    /// <summary>Сбрасывает положение окна: следующий запуск откроет окно по центру.</summary>
+    public static void ResetWindowPlacement()
+    {
+        Update(data => data.Window = new WindowPlacementData());
     }
 
     public static bool EqualizerEnabled

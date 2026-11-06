@@ -2054,7 +2054,7 @@
                                                             Glyph="&#xE72E;"
                                                             VerticalAlignment="Center" />
                                                         <TextBlock
- Style="{StaticResource BodyStrongTextBlockStyle}" x:Uid="Ui_HostPIN" loc:Localization.Key="Ui_HostPIN.Text" />
+ Style="{StaticResource BodyStrongTextBlockStyle}" x:Uid="Ui_HostPinCaption" loc:Localization.Key="Ui_HostPinCaption.Text" />
                                                     </StackPanel>
                                                     <TextBlock
                                                         x:Name="RemotePinValue"
@@ -2083,7 +2083,7 @@
                                                             Glyph="&#xE7EF;"
                                                             VerticalAlignment="Center" />
                                                         <TextBlock
- Style="{StaticResource BodyStrongTextBlockStyle}" x:Uid="Ui_AdminPIN" loc:Localization.Key="Ui_AdminPIN.Text" />
+ Style="{StaticResource BodyStrongTextBlockStyle}" x:Uid="Ui_AdminPinCaption" loc:Localization.Key="Ui_AdminPinCaption.Text" />
                                                     </StackPanel>
                                                     <TextBlock
                                                         x:Name="RemoteAdminPinValue"
@@ -2584,6 +2584,19 @@
                                 <ComboBoxItem Tag="light" x:Uid="Ui_Light" loc:Localization.Key="Ui_Light.Content" />
                                 <ComboBoxItem Tag="dark" x:Uid="Ui_Dark" loc:Localization.Key="Ui_Dark.Content" />
                             </ComboBox>
+                        </toolkit:SettingsCard>
+
+                        <toolkit:SettingsCard
+ x:Uid="Settings_WindowPlacement" loc:Localization.Key="Settings_WindowPlacement.Description" loc:Localization.SecondaryKey="Settings_WindowPlacement.Header">
+                            <toolkit:SettingsCard.HeaderIcon>
+                                <FontIcon Glyph="&#xE737;" />
+                            </toolkit:SettingsCard.HeaderIcon>
+                            <Button
+ x:Name="ResetWindowPlacementButton"
+ AutomationProperties.AutomationId="ResetWindowPlacementButton"
+ Click="ResetWindowPlacement_Click"
+ x:Uid="Settings_ResetWindow"
+ loc:Localization.Key="Settings_ResetWindow.Content" />
                         </toolkit:SettingsCard>
 
                         <TextBlock
