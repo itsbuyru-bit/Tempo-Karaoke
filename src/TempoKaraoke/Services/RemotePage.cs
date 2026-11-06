@@ -22,7 +22,7 @@ body{background:var(--bg);color:var(--text);font:16px/1.4 -apple-system,BlinkMac
 .app{width:100%;max-width:520px;display:flex;flex-direction:column;gap:14px;padding-bottom:24px}
 header{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:4px 2px 10px;border-bottom:1px solid var(--border)}
 .brand{display:flex;align-items:center;gap:8px;font-weight:800;font-size:1.15rem;min-width:0}
-.brand span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.brand span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
 .brand-icon{width:34px;height:34px;border-radius:9px;object-fit:contain;display:block;flex:0 0 auto}
 .header-tools{display:flex;align-items:center;gap:6px;flex:0 0 auto}
 .lang-select{height:40px;padding:0 8px;border:1px solid var(--border);border-radius:10px;background:var(--card);color:var(--text);font:inherit;font-size:.74rem;font-weight:800;letter-spacing:.5px;cursor:pointer;outline:none}
@@ -54,7 +54,7 @@ header{display:flex;justify-content:space-between;align-items:center;gap:8px;pad
 .notification-badge{position:absolute;top:-5px;right:-5px;min-width:18px;height:18px;padding:0 4px;border-radius:9px;background:var(--primary);color:#fff;font:800 .64rem/18px inherit;text-align:center;box-shadow:0 0 0 2px var(--bg);animation:notifyPulse 1.8s ease-in-out infinite}
 .notification-badge[hidden]{display:none}
 @keyframes notifyPulse{0%,100%{box-shadow:0 0 0 2px var(--bg),0 0 0 0 rgba(0,163,255,.55)}50%{box-shadow:0 0 0 2px var(--bg),0 0 0 7px rgba(0,163,255,0)}}
-@media (max-width:430px){.brand span{display:none}.host-badge-btn{padding:6px 8px}.role-text{max-width:140px}.lang-select{padding:0 5px}.header-tools{gap:4px}}
+@media (max-width:430px){.brand{font-size:1rem;gap:6px}.brand span{display:block;white-space:normal;line-height:1.05;max-width:118px}.host-badge-btn{padding:6px 8px}.role-text{max-width:140px}.lang-select{padding:0 5px}.header-tools{gap:4px}}
 .player{background:linear-gradient(180deg,var(--surface),var(--card));border:1px solid var(--border);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:12px;box-shadow:0 8px 24px rgba(0,0,0,.35)}
 .player-top{display:flex;justify-content:space-between;align-items:center}
 .status{font-size:.72rem;text-transform:uppercase;font-weight:700;letter-spacing:.8px;color:var(--primary);display:flex;align-items:center;gap:6px}
@@ -236,7 +236,7 @@ input,textarea{user-select:text;font-size:16px}
 <body>
 <div class="app">
   <header>
-    <div class="brand"><img class="brand-icon" src="/appicon.png" alt="Tempo Karaoke"><span>TempoKaraoke</span></div>
+    <div class="brand"><img class="brand-icon" src="/appicon.png" alt="Tempo Karaoke"><span>Tempo Karaoke</span></div>
     <div class="header-tools">
       <select class="lang-select" id="langSelect" onchange="changeLanguage(this.value)" aria-label="Language"></select>
       <button class="icon-btn requests-btn" id="requestsToggleBtn" type="button" title="Song requests" aria-label="Song requests" onclick="openRequests(event)">
