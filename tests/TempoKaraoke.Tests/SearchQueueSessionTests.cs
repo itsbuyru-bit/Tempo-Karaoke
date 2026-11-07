@@ -46,11 +46,29 @@ public sealed class SearchSessionTests
     public void SearchAllReturnsUnboundedResults()
     {
         var session = new SearchSession();
-        session.SetItems(Enumerable.Range(0, 12).Select(i => Item($"Песня {i}")).ToList());
+        session.SetItems(Enumerable.Range(0, 12).Select(i => Item($"Трек {i}")).ToList());
 
-        var results = session.SearchAll("Песня");
+        var results = session.SearchAll("Трек");
 
         Assert.Equal(12, results.Count);
+    }
+
+    [Fact]
+    public void GroupsDuplicateVersionsBeforeApplyingTheLimit()
+    {
+        var session = new SearchSession();
+        session.SetItems(new[]
+        {
+            new MediaItem(@"G:\Karaoke\A\Конь.mkv", "Любэ", "Конь", "A"),
+            new MediaItem(@"G:\Karaoke\B\Конь.mp4", "Любэ", "Конь", "B"),
+            new MediaItem(@"G:\Karaoke\A\Другая.mkv", "Любэ", "Другая", "A"),
+        });
+
+        var page = session.Search("Конь", limit: 1, groupResults: true);
+
+        Assert.Single(page.Items);
+        Assert.Equal(1, page.TotalCount);
+        Assert.Equal("Конь", page.Items[0].Title);
     }
 
     [Fact]

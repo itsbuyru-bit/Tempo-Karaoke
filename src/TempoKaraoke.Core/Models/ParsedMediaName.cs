@@ -19,6 +19,15 @@ public sealed record ParsedMediaName
         NeedsAttention = true,
     };
 
+    /// <summary>Исходное имя файла без расширения, до очистки.</summary>
+    public string RawName { get; init; } = string.Empty;
+
+    /// <summary>Номер трека, если он был найден в начале или середине имени.</summary>
+    public int? TrackNumber { get; init; }
+
+    /// <summary>Год из скобок; в поисковые токены не входит.</summary>
+    public int? Year { get; init; }
+
     /// <summary>Исполнитель как в имени файла. Пусто, если его нет.</summary>
     public string Artist { get; init; } = string.Empty;
 

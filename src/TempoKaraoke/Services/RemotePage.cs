@@ -25,7 +25,7 @@ header{display:flex;justify-content:space-between;align-items:center;gap:8px;pad
 .brand span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
 .brand-icon{width:34px;height:34px;border-radius:9px;object-fit:contain;display:block;flex:0 0 auto}
 .header-tools{display:flex;align-items:center;gap:6px;flex:0 0 auto}
-.lang-select{height:40px;padding:0 8px;border:1px solid var(--border);border-radius:10px;background:var(--card);color:var(--text);font:inherit;font-size:.74rem;font-weight:800;letter-spacing:.5px;cursor:pointer;outline:none}
+.lang-select{height:40px;width:66px;padding:0 6px;border:1px solid var(--border);border-radius:10px;background:var(--card);color:var(--text);font:inherit;font-size:.74rem;font-weight:800;letter-spacing:.5px;text-align:center;cursor:pointer;outline:none}
 .role{display:flex;align-items:center;gap:6px;min-height:40px;padding:6px 12px;border-radius:999px;font-size:.8rem;font-weight:600;background:var(--card);border:1px solid var(--border);color:var(--muted);cursor:pointer}
 .role.host{display:flex;flex-direction:row;align-items:center;background:rgba(245,158,11,.14);border-color:rgba(245,158,11,.5);color:#fbbf24}
 .role-text{max-width:138px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -100,6 +100,11 @@ header{display:flex;justify-content:space-between;align-items:center;gap:8px;pad
 .clear{position:absolute;right:5px;top:50%;transform:translateY(-50%);width:32px;height:32px;border:0;border-radius:8px;background:transparent;color:var(--muted);display:none;font-size:.9rem}
 .clear.visible{display:grid;place-items:center}
 .clear:active{background:var(--border)}
+.search-suggest{position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:30;display:flex;flex-direction:column;overflow:hidden;background:var(--surface);border:1px solid var(--border);border-radius:10px;box-shadow:0 12px 32px rgba(0,0,0,.35)}
+.search-suggest[hidden]{display:none}
+.search-suggest button{display:block;width:100%;padding:10px 12px;border:0;border-bottom:1px solid var(--border);background:transparent;color:var(--text);font:inherit;font-size:.9rem;text-align:left;cursor:pointer}
+.search-suggest button:last-child{border-bottom:0}
+.search-suggest button:active{background:var(--border)}
 input[type="search"]::-webkit-search-cancel-button,
 input[type="search"]::-webkit-search-decoration{-webkit-appearance:none;appearance:none;display:none}
 input,textarea{user-select:text;font-size:16px}
@@ -146,19 +151,17 @@ input,textarea{user-select:text;font-size:16px}
 .delete.info{margin:0;padding:0;line-height:1;display:inline-flex;align-items:center;justify-content:center;color:var(--primary)}
 .quick-play{width:30px;height:30px;min-width:30px;padding:0;border:1px solid rgba(56,189,248,.45);border-radius:50%;background:rgba(56,189,248,.1);color:var(--primary);font-size:.72rem;display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;cursor:pointer}
 .quick-play:active{background:var(--primary);color:#071018}
-.catalog-actions{display:flex;align-items:center;gap:6px;flex:0 0 auto}
-.item.catalog-card{align-items:center;gap:10px;padding:11px 12px}
-.catalog-card .info{flex:1;min-width:0}
-.catalog-card .name{font-weight:700}
-.catalog-card .sub{gap:6px}
-.catalog-play{width:40px;height:40px;min-width:40px;border-radius:8px;border:1px solid rgba(0,163,255,.5);background:rgba(0,163,255,.12);color:var(--primary);font-size:1rem;display:inline-flex;align-items:center;justify-content:center;cursor:pointer}
-.catalog-play:active{background:var(--primary);color:#06121c}
-.catalog-add{min-height:40px;padding:0 12px;border-radius:8px;border:1px solid rgba(0,163,255,.45);background:rgba(0,163,255,.12);color:var(--primary);font:inherit;font-size:.78rem;font-weight:800;cursor:pointer;white-space:nowrap}
-.catalog-add:active,.catalog-add.added{background:var(--primary);color:#06121c}
-.catalog-next{width:96px;height:40px;min-width:96px;padding:0 6px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--muted);font-size:.72rem;font-weight:800;line-height:1.1;text-align:center;white-space:normal;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden}
-.catalog-next:active{color:var(--primary);border-color:var(--primary)}
+.catalog-actions{display:flex;align-items:center;gap:4px;flex:0 0 auto}
+.item.catalog-card{align-items:center;gap:8px;padding:10px 11px}
+.catalog-card .info{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.catalog-card .name{font-weight:700;white-space:normal;overflow-wrap:anywhere;word-break:break-word;line-height:1.25}
+.catalog-card .sub{display:flex;align-items:center;gap:6px;min-width:0;white-space:nowrap;overflow:hidden}
+.catalog-card .sub .artist{min-width:0;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.catalog-card .sub .duration{flex:0 0 auto}
+.catalog-play,.catalog-add,.catalog-next{width:34px;height:34px;min-width:34px;padding:0;border-radius:8px;border:1px solid rgba(0,163,255,.45);background:rgba(0,163,255,.12);color:var(--primary);font:inherit;font-size:1rem;font-weight:800;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;flex:0 0 auto}
+.catalog-play:active,.catalog-add:active,.catalog-next:active,.catalog-add.added{background:var(--primary);color:#06121c}
 .catalog-next.btn-success{background:rgba(34,197,94,.15);border-color:rgba(34,197,94,.55);color:#4ade80;cursor:default}
-@media (max-width:390px){.catalog-add{max-width:84px;padding:0 7px;font-size:.7rem}.catalog-play{width:36px;min-width:36px;height:38px}.catalog-next{width:88px;min-width:88px;height:38px;font-size:.66rem}}
+@media (max-width:390px){.catalog-card{padding:9px;gap:6px}.catalog-card .name{font-size:.88rem}.catalog-play,.catalog-add,.catalog-next{width:32px;height:32px;min-width:32px;font-size:.92rem}}
 .add.play-now{color:var(--text);border-color:rgba(56,189,248,.5);background:rgba(56,189,248,.12)}
 .order{display:flex;flex-direction:column;gap:2px}
 .arrow{width:24px;height:18px;border:1px solid var(--border);border-radius:5px;background:var(--card);color:var(--muted);font-size:.65rem;display:grid;place-items:center}
@@ -220,6 +223,9 @@ input,textarea{user-select:text;font-size:16px}
 .request-clear-archive:active{background:rgba(239,68,68,.14)}
 .request-reject:active{background:rgba(239,68,68,.15);color:#fca5a5}.playlist-box{background:var(--surface);border:1px solid var(--border);border-radius:22px;width:100%;max-width:380px;max-height:80vh;padding:22px;display:flex;flex-direction:column;gap:12px;box-shadow:0 16px 40px rgba(0,0,0,.6)}
 .playlist-list{display:flex;flex-direction:column;gap:8px;overflow-y:auto;min-height:60px}
+.playlist-loading{display:flex;align-items:center;gap:10px;padding:14px 12px;border:1px solid var(--border);border-radius:12px;background:var(--card);color:var(--muted);font-size:.84rem}
+.playlist-loading i{width:18px;height:18px;border:2px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:playlist-spin .8s linear infinite}
+@keyframes playlist-spin{to{transform:rotate(360deg)}}
 .playlist-row{display:flex;align-items:center;gap:10px;padding:11px 12px;border:1px solid var(--border);border-radius:12px;background:var(--card)}
 .playlist-row .info{flex:1;min-width:0}
 .playlist-row .add{min-height:34px;padding:6px 10px}
@@ -308,6 +314,7 @@ input,textarea{user-select:text;font-size:16px}
     <span class="search-icon">⌕</span>
     <input class="search" id="search" type="search" placeholder="Song or artist" data-i18n-placeholder="search_placeholder" oninput="searchChanged()">
     <button class="clear" id="clearSearch" onclick="clearSearch()" aria-label="Clear search">✕</button>
+    <div class="search-suggest" id="searchSuggest" hidden></div>
   </div>
 
   <div class="list" id="list"></div>
@@ -495,6 +502,7 @@ const FALLBACK_MESSAGES = {
   "search_clear": "Clear search",
   "search_failed": "Search failed.",
   "search_empty": "Nothing found.",
+  "search_clarify": "Please refine your search: enter a song title or artist name",
   "catalog_prompt": "Enter a song title or artist.",
   "catalog_play_now": "▶ Play now",
   "empty_queue": "The queue is empty. Open the catalog and add a song.",
@@ -512,6 +520,7 @@ const FALLBACK_MESSAGES = {
   "playlists_title": "My playlists",
   "playlists_sub": "Add a playlist to the queue",
   "playlists_empty": "No playlists yet.",
+  "playlists_loading": "Loading playlists…",
   "playlists_error": "Could not load playlists.",
   "playlist_tracks_one": "{count} track",
   "playlist_tracks_few": "{count} tracks",
@@ -595,13 +604,19 @@ function populateLanguageSelectors() {
     languageOptions.forEach(option => {
       const element = document.createElement('option');
       element.value = option.tag;
-      element.textContent = option.nativeName;
+      element.textContent = languageCode(option.tag);
+      element.title = option.nativeName;
       select.appendChild(element);
     });
     select.value = previous && languageOptions.some(option => option.tag === previous)
       ? previous
       : language;
   });
+}
+
+function languageCode(tag) {
+  const primary = String(tag || '').split('-')[0].trim();
+  return (primary || String(tag || '')).toUpperCase();
 }
 
 async function fetchCatalog(tag) {
@@ -770,6 +785,7 @@ function apply(data) {
   if (!canControl && !canAdmin) closeProfileMenu();
   $('hostControls').classList.toggle('visible', canControl);
   $('hostQueueTools').classList.toggle('visible', canControl);
+  if (canControl) preloadPlaylists();
   $('guestNote').style.display = canControl ? 'none' : 'block';
   if (canControl || canAdmin) refreshRequestBadge();
   else {
@@ -924,8 +940,15 @@ async function renderCatalog(list) {
   }
 
   let results = [];
+  let needsClarification = false;
   try {
-    results = await api('/api/search?q=' + encodeURIComponent(query));
+    const payload = await api('/api/search?q=' + encodeURIComponent(query));
+    if (Array.isArray(payload)) {
+      results = payload;
+    } else {
+      results = payload.items || [];
+      needsClarification = payload.needsClarification === true;
+    }
   } catch {
     const error = document.createElement('div');
     error.className = 'empty';
@@ -937,7 +960,7 @@ async function renderCatalog(list) {
   if (!results.length) {
     const empty = document.createElement('div');
     empty.className = 'empty';
-    empty.textContent = t('search_empty');
+    empty.textContent = needsClarification ? t('search_clarify') : t('search_empty');
     list.append(empty);
     return;
   }
@@ -953,8 +976,10 @@ async function renderCatalog(list) {
     const sub = document.createElement('div');
     sub.className = 'sub';
     const artist = document.createElement('span');
+    artist.className = 'artist';
     artist.textContent = item.artist || '';
     const duration = document.createElement('span');
+    duration.className = 'duration';
     duration.textContent = item.duration || '';
     sub.append(artist, duration);
     info.append(name, sub);
@@ -973,7 +998,9 @@ async function renderCatalog(list) {
     const add = document.createElement('button');
     add.className = 'catalog-add';
     add.type = 'button';
-    add.textContent = t('btn_add_to_queue');
+    add.textContent = '+';
+    add.title = t('btn_add_to_queue');
+    add.setAttribute('aria-label', t('btn_add_to_queue'));
     add.onclick = () => enqueue(item.path, add);
     actions.append(add);
     const ask = document.createElement('button');
@@ -1004,11 +1031,11 @@ async function enqueue(path, button) {
     if (button) {
       button.disabled = true;
       button.classList.add('added');
-      button.textContent = '✓ ' + t('btn_added');
+      button.textContent = '✓';
       setTimeout(() => {
         button.disabled = false;
         button.classList.remove('added');
-        button.textContent = t('btn_add_to_queue');
+        button.textContent = '+';
       }, 2000);
     }
     const count = $('queueCount');
@@ -1429,44 +1456,96 @@ async function confirmClearQueue() {
 
 async function openPlaylists() {
   if (!canControl) return;
-  $('playlistList').replaceChildren();
+  const list = $('playlistList');
+  list.replaceChildren();
   $('playlistsModal').classList.add('active');
-  try {
-    const playlists = await api('/api/playlists');
-    if (!playlists.length) {
-      const empty = document.createElement('div');
-      empty.className = 'empty';
-      empty.textContent = t('playlists_empty');
-      $('playlistList').append(empty);
-      return;
-    }
 
-    playlists.forEach(playlist => {
-      const row = document.createElement('div');
-      row.className = 'playlist-row';
-      const info = document.createElement('div');
-      info.className = 'info';
-      const name = document.createElement('div');
-      name.className = 'name';
-      name.textContent = playlist.name;
-      const sub = document.createElement('div');
-      sub.className = 'sub';
-      const count = playlist.count || 0;
-      sub.textContent = tp('playlist_tracks', count);
-      info.append(name, sub);
-      const add = document.createElement('button');
-      add.className = 'add';
-      add.textContent = t('btn_add_to_queue');
-      add.onclick = () => addPlaylist(playlist.id, playlist.name, add);
-      row.append(info, add);
-      $('playlistList').append(row);
-    });
+  if (playlistsCache) {
+    renderPlaylists(playlistsCache);
+  } else {
+    list.append(loadingPlaylists());
+  }
+
+  try {
+    const playlists = await loadPlaylists();
+    renderPlaylists(playlists);
   } catch {
+    list.replaceChildren();
     const error = document.createElement('div');
     error.className = 'empty';
     error.textContent = t('playlists_error');
-    $('playlistList').append(error);
+    list.append(error);
   }
+}
+
+let playlistsCache = null;
+let playlistsCacheAt = 0;
+let playlistsRequest = null;
+
+function loadingPlaylists() {
+  const row = document.createElement('div');
+  row.className = 'playlist-loading';
+  const spinner = document.createElement('i');
+  const text = document.createElement('span');
+  text.textContent = t('playlists_loading');
+  row.append(spinner, text);
+  return row;
+}
+
+function loadPlaylists(force = false) {
+  if (!force && playlistsCache && Date.now() - playlistsCacheAt < 30000) {
+    return Promise.resolve(playlistsCache);
+  }
+  if (playlistsRequest) return playlistsRequest;
+  playlistsRequest = api('/api/playlists')
+    .then(playlists => {
+      playlistsCache = playlists;
+      playlistsCacheAt = Date.now();
+      return playlists;
+    })
+    .finally(() => {
+      playlistsRequest = null;
+    });
+  return playlistsRequest;
+}
+
+function preloadPlaylists() {
+  if (canControl && !playlistsCache) {
+    loadPlaylists().catch(() => {});
+  }
+}
+
+function renderPlaylists(playlists) {
+  const list = $('playlistList');
+  list.replaceChildren();
+  if (!playlists.length) {
+    const empty = document.createElement('div');
+    empty.className = 'empty';
+    empty.textContent = t('playlists_empty');
+    list.append(empty);
+    return;
+  }
+
+  playlists.forEach(playlist => {
+    const row = document.createElement('div');
+    row.className = 'playlist-row';
+    const info = document.createElement('div');
+    info.className = 'info';
+    const name = document.createElement('div');
+    name.className = 'name';
+    name.textContent = playlist.name;
+    const sub = document.createElement('div');
+    sub.className = 'sub';
+    const count = playlist.count || 0;
+    sub.textContent = tp('playlist_tracks', count);
+    info.append(name, sub);
+    const add = document.createElement('button');
+    add.className = 'add';
+    add.textContent = t('btn_add_to_queue');
+    add.onclick = () => addPlaylist(playlist.id, playlist.name, add);
+    row.append(info, add);
+    list.append(row);
+  });
 }
 
 function closePlaylists() {
@@ -1597,6 +1676,41 @@ function searchChanged() {
   $('clearSearch').classList.toggle('visible', $('search').value.length > 0);
   clearTimeout(searchTimer);
   searchTimer = setTimeout(render, 250);
+  clearTimeout(suggestTimer);
+  suggestTimer = setTimeout(loadSuggestions, 140);
+}
+
+async function loadSuggestions() {
+  const input = $('search');
+  const box = $('searchSuggest');
+  if (!input || !box) return;
+  const query = input.value.trim();
+  if (query.length < 2) {
+    box.hidden = true;
+    box.innerHTML = '';
+    return;
+  }
+
+  try {
+    const suggestions = await api('/api/suggest?q=' + encodeURIComponent(query));
+    box.innerHTML = '';
+    suggestions.slice(0, 6).forEach(value => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.textContent = value;
+      button.addEventListener('click', () => {
+        input.value = value;
+        $('clearSearch').classList.add('visible');
+        box.hidden = true;
+        box.innerHTML = '';
+        render();
+      });
+      box.append(button);
+    });
+    box.hidden = suggestions.length === 0;
+  } catch {
+    box.hidden = true;
+  }
 }
 
 function clearSearch() {

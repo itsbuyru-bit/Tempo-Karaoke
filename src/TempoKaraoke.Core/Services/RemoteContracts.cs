@@ -18,6 +18,10 @@ public sealed record RemoteSearchItem(
     string Subtitle,
     string Duration);
 
+public sealed record RemoteSearchResponse(
+    IReadOnlyList<RemoteSearchItem> Items,
+    bool NeedsClarification);
+
 public sealed record RemotePlaylistItem(
     string Id,
     string Name,
@@ -77,6 +81,8 @@ public interface IRemoteHost
     Task<RemoteSnapshot> GetSnapshotAsync();
 
     Task<IReadOnlyList<RemoteSearchItem>> SearchAsync(string query);
+
+    Task<IReadOnlyList<string>> SuggestAsync(string query);
 
     Task<bool> EnqueueAsync(string path, string? requesterId, string? requesterName);
 

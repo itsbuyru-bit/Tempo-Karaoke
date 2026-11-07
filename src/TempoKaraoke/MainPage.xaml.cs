@@ -220,6 +220,8 @@ public sealed partial class MainPage : Page, IRemoteHost, INotifyPropertyChanged
     public MainPage()
     {
         InitializeComponent();
+        SearchService.EnsureAliasTemplate();
+        SearchService.EnsureScoringTemplate();
         LocalizationService.Apply(RootLayout, SettingsService.Language);
         Loaded += (_, _) => LocalizationService.Apply(RootLayout, SettingsService.Language);
         LibraryList.ItemTemplate = (DataTemplate)Resources["MediaGroupCardTemplate"];
@@ -529,7 +531,8 @@ public sealed partial class MainPage : Page, IRemoteHost, INotifyPropertyChanged
     private void ShowSearchResults(string query)
     {
         ShowTopLevelView(SearchResultsView);
-        var matches = _searchSession.Search(query, limit: 0).Items;
+        var page = _searchSession.Search(query, limit: 0);
+        var matches = page.Items;
         var groups = MediaGroupingService.Group(matches);
 
         SearchResults.Clear();
@@ -557,16 +560,25 @@ public sealed partial class MainPage : Page, IRemoteHost, INotifyPropertyChanged
         PlaylistsView.Visibility = Visibility.Collapsed;
         SearchResultsView.Visibility = Visibility.Visible;
         NavView.SelectedItem = SearchResultsNavItem;
-        UpdateSearchResultsEmptyState();
+        UpdateSearchResultsEmptyState(page.NeedsClarification);
         UpdateHeader();
     }
 
-    private void UpdateSearchResultsEmptyState()
+    private void UpdateSearchResultsEmptyState(bool clarify = false)
     {
         var empty = SearchResults.Count == 0;
         SearchResultsList.Visibility = empty ? Visibility.Collapsed : Visibility.Visible;
         SearchResultsEmptyPanel.Visibility = empty ? Visibility.Visible : Visibility.Collapsed;
+        if (SearchResultsEmptyHint is not null)
+        {
+            SearchResultsEmptyHint.Text = clarify
+                ? ClarifySearchText()
+                : LocalizationService.Get("Ui_TryChangingTheQuery.Text");
+        }
     }
+
+    private static string ClarifySearchText() =>
+        LocalizationService.Get("Search_Clarify.Text");
 
     private void LibrarySelector_SelectionChanged(SelectorBar sender, SelectorBarSelectionChangedEventArgs args)
     {
@@ -2221,7 +2233,7 @@ public sealed partial class MainPage : Page, IRemoteHost, INotifyPropertyChanged
             "\uE734",
             () =>
             {
-                LibraryActivityStore.ToggleFavorite(item.Path);
+                ToggleFavorite(item);
                 RefreshHomeSection();
             }));
 
@@ -2411,7 +2423,7 @@ public sealed partial class MainPage : Page, IRemoteHost, INotifyPropertyChanged
             "\uE734",
             () =>
             {
-                LibraryActivityStore.ToggleFavorite(item.Path);
+                ToggleFavorite(item);
                 RefreshHomeSection();
             }));
         flyout.Items.Add(CreateMenuItem(
@@ -3403,6 +3415,7 @@ public sealed partial class MainPage : Page, IRemoteHost, INotifyPropertyChanged
 
             _all.Clear();
             _all.AddRange(items);
+            LibraryActivityStore.Reconcile(_all);
             RebuildVersionCounts();
             _itemsByPath.Clear();
             _thumbnailCache.Clear();
@@ -3410,6 +3423,8 @@ public sealed partial class MainPage : Page, IRemoteHost, INotifyPropertyChanged
             {
                 _itemsByPath[item.Path] = item;
                 ApplyCachedMetadata(item);
+                item.IsFavorite = LibraryActivityStore.IsFavorite(item.Path);
+                item.PlayCount = LibraryActivityStore.GetPlayCount(item.Path);
             }
 
             // Чистим записи об удалённых файлах и их превью, чтобы media.db не рос вечно.
@@ -5219,7 +5234,13 @@ public sealed partial class MainPage : Page, IRemoteHost, INotifyPropertyChanged
             return;
         }
 
-        var page = _searchSession.Search(query, filter: BuildQuickSearchFilter());
+        var page = _searchSession.Search(
+            query,
+            filter: BuildQuickSearchFilter(),
+            groupResults: true);
+        QuickSearchEmptyText.Text = page.NeedsClarification
+            ? ClarifySearchText()
+            : LocalizationService.Get("QuickSearch_NoResults.Text");
         var visibleResults = page.Items;
         _quickSearchQuery = page.Query;
         QuickSearchResults.ItemsSource = visibleResults
@@ -5410,7 +5431,7 @@ public sealed partial class MainPage : Page, IRemoteHost, INotifyPropertyChanged
             "\uE734",
             () =>
             {
-                LibraryActivityStore.ToggleFavorite(item.Path);
+                ToggleFavorite(item);
                 RefreshHomeSection();
             }));
         flyout.Items.Add(CreateMenuItem(
@@ -6973,6 +6994,12 @@ public sealed partial class MainPage : Page, IRemoteHost, INotifyPropertyChanged
         UpdateRecentEmpty();
     }
 
+    private void ToggleFavorite(MediaItem item)
+    {
+        item.IsFavorite = LibraryActivityStore.ToggleFavorite(item.Path);
+        _searchSession.InvalidateActivityCache();
+    }
+
     private void RecordRecent(MediaItem item)
     {
         var existing = Recent.FirstOrDefault(
@@ -6990,6 +7017,8 @@ public sealed partial class MainPage : Page, IRemoteHost, INotifyPropertyChanged
 
         SettingsService.RecentPaths = Recent.Select(recent => recent.Best.Path).ToList();
         LibraryActivityStore.RecordPlay(item.Path);
+        item.PlayCount = LibraryActivityStore.GetPlayCount(item.Path);
+        _searchSession.InvalidateActivityCache();
         UpdateRecentEmpty();
     }
 
@@ -8840,6 +8869,11 @@ public sealed partial class MainPage : Page, IRemoteHost, INotifyPropertyChanged
         return _remoteClientDirectory.ResolveName(requesterId, "Компьютер");
     }
 
+    public async Task<IReadOnlyList<string>> SuggestAsync(string query)
+    {
+        return await OnUiAsync<IReadOnlyList<string>>(() => _searchSession.Suggest(query));
+    }
+
     public Task<IReadOnlyList<RemoteSearchItem>> SearchAsync(string query)
     {
         return OnUiAsync<IReadOnlyList<RemoteSearchItem>>(() =>
@@ -8849,8 +8883,7 @@ public sealed partial class MainPage : Page, IRemoteHost, INotifyPropertyChanged
                 return new List<RemoteSearchItem>();
             }
 
-            return _searchSession.Search(query, limit: 0).Items
-                .Take(30)
+            return _searchSession.Search(query, limit: 30, groupResults: true).Items
                 .Select(item => new RemoteSearchItem(
                     item.Path,
                     item.DisplayTitle,

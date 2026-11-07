@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 using TempoKaraoke.Models;
@@ -29,6 +30,37 @@ public static class MediaNameParser
         @"^\s*(?:караоке|karaoke)\s+",
         RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
+    private static readonly Regex LeadingTrackNumber = new(
+        @"^\s*(?<number>\d{1,3})\s*[._-]\s*",
+        RegexOptions.Compiled | RegexOptions.CultureInvariant);
+
+    private static readonly Regex YearTag = new(
+        @"[\(\[]\s*(?<year>(?:19|20)\d{2})\s*[\)\]]",
+        RegexOptions.Compiled | RegexOptions.CultureInvariant);
+
+    private static readonly Regex ArtistMarker = new(
+        @"\b(?:feat\.?|ft\.?|featuring|vs\.?|versus|дуэт|группа)\b|&|;|/|,",
+        RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.CultureInvariant);
+
+    private static readonly HashSet<string> KnownArtists = new(StringComparer.Ordinal)
+    {
+        "любэ", "лепс", "пугачева", "меладзе", "земфира", "баста", "киш",
+        "король и шут", "2маши", "две маши", "queen", "boney m", "metallica",
+        "nirvana", "modern talking", "би 2", "bi 2", "tatu", "rammstein",
+        "little big", "ac dc", "prodigy", "растеряев",
+    };
+
+    private static readonly Regex BracketArtist = new(
+        @"^\s*(?<title>.+?)\s*[\(\[](?<artist>[^()\[\]]{1,60})[\)\]]\s*$",
+        RegexOptions.Compiled | RegexOptions.CultureInvariant);
+
+    private static readonly Regex TechnicalBracket = new(
+        @"\b(?:karaoke|караоке|minus|минус|минусовка|live|лайв|concert|концерт|duet|дуэт|"
+        + @"version|версия|remix|ремикс|cover|кавер|instrumental|acoustic|"
+        + @"back\s*vocal|бэк[\s-]*вокал|бэк|вокал|подпевка|хор|оркестр|"
+        + @"hd|uhd|4k)\b|(?:19|20)\d{2}|\d{3,4}p",
+        RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.CultureInvariant);
+
     private static readonly Regex Brackets = new(
         @"\[[^\]]*\]|\([^)]*\)|\{[^}]*\}",
         RegexOptions.Compiled | RegexOptions.CultureInvariant);
@@ -36,10 +68,11 @@ public static class MediaNameParser
     // Служебные пометки источников и качества. Убираются из названия, но тип
     // версии к этому моменту уже определён по исходной строке.
     private static readonly Regex Noise = new(
-        @"\b(?:пой\s+под\s+бит|кавер[\s-]*минус|оригинальный\s+минус|кавер|cover|минус|"
-        + @"текст\s+песни|караоке|karaoke|mood\s+video|official\s+video|официальное\s+видео|"
+        @"\b(?:пой\s+под\s+бит|кавер[\s-]*минус|оригинальный\s+минус|кавер|cover|минус|минусовка|"
+        + @"текст\s+песни|караоке|karaoke|back\s*vocal|бэк[\s-]*вокал|бэк|minus|"
+        + @"mood\s+video|official\s+video|официальное\s+видео|"
         + @"премьера\s+клипа|premiere|клип|lyrics|транскрипция|на\s+русском|русский\s+текст|"
-        + @"экстремальное\s+караоке|4k|uhd|full\s*hd|hd|1080p|720p|480p)\b",
+        + @"экстремальное\s+караоке|full\s*hd|uhd|4k|1080p|720p|480p|hd|original|оригинал)\b",
         RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
     // Номер варианта — только в явной форме: «(2)», «[2]», «#2». Голое « 2»
@@ -124,6 +157,22 @@ public static class MediaNameParser
         }
 
         var stem = Path.GetFileNameWithoutExtension(fileName).Trim();
+        stem = stem.Trim('\uFEFF', '\u200B', '\u200C', '\u200D');
+        var rawName = stem;
+        var yearMatch = YearTag.Match(stem);
+        int? year = yearMatch.Success && int.TryParse(yearMatch.Groups["year"].Value, out var parsedYear)
+            ? parsedYear
+            : null;
+
+        int? leadingTrack = null;
+        var leading = LeadingTrackNumber.Match(stem);
+        if (leading.Success &&
+            int.TryParse(leading.Groups["number"].Value, out var parsedTrack))
+        {
+            leadingTrack = parsedTrack;
+            stem = stem[leading.Length..].Trim();
+        }
+
         if (stem.Length == 0)
         {
             return ParsedMediaName.Empty;
@@ -159,15 +208,42 @@ public static class MediaNameParser
                     Version = version,
                     Ordinal = ordinal,
                     FilmSource = filmName,
+                    RawName = rawName,
+                    TrackNumber = leadingTrack,
+                    Year = year,
                 };
             }
         }
+
+        // «Конь (Любэ)» and «Bohemian Rhapsody [Queen]» are also common.
+        var bracketArtist = ExtractBracketArtist(ref raw);
 
         // Пробелы здесь не схлопываем: у Karaoke4U разделитель — ровно три
         // пробела, и любое сжатие до разбиения его уничтожает.
         var working = LeadingMarker.Replace(raw, string.Empty).Replace('_', ' ').Trim();
 
         var (artist, title) = SplitParts(working, folder);
+        if (!string.IsNullOrWhiteSpace(bracketArtist))
+        {
+            artist = string.IsNullOrWhiteSpace(artist)
+                ? bracketArtist
+                : $"{artist} & {bracketArtist}";
+        }
+
+        // «Любэ - 01 - Конь»: номер стоит между артистом и названием.
+        var middle = LeadingTrackNumber.Match(title);
+        if (middle.Success &&
+            int.TryParse(middle.Groups["number"].Value, out var middleTrack))
+        {
+            leadingTrack ??= middleTrack;
+            title = title[middle.Length..].Trim();
+        }
+
+        // «Конь - Любэ» and «bohemian rhapsody - queen» are common in file names.
+        if (ShouldSwap(artist, title))
+        {
+            (artist, title) = (title, artist);
+        }
 
         artist = CleanArtist(artist);
         var titleRaw = title;
@@ -204,6 +280,9 @@ public static class MediaNameParser
             Version = version,
             Ordinal = ordinal,
             FilmSource = null,
+            RawName = rawName,
+            TrackNumber = leadingTrack,
+            Year = year,
             // Сироту без исполнителя и без фильма отправляем в отдельную папку
             // каталога, а не оставляем на месте: флаг нужен только для имён,
             // которые нельзя разобрать однозначно.
@@ -212,6 +291,73 @@ public static class MediaNameParser
                 || SpacedDash.IsMatch(artist),
         };
     }
+
+    private static bool ShouldSwap(string artist, string title)
+    {
+        if (string.IsNullOrWhiteSpace(artist) || string.IsNullOrWhiteSpace(title))
+        {
+            return false;
+        }
+
+        if (ArtistMarker.IsMatch(artist))
+        {
+            return false;
+        }
+
+        var artistKey = NormalizeName(artist);
+        var titleKey = NormalizeName(title);
+        if (KnownArtists.Contains(artistKey))
+        {
+            return false;
+        }
+
+        if (KnownArtists.Contains(titleKey))
+        {
+            return true;
+        }
+
+        // A numeric/trailing tag on one side is almost never an artist.
+        if (LooksLikeOnlyNumberOrTag(title))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    private static string NormalizeName(string value) =>
+        SearchService.Normalize(value);
+
+    private static string? ExtractBracketArtist(ref string raw)
+    {
+        var match = BracketArtist.Match(raw);
+        if (!match.Success)
+        {
+            return null;
+        }
+
+        var candidate = Trim(match.Groups["artist"].Value);
+        if (candidate.Length == 0 || TechnicalBracket.IsMatch(candidate))
+        {
+            return null;
+        }
+
+        var words = candidate.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        var known = KnownArtists.Contains(SearchService.Normalize(candidate));
+        if (words.Length is < 1 or > 4 || (!known && words.Length > 4))
+        {
+            return null;
+        }
+
+        raw = match.Groups["title"].Value.Trim();
+        return candidate;
+    }
+
+    private static bool LooksLikeOnlyNumberOrTag(string value) =>
+        Regex.IsMatch(
+            value,
+            @"^\s*(?:\d{1,4}|(?:480p|360p|144p|720p|1080p|4k|hd|uhd))\s*$",
+            RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
 
     private static (string Artist, string Title) SplitParts(string working, string folder)
     {

@@ -1225,6 +1225,7 @@
                         <TextBlock
  HorizontalAlignment="Center" Style="{StaticResource SubtitleTextBlockStyle}" x:Uid="Ui_NothingFound_50" loc:Localization.Key="Ui_NothingFound_50.Text" />
                         <TextBlock
+ x:Name="SearchResultsEmptyHint"
  HorizontalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" x:Uid="Ui_TryChangingTheQuery" loc:Localization.Key="Ui_TryChangingTheQuery.Text" />
                         <Button
  HorizontalAlignment="Center" Click="ResetSearch_Click" Style="{StaticResource AccentButtonStyle}" x:Uid="Ui_ResetSearch_52" loc:Localization.Key="Ui_ResetSearch_52.Content" />
@@ -2685,8 +2686,8 @@
                                             HorizontalAlignment="Stretch"
                                             HorizontalContentAlignment="Stretch"
                                             VerticalContentAlignment="Center"
-                                            AutomationProperties.HelpText="{x:Bind Description}"
-                                            AutomationProperties.Name="{x:Bind Title}"
+                                            AutomationProperties.HelpText="{x:Bind Description, Mode=OneTime}"
+                                            AutomationProperties.Name="{x:Bind Title, Mode=OneTime}"
                                             Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                                             BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
                                             BorderThickness="1"
@@ -2714,21 +2715,21 @@
                                                     VerticalAlignment="Center"
                                                     FontSize="20"
                                                     Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                                    Glyph="{x:Bind Icon}" />
+                                                    Glyph="{x:Bind Icon, Mode=OneTime}" />
                                                 <StackPanel
                                                     Grid.Column="1"
                                                     HorizontalAlignment="Left"
                                                     Spacing="2">
                                                     <TextBlock
                                                         Style="{StaticResource BodyStrongTextBlockStyle}"
-                                                        Text="{x:Bind Title}"
+                                                        Text="{x:Bind Title, Mode=OneTime}"
                                                         TextAlignment="Left"
                                                         TextTrimming="CharacterEllipsis" />
                                                     <TextBlock
                                                         MaxWidth="520"
                                                         Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                                         Style="{StaticResource CaptionTextBlockStyle}"
-                                                        Text="{x:Bind Description}"
+                                                        Text="{x:Bind Description, Mode=OneTime}"
                                                         TextAlignment="Left"
                                                         TextTrimming="CharacterEllipsis"
                                                         TextWrapping="NoWrap" />

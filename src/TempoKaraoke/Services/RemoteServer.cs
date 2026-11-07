@@ -256,8 +256,26 @@ public sealed class RemoteServer : IAsyncDisposable
                 var results = await _host.SearchAsync(query);
                 await WriteJsonAsync(
                     context,
-                    new List<RemoteSearchItem>(results),
-                    RemoteJsonContext.Default.ListRemoteSearchItem);
+                    new RemoteSearchResponse(
+                        new List<RemoteSearchItem>(results),
+                        SearchService.IsStopWordOnlyQuery(query) && results.Count == 0),
+                    RemoteJsonContext.Default.RemoteSearchResponse);
+            });
+
+            app.MapGet("/api/suggest", async context =>
+            {
+                var clientId = await PrepareClientAsync(context, requireHost: false);
+                if (clientId is null)
+                {
+                    return;
+                }
+
+                var query = context.Request.Query["q"].ToString();
+                var suggestions = await _host.SuggestAsync(query);
+                await WriteJsonAsync(
+                    context,
+                    new List<string>(suggestions),
+                    RemoteJsonContext.Default.ListString);
             });
 
             app.MapPost("/api/queue", async context =>

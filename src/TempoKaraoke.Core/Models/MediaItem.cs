@@ -2,6 +2,7 @@ using System;
 using System.ComponentModel;
 using System.Globalization;
 using System.IO;
+using TempoKaraoke.Services;
 
 namespace TempoKaraoke.Models;
 
@@ -69,6 +70,12 @@ public sealed class MediaItem : INotifyPropertyChanged
     public int Height => _height;
 
     public string? ThumbnailPath => _thumbnailPath;
+
+    /// <summary>Бонус к поисковой выдаче: трек добавлен в избранное.</summary>
+    public bool IsFavorite { get; set; }
+
+    /// <summary>Сколько раз трек запускали; используется как мягкий тай-брейкер.</summary>
+    public int PlayCount { get; set; }
 
     /// <summary>Выделен ли элемент в очереди (состояние чекбокса).</summary>
     public bool IsSelected
@@ -296,17 +303,24 @@ public sealed class MediaItem : INotifyPropertyChanged
     public static MediaItem FromPath(string path)
     {
         var fileName = System.IO.Path.GetFileNameWithoutExtension(path);
-        var artist = string.Empty;
-        var title = fileName;
+        var folder = System.IO.Path.GetFileName(System.IO.Path.GetDirectoryName(path) ?? string.Empty);
+        var parsed = MediaNameParser.Parse(System.IO.Path.GetFileName(path), folder);
+        var artist = parsed.Artist;
+        var title = parsed.Title;
 
-        var separator = fileName.IndexOf(" - ", StringComparison.Ordinal);
-        if (separator > 0)
+        // A malformed or unsupported file name must still produce a usable item.
+        if (string.IsNullOrWhiteSpace(title))
         {
-            artist = fileName[..separator].Trim();
-            title = fileName[(separator + 3)..].Trim();
+            artist = string.Empty;
+            title = fileName;
+            var separator = fileName.IndexOf(" - ", StringComparison.Ordinal);
+            if (separator > 0)
+            {
+                artist = fileName[..separator].Trim();
+                title = fileName[(separator + 3)..].Trim();
+            }
         }
 
-        var folder = System.IO.Path.GetFileName(System.IO.Path.GetDirectoryName(path) ?? string.Empty);
         var modifiedUtc = default(DateTime);
         var sizeBytes = 0L;
         try
@@ -332,6 +346,8 @@ public sealed class MediaItem : INotifyPropertyChanged
         var copy = new MediaItem(Path, Artist, Title, Folder, ModifiedUtc, SizeBytes);
         copy.ApplyMetadata(DurationMs, Width, Height, ThumbnailPath);
         copy.SetQueuedBy(QueuedBy);
+        copy.IsFavorite = IsFavorite;
+        copy.PlayCount = PlayCount;
         return copy;
     }
 }

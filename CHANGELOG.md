@@ -9,6 +9,29 @@ components (`major.minor.patch.revision`).
 Detailed user-facing release notes for each release live in
 `docs/releases/<tag>.md` and are published together with the GitHub Release.
 
+## [1.10.3.0] — 2026-11-07
+
+Full details: [`docs/releases/v1.10.3.0.md`](docs/releases/v1.10.3.0.md).
+
+### Search
+
+- Universal filename parsing: separators, track numbers, reverse order,
+  collaboration markers and artist names in `(Artist)` / `[Artist]` brackets.
+- Raw-name indexing, technical-tag cleanup, stop-word handling, aliases,
+  transliteration/layout correction, Damerau–Levenshtein typos, phonetic keys,
+  stemming fallback and N−1/free-text matching.
+- Favorites, play counts, recency, artist intent and diversity cap in ranking.
+- LRU cache invalidation, grouped versions and `Suggest()`.
+- Automatically created `search_aliases.json` and `search_config.json` with safe
+  fallback to built-in weights.
+
+### Web remote
+
+- Mobile catalog cards wrap long titles and use one consistent icon-button row.
+- Language selector shows `EN` / `RU` short codes.
+- Playlist loading indicator, host-mode prefetch and a short-lived cache.
+- Search suggestions and localized “refine your query” feedback.
+
 ## [1.10.2.7] — 2026-11-07
 
 Full details: [`docs/releases/v1.10.2.7.md`](docs/releases/v1.10.2.7.md).

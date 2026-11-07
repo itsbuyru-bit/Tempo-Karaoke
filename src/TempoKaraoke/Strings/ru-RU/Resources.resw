@@ -282,6 +282,7 @@
   <data name="Search_AllFolders" xml:space="preserve"><value>Все папки</value></data>
   <data name="Search_AllFormats" xml:space="preserve"><value>Все форматы</value></data>
   <data name="Search_AnyDuration" xml:space="preserve"><value>Любая длительность</value></data>
+  <data name="Search_Clarify.Text" xml:space="preserve"><value>Уточните запрос: укажите название песни или исполнителя</value></data>
   <data name="Search_LongDuration" xml:space="preserve"><value>5+ мин</value></data>
   <data name="Search_MediumDuration" xml:space="preserve"><value>3–5 мин</value></data>
   <data name="Search_OpenHint.AutomationName" xml:space="preserve"><value>Открыть поиск</value></data>

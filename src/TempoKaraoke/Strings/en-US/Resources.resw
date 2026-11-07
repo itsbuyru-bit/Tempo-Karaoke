@@ -282,6 +282,7 @@
   <data name="Search_AllFolders" xml:space="preserve"><value>All folders</value></data>
   <data name="Search_AllFormats" xml:space="preserve"><value>All formats</value></data>
   <data name="Search_AnyDuration" xml:space="preserve"><value>Any duration</value></data>
+  <data name="Search_Clarify.Text" xml:space="preserve"><value>Please refine your search: enter a song title or artist name</value></data>
   <data name="Search_LongDuration" xml:space="preserve"><value>5+ min</value></data>
   <data name="Search_MediumDuration" xml:space="preserve"><value>3–5 min</value></data>
   <data name="Search_OpenHint.AutomationName" xml:space="preserve"><value>Open search</value></data>

@@ -82,4 +82,121 @@ public sealed class SearchServiceTests
 
         Assert.Empty(result);
     }
+
+    [Fact]
+    public void IgnoresTechnicalTagsAndKaraokeStopWords()
+    {
+        var library = SearchService.Build(new[]
+        {
+            new MediaItem(
+                @"G:\Karaoke\01. Любэ - Конь (Karaoke 1080p).mkv",
+                "Любэ",
+                "Конь",
+                "Karaoke"),
+            new MediaItem(
+                @"G:\Karaoke\Баста - Медлячок (minus).mkv",
+                "Баста",
+                "Медлячок",
+                "Karaoke"),
+        });
+
+        Assert.Contains("Любэ — Конь", Titles(SearchService.Search(library, "любе конь караоке")));
+        Assert.Contains("Баста — Медлячок", Titles(SearchService.Search(library, "баста медлячок минус")));
+    }
+
+    [Fact]
+    public void ParsesLeadingTrackNumberAndTechnicalTags()
+    {
+        var item = MediaItem.FromPath(@"G:\Karaoke\01. Любэ - Конь (Karaoke 1080p).mkv");
+
+        Assert.Equal("Любэ", item.Artist);
+        Assert.Equal("Конь", item.Title);
+    }
+
+    [Fact]
+    public void FindsTransposedNeighborLetters()
+    {
+        var library = SearchService.Build(new[]
+        {
+            new MediaItem(
+                @"G:\Karaoke\Nirvana - Smells Like Teen Spirit.mkv",
+                "Nirvana",
+                "Smells Like Teen Spirit",
+                "Karaoke"),
+        });
+
+        var result = SearchService.Search(library, "nirvnaa");
+
+        Assert.Contains("Nirvana — Smells Like Teen Spirit", Titles(result));
+    }
+
+    [Theory]
+    [InlineData("квин", "Queen — Bohemian Rhapsody")]
+    [InlineData("модерн токинг", "Modern Talking — Cheri Cheri Lady")]
+    [InlineData("металлика", "Metallica — Nothing Else Matters")]
+    [InlineData("бони эм", "Boney M — Rasputin")]
+    [InlineData("нирвана", "Nirvana — Smells Like Teen Spirit")]
+    public void FindsForeignArtistsTypedInCyrillic(string query, string expected)
+    {
+        var library = SearchService.Build(new[]
+        {
+            new MediaItem(@"G:\Karaoke\Queen - Bohemian Rhapsody.mkv", "Queen", "Bohemian Rhapsody", "Karaoke"),
+            new MediaItem(@"G:\Karaoke\Modern Talking - Cheri Cheri Lady.mkv", "Modern Talking", "Cheri Cheri Lady", "Karaoke"),
+            new MediaItem(@"G:\Karaoke\Metallica - Nothing Else Matters.mkv", "Metallica", "Nothing Else Matters", "Karaoke"),
+            new MediaItem(@"G:\Karaoke\Boney M - Rasputin.mkv", "Boney M", "Rasputin", "Karaoke"),
+            new MediaItem(@"G:\Karaoke\Nirvana - Smells Like Teen Spirit.mkv", "Nirvana", "Smells Like Teen Spirit", "Karaoke"),
+        });
+
+        var result = SearchService.Search(library, query);
+
+        Assert.Contains(expected, Titles(result));
+    }
+
+    [Fact]
+    public void ExpandsKaraokeArtistAliases()
+    {
+        var library = SearchService.Build(new[]
+        {
+            new MediaItem(@"G:\Karaoke\Король и Шут - Лесник.mkv", "Король и Шут", "Лесник", "Karaoke"),
+            new MediaItem(@"G:\Karaoke\2Маши - Босая.mkv", "2Маши", "Босая", "Karaoke"),
+            new MediaItem(@"G:\Karaoke\Би-2 - Полковнику никто не пишет.mkv", "Би-2", "Полковнику никто не пишет", "Karaoke"),
+        });
+
+        Assert.Contains("Король и Шут — Лесник", Titles(SearchService.Search(library, "киш лесник")));
+        Assert.Contains("2Маши — Босая", Titles(SearchService.Search(library, "две маши босая")));
+        Assert.Contains(
+            "Би-2 — Полковнику никто не пишет",
+            Titles(SearchService.Search(library, "би2")));
+    }
+
+    [Fact]
+    public void FallsBackToNMinusOneForLongQueries()
+    {
+        var library = SearchService.Build(new[]
+        {
+            new MediaItem(@"G:\Karaoke\Баста - Медлячок.mkv", "Баста", "Медлячок", "Karaoke"),
+        });
+
+        var result = SearchService.Search(library, "баста медлячок лишнее");
+
+        Assert.Contains("Баста — Медлячок", Titles(result));
+    }
+
+    [Fact]
+    public void UsesFavoriteAndPlayCountOnlyAsTieBreakers()
+    {
+        var favorite = new MediaItem(@"G:\Karaoke\Лепс - Любимый хит.mkv", "Лепс", "Любимый хит", "Karaoke")
+        {
+            IsFavorite = true,
+        };
+        var popular = new MediaItem(@"G:\Karaoke\Лепс - Популярный хит.mkv", "Лепс", "Популярный хит", "Karaoke")
+        {
+            PlayCount = 5,
+        };
+        var plain = new MediaItem(@"G:\Karaoke\Лепс - Обычный хит.mkv", "Лепс", "Обычный хит", "Karaoke");
+
+        var result = SearchService.Search(SearchService.Build(new[] { plain, popular, favorite }), "лепс");
+
+        Assert.Equal("Лепс — Любимый хит", result[0].DisplayTitle);
+    }
 }

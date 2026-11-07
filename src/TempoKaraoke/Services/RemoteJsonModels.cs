@@ -114,6 +114,8 @@ public sealed class ClientErrorRequest
 [JsonSerializable(typeof(RemoteRequestDecision))]
 [JsonSerializable(typeof(RemoteSearchItem))]
 [JsonSerializable(typeof(List<RemoteSearchItem>))]
+[JsonSerializable(typeof(RemoteSearchResponse))]
+[JsonSerializable(typeof(List<string>))]
 [JsonSerializable(typeof(RemotePlaylistItem))]
 [JsonSerializable(typeof(List<RemotePlaylistItem>))]
 [JsonSerializable(typeof(QueueRequest))]
