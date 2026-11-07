@@ -134,6 +134,18 @@ button, input { font: inherit; }
 
 .hero-copy { position: relative; z-index: 1; }
 
+.hero-glow {
+  position: absolute;
+  z-index: 0;
+  top: 40px;
+  right: -70px;
+  width: min(600px, 72vw);
+  opacity: .12;
+  pointer-events: none;
+  filter: blur(12px) saturate(1.2);
+}
+.hero-glow img { display: block; width: 100%; height: auto; }
+
 .eyebrow {
   display: inline-flex;
   align-items: center;
@@ -476,4 +488,10 @@ section { padding: 54px 0; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; }
+}
+
+.carousel-control-prev svg,
+.carousel-control-next svg { width: 20px; height: 20px; }
+@media (max-width: 700px) {
+  .hero-glow { width: 460px; right: -30%; top: -70px; opacity: .12; }
 }

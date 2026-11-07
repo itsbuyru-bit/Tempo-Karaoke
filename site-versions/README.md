@@ -24,6 +24,7 @@ before replacing it, so a restore can be undone the same way.
 | `2026-11-07-caption-carousel` | Current landing: Bootstrap-style screenshot carousel with overlaid captions, indicators and prev/next controls. |
 | `2026-11-07-bootstrap-carousel` | Current landing: app screenshots recaptured at two-thirds height, served through the vendored Bootstrap carousel data API. |
 | `2026-11-07-aurora` | Current landing: brighter aurora background (blue, violet, pink, teal and warm glows) behind the Bootstrap carousel. |
+| `2026-11-07-playlists` | Current landing: new app icon, blurred icon glow, Bootstrap chevrons, and a five-slide carousel with the English playlists screen. |
 
 Archives are committed so a previous look can be restored without relying on
 the git history of the `site/` directory. To try one without touching the

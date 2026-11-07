@@ -33,6 +33,7 @@
 
   <main>
     <section class="container hero">
+      <div class="hero-glow" aria-hidden="true"><img src="assets/appicon.png" alt=""></div>
       <div class="hero-copy">
         <span class="eyebrow"><span class="dot"></span>Гостям не нужно ничего устанавливать</span>
         <h1>Сканируй, заказывай<br><span class="gradient">и пой за секунды.</span></h1>
@@ -79,55 +80,64 @@
       <div class="section-head">
         <span class="section-kicker">Внутри приложения</span>
         <h2>Сделано для настоящего караоке-вечера.</h2>
-        <p>Четыре экрана Windows-приложения: медиатека, очередь, веб-пульт и настройки, которые их связывают.</p>
+        <p>Пять экранов Windows-приложения: медиатека, очередь, плейлисты, веб-пульт и настройки, которые их связывают.</p>
       </div>
 
       <div id="shotsCarousel" class="carousel slide" data-bs-ride="false" aria-roledescription="carousel" aria-label="Скриншоты Tempo Karaoke">
         <div class="carousel-inner">
-          <figure class="carousel-item active" aria-roledescription="slide" aria-label="1 из 4">
+          <figure class="carousel-item active" aria-roledescription="slide" aria-label="1 из 5">
             <img src="assets/screenshots/library.png" alt="Медиатека Tempo Karaoke с карточками песен" loading="lazy" width="1938" height="1200">
             <figcaption class="carousel-caption">
-              <span class="slide-count">01 / 04</span>
+              <span class="slide-count">01 / 05</span>
               <strong>Медиатека</strong>
               <p>Тысячи песен, сгруппированные по исполнителю и версии.</p>
             </figcaption>
           </figure>
-          <figure class="carousel-item" aria-roledescription="slide" aria-label="2 из 4" aria-hidden="true">
+          <figure class="carousel-item" aria-roledescription="slide" aria-label="2 из 5" aria-hidden="true">
             <img src="assets/screenshots/queue.png" alt="Очередь воспроизведения Tempo Karaoke с песнями и именами" loading="lazy" width="1938" height="1200">
             <figcaption class="carousel-caption">
-              <span class="slide-count">02 / 04</span>
+              <span class="slide-count">02 / 05</span>
               <strong>Очередь воспроизведения</strong>
               <p>Сохраняется между запусками и помнит, кто заказал песню.</p>
             </figcaption>
           </figure>
-          <figure class="carousel-item" aria-roledescription="slide" aria-label="3 из 4" aria-hidden="true">
+          <figure class="carousel-item" aria-roledescription="slide" aria-label="3 из 5" aria-hidden="true">
+            <img src="assets/screenshots/playlists.png" alt="Плейлисты Tempo Karaoke с английским интерфейсом" loading="lazy" width="1938" height="1200">
+            <figcaption class="carousel-caption">
+              <span class="slide-count">03 / 05</span>
+              <strong>Плейлисты</strong>
+              <p>Сохранённые наборы для всего вечера — весь интерфейс на английском.</p>
+            </figcaption>
+          </figure>
+          <figure class="carousel-item" aria-roledescription="slide" aria-label="4 из 5" aria-hidden="true">
             <img src="assets/screenshots/connection.png" alt="Настройки подключения веб-пульта Tempo Karaoke" loading="lazy" width="1938" height="1200">
             <figcaption class="carousel-caption">
-              <span class="slide-count">03 / 04</span>
+              <span class="slide-count">04 / 05</span>
               <strong>Веб-пульт</strong>
               <p>Запуск сервера по Wi-Fi или Wi-Fi Direct.</p>
             </figcaption>
           </figure>
-          <figure class="carousel-item" aria-roledescription="slide" aria-label="4 из 4" aria-hidden="true">
+          <figure class="carousel-item" aria-roledescription="slide" aria-label="5 из 5" aria-hidden="true">
             <img src="assets/screenshots/settings.png" alt="Общие настройки Tempo Karaoke" loading="lazy" width="1938" height="1200">
             <figcaption class="carousel-caption">
-              <span class="slide-count">04 / 04</span>
+              <span class="slide-count">05 / 05</span>
               <strong>Настройки</strong>
               <p>Медиатека, воспроизведение, пульт, диагностика и обновления.</p>
             </figcaption>
           </figure>
         </div>
         <button class="carousel-control-prev" type="button" data-bs-target="#shotsCarousel" data-bs-slide="prev" aria-label="Предыдущий скриншот">
-          <span aria-hidden="true">&#8249;</span>
+          <svg class="bi bi-chevron-left" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"/></svg>
         </button>
         <button class="carousel-control-next" type="button" data-bs-target="#shotsCarousel" data-bs-slide="next" aria-label="Следующий скриншот">
-          <span aria-hidden="true">&#8250;</span>
+          <svg class="bi bi-chevron-right" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708"/></svg>
         </button>
         <div class="carousel-indicators">
           <button type="button" class="active" data-bs-target="#shotsCarousel" data-bs-slide-to="0" aria-label="Скриншот 1" aria-current="true"></button>
           <button type="button" data-bs-target="#shotsCarousel" data-bs-slide-to="1" aria-label="Скриншот 2"></button>
           <button type="button" data-bs-target="#shotsCarousel" data-bs-slide-to="2" aria-label="Скриншот 3"></button>
           <button type="button" data-bs-target="#shotsCarousel" data-bs-slide-to="3" aria-label="Скриншот 4"></button>
+          <button type="button" data-bs-target="#shotsCarousel" data-bs-slide-to="4" aria-label="Скриншот 5"></button>
         </div>
       </div>
     </section>

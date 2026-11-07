@@ -33,6 +33,7 @@
 
   <main>
     <section class="container hero">
+      <div class="hero-glow" aria-hidden="true"><img src="assets/appicon.png" alt=""></div>
       <div class="hero-copy">
         <span class="eyebrow"><span class="dot"></span>Zero-friction guest experience</span>
         <h1>Scan, queue &amp; sing<br><span class="gradient">in seconds.</span></h1>
@@ -79,55 +80,64 @@
       <div class="section-head">
         <span class="section-kicker">Inside the app</span>
         <h2>Built for a real karaoke night.</h2>
-        <p>Four views from the Windows app: the library, the queue, the phone remote and the settings that connect them.</p>
+        <p>Five views from the Windows app: the library, the queue, playlists, the phone remote and the settings that connect them.</p>
       </div>
 
       <div id="shotsCarousel" class="carousel slide" data-bs-ride="false" aria-roledescription="carousel" aria-label="Tempo Karaoke screenshots">
         <div class="carousel-inner">
-          <figure class="carousel-item active" aria-roledescription="slide" aria-label="1 of 4">
+          <figure class="carousel-item active" aria-roledescription="slide" aria-label="1 of 5">
             <img src="assets/screenshots/library.png" alt="Tempo Karaoke video library with song cards" loading="lazy" width="1938" height="1200">
             <figcaption class="carousel-caption">
-              <span class="slide-count">01 / 04</span>
+              <span class="slide-count">01 / 05</span>
               <strong>Video library</strong>
               <p>Thousands of songs, grouped by artist and version.</p>
             </figcaption>
           </figure>
-          <figure class="carousel-item" aria-roledescription="slide" aria-label="2 of 4" aria-hidden="true">
+          <figure class="carousel-item" aria-roledescription="slide" aria-label="2 of 5" aria-hidden="true">
             <img src="assets/screenshots/queue.png" alt="Tempo Karaoke playback queue with songs and requester names" loading="lazy" width="1938" height="1200">
             <figcaption class="carousel-caption">
-              <span class="slide-count">02 / 04</span>
+              <span class="slide-count">02 / 05</span>
               <strong>Playback queue</strong>
               <p>A queue that survives restarts and remembers who asked.</p>
             </figcaption>
           </figure>
-          <figure class="carousel-item" aria-roledescription="slide" aria-label="3 of 4" aria-hidden="true">
+          <figure class="carousel-item" aria-roledescription="slide" aria-label="3 of 5" aria-hidden="true">
+            <img src="assets/screenshots/playlists.png" alt="Tempo Karaoke playlists screen with English interface" loading="lazy" width="1938" height="1200">
+            <figcaption class="carousel-caption">
+              <span class="slide-count">03 / 05</span>
+              <strong>Playlists</strong>
+              <p>Saved sets for a full night, with the whole app in English.</p>
+            </figcaption>
+          </figure>
+          <figure class="carousel-item" aria-roledescription="slide" aria-label="4 of 5" aria-hidden="true">
             <img src="assets/screenshots/connection.png" alt="Tempo Karaoke remote control connection settings" loading="lazy" width="1938" height="1200">
             <figcaption class="carousel-caption">
-              <span class="slide-count">03 / 04</span>
+              <span class="slide-count">04 / 05</span>
               <strong>Web remote</strong>
               <p>Start the server over Wi-Fi or Wi-Fi Direct.</p>
             </figcaption>
           </figure>
-          <figure class="carousel-item" aria-roledescription="slide" aria-label="4 of 4" aria-hidden="true">
+          <figure class="carousel-item" aria-roledescription="slide" aria-label="5 of 5" aria-hidden="true">
             <img src="assets/screenshots/settings.png" alt="Tempo Karaoke settings overview" loading="lazy" width="1938" height="1200">
             <figcaption class="carousel-caption">
-              <span class="slide-count">04 / 04</span>
+              <span class="slide-count">05 / 05</span>
               <strong>Settings</strong>
               <p>Library, playback, remote, diagnostics and updates.</p>
             </figcaption>
           </figure>
         </div>
         <button class="carousel-control-prev" type="button" data-bs-target="#shotsCarousel" data-bs-slide="prev" aria-label="Previous screenshot">
-          <span aria-hidden="true">&#8249;</span>
+          <svg class="bi bi-chevron-left" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"/></svg>
         </button>
         <button class="carousel-control-next" type="button" data-bs-target="#shotsCarousel" data-bs-slide="next" aria-label="Next screenshot">
-          <span aria-hidden="true">&#8250;</span>
+          <svg class="bi bi-chevron-right" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708"/></svg>
         </button>
         <div class="carousel-indicators">
           <button type="button" class="active" data-bs-target="#shotsCarousel" data-bs-slide-to="0" aria-label="Screenshot 1" aria-current="true"></button>
           <button type="button" data-bs-target="#shotsCarousel" data-bs-slide-to="1" aria-label="Screenshot 2"></button>
           <button type="button" data-bs-target="#shotsCarousel" data-bs-slide-to="2" aria-label="Screenshot 3"></button>
           <button type="button" data-bs-target="#shotsCarousel" data-bs-slide-to="3" aria-label="Screenshot 4"></button>
+          <button type="button" data-bs-target="#shotsCarousel" data-bs-slide-to="4" aria-label="Screenshot 5"></button>
         </div>
       </div>
     </section>
