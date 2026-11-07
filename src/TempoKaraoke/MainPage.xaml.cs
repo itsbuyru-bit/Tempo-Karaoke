@@ -2188,8 +2188,13 @@ public sealed partial class MainPage : Page, IRemoteHost, INotifyPropertyChanged
 
     private void ShowLibraryItemContextMenu(FrameworkElement target, MediaGroup group, Point position)
     {
+        var started = Stopwatch.StartNew();
         var item = group.Best;
         var flyout = new MenuFlyout();
+
+        // ПКМ не должен оставлять системный «занятый» курсор, пока открыто меню.
+        ProtectedCursor = InputSystemCursor.Create(InputSystemCursorShape.Arrow);
+        flyout.Closed += (_, _) => ProtectedCursor = null;
 
         flyout.Items.Add(CreateMenuItem("ContextMenu_Play.Text", "\uE768", () => PlayNow(item)));
         flyout.Items.Add(CreateMenuItem("Menu_PlayNext.Text", "\uED35", () => EnqueueItemNext(item)));
@@ -2225,6 +2230,10 @@ public sealed partial class MainPage : Page, IRemoteHost, INotifyPropertyChanged
         flyout.Items.Add(CreateMenuItem("ContextMenu_Select.Text", "\uE73A", () => EnterCardSelection(group)));
 
         flyout.ShowAt(target, position);
+        if (started.ElapsedMilliseconds > 100)
+        {
+            LogService.Warn($"[context] media menu took {started.ElapsedMilliseconds} ms");
+        }
     }
 
     /// <summary>Включает режим выбора чек-боксами и отмечает карточку.</summary>
