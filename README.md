@@ -18,7 +18,7 @@ A modern, native video karaoke player for Windows that works with any local medi
 * Complete feature guide: [`docs/en/FEATURES.md`](docs/en/FEATURES.md)
 * Localization guide: [`docs/en/LOCALIZATION.md`](docs/en/LOCALIZATION.md)
 
-![Tempo Karaoke Banner](docs/assets/banner.png)
+![Tempo Karaoke Banner](docs/assets/banner-en.png)
 
 ---
 
