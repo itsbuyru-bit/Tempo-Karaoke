@@ -76,71 +76,89 @@
       <div class="stat"><b>1</b><span>QR-код от ноутбука к телевизору</span></div>
     </section>
 
-    <section class="container app-shots" aria-label="Внутри приложения">
-      <div class="section-head">
-        <span class="section-kicker">Внутри приложения</span>
-        <h2>Сделано для настоящего караоке-вечера.</h2>
-        <p>Пять экранов Windows-приложения: медиатека, очередь, плейлисты, веб-пульт и настройки, которые их связывают.</p>
+        <section id="showcase" class="container app-shots" aria-label="Внутри приложения" data-autoplay-on="Автопоказ: ВКЛ" data-autoplay-off="Автопоказ: ВЫКЛ">
+      <div class="showcase-head">
+        <div class="section-head">
+          <span class="section-kicker">Внутри приложения</span>
+          <h2>Сделано для настоящего караоке-вечера.</h2>
+          <p>Пять экранов нативного Windows-приложения. Переключайтесь по вкладкам, стрелкам ← → или откройте скриншот на весь экран.</p>
+        </div>
+        <button type="button" class="autoplay-toggle" data-showcase-autoplay aria-pressed="true">
+          <span class="autoplay-dot"></span><span data-autoplay-label>Автопоказ: ВКЛ</span>
+        </button>
       </div>
 
-      <div id="shotsCarousel" class="carousel slide" data-bs-ride="false" aria-roledescription="carousel" aria-label="Скриншоты Tempo Karaoke">
-        <div class="carousel-inner">
-          <figure class="carousel-item active" aria-roledescription="slide" aria-label="1 из 5">
-            <img src="assets/screenshots/library.png" alt="Медиатека Tempo Karaoke с карточками песен" loading="lazy" width="1938" height="1200">
-            <figcaption class="carousel-caption">
-              <span class="slide-count">01 / 05</span>
-              <strong>Медиатека</strong>
-              <p>Тысячи песен, сгруппированные по исполнителю и версии.</p>
-            </figcaption>
-          </figure>
-          <figure class="carousel-item" aria-roledescription="slide" aria-label="2 из 5" aria-hidden="true">
-            <img src="assets/screenshots/queue.png" alt="Очередь воспроизведения Tempo Karaoke с песнями и именами" loading="lazy" width="1938" height="1200">
-            <figcaption class="carousel-caption">
-              <span class="slide-count">02 / 05</span>
-              <strong>Очередь воспроизведения</strong>
-              <p>Сохраняется между запусками и помнит, кто заказал песню.</p>
-            </figcaption>
-          </figure>
-          <figure class="carousel-item" aria-roledescription="slide" aria-label="3 из 5" aria-hidden="true">
-            <img src="assets/screenshots/playlists.png" alt="Плейлисты Tempo Karaoke с английским интерфейсом" loading="lazy" width="1938" height="1200">
-            <figcaption class="carousel-caption">
-              <span class="slide-count">03 / 05</span>
-              <strong>Плейлисты</strong>
-              <p>Сохранённые наборы для всего вечера — весь интерфейс на английском.</p>
-            </figcaption>
-          </figure>
-          <figure class="carousel-item" aria-roledescription="slide" aria-label="4 из 5" aria-hidden="true">
-            <img src="assets/screenshots/connection.png" alt="Настройки подключения веб-пульта Tempo Karaoke" loading="lazy" width="1938" height="1200">
-            <figcaption class="carousel-caption">
-              <span class="slide-count">04 / 05</span>
-              <strong>Веб-пульт</strong>
-              <p>Запуск сервера по Wi-Fi или Wi-Fi Direct.</p>
-            </figcaption>
-          </figure>
-          <figure class="carousel-item" aria-roledescription="slide" aria-label="5 из 5" aria-hidden="true">
-            <img src="assets/screenshots/settings.png" alt="Общие настройки Tempo Karaoke" loading="lazy" width="1938" height="1200">
-            <figcaption class="carousel-caption">
-              <span class="slide-count">05 / 05</span>
-              <strong>Настройки</strong>
-              <p>Медиатека, воспроизведение, пульт, диагностика и обновления.</p>
-            </figcaption>
-          </figure>
+      <div class="showcase" data-showcase>
+        <div class="showcase-tabs" role="tablist" aria-label="Внутри приложения">
+          <button type="button" class="showcase-tab active" role="tab" aria-selected="true" data-showcase-tab="0"><b>01</b><span>Медиатека</span></button>
+          <button type="button" class="showcase-tab" role="tab" aria-selected="false" data-showcase-tab="1"><b>02</b><span>Очередь</span></button>
+          <button type="button" class="showcase-tab" role="tab" aria-selected="false" data-showcase-tab="2"><b>03</b><span>Плейлисты</span></button>
+          <button type="button" class="showcase-tab" role="tab" aria-selected="false" data-showcase-tab="3"><b>04</b><span>Веб-пульт</span></button>
+          <button type="button" class="showcase-tab" role="tab" aria-selected="false" data-showcase-tab="4"><b>05</b><span>Настройки</span></button>
         </div>
-        <button class="carousel-control-prev" type="button" data-bs-target="#shotsCarousel" data-bs-slide="prev" aria-label="Предыдущий скриншот">
-          <svg class="bi bi-chevron-left" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"/></svg>
-        </button>
-        <button class="carousel-control-next" type="button" data-bs-target="#shotsCarousel" data-bs-slide="next" aria-label="Следующий скриншот">
-          <svg class="bi bi-chevron-right" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708"/></svg>
-        </button>
-        <div class="carousel-indicators">
-          <button type="button" class="active" data-bs-target="#shotsCarousel" data-bs-slide-to="0" aria-label="Скриншот 1" aria-current="true"></button>
-          <button type="button" data-bs-target="#shotsCarousel" data-bs-slide-to="1" aria-label="Скриншот 2"></button>
-          <button type="button" data-bs-target="#shotsCarousel" data-bs-slide-to="2" aria-label="Скриншот 3"></button>
-          <button type="button" data-bs-target="#shotsCarousel" data-bs-slide-to="3" aria-label="Скриншот 4"></button>
-          <button type="button" data-bs-target="#shotsCarousel" data-bs-slide-to="4" aria-label="Скриншот 5"></button>
+
+        <div class="showcase-frame">
+          <div class="showcase-titlebar">
+            <div class="showcase-brand">
+              <img src="assets/appicon.png" alt="">
+              <strong>Tempo Karaoke</strong>
+              <span class="showcase-dash">—</span>
+              <span class="showcase-crumb" data-showcase-crumb>Медиатека · 4 656 песен</span>
+            </div>
+            <div class="showcase-tools">
+              <button type="button" class="showcase-expand" data-showcase-expand>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+                <span>Открыть на весь экран</span>
+              </button>
+              <span class="showcase-window-controls" aria-hidden="true"><i>—</i><i>□</i><i>×</i></span>
+            </div>
+          </div>
+
+          <div class="showcase-viewport" tabindex="0" data-showcase-viewport aria-label="Кликните для увеличения">
+            <figure class="showcase-slide active" data-showcase-slide="0" data-title="Медиатека" data-desc="Тысячи песен, сгруппированные по исполнителю и версии." data-crumb="Медиатека · 4 656 песен" aria-hidden="false">
+              <img src="assets/screenshots/library.png" alt="Медиатека Tempo Karaoke" width="1938" height="1160">
+            </figure>
+            <figure class="showcase-slide" data-showcase-slide="1" data-title="Очередь" data-desc="Очередь сохраняется между запусками и помнит, кто заказал." data-crumb="Очередь · 3 трека" aria-hidden="true">
+              <img src="assets/screenshots/queue.png" alt="Очередь воспроизведения Tempo Karaoke" loading="lazy" width="1938" height="1160">
+            </figure>
+            <figure class="showcase-slide" data-showcase-slide="2" data-title="Плейлисты" data-desc="Сохранённые наборы для всего вечера — интерфейс полностью на английском." data-crumb="Плейлисты · Test1, Test2" aria-hidden="true">
+              <img src="assets/screenshots/playlists.png" alt="Плейлисты Tempo Karaoke" loading="lazy" width="1938" height="1160">
+            </figure>
+            <figure class="showcase-slide" data-showcase-slide="3" data-title="Веб-пульт" data-desc="Запуск сервера по Wi-Fi или Wi-Fi Direct." data-crumb="Веб-пульт · порт 4663" aria-hidden="true">
+              <img src="assets/screenshots/connection.png" alt="Настройки подключения веб-пульта" loading="lazy" width="1938" height="1160">
+            </figure>
+            <figure class="showcase-slide" data-showcase-slide="4" data-title="Настройки" data-desc="Медиатека, воспроизведение, пульт, диагностика и обновления." data-crumb="Настройки" aria-hidden="true">
+              <img src="assets/screenshots/settings.png" alt="Настройки Tempo Karaoke" loading="lazy" width="1938" height="1160">
+            </figure>
+            <span class="showcase-zoom-hint">Кликните для увеличения</span>
+          </div>
+
+          <div class="showcase-caption">
+            <div class="showcase-copy">
+              <span class="showcase-counter" data-showcase-counter>01 / 05</span>
+              <strong data-showcase-title>Медиатека</strong>
+              <span data-showcase-desc>Тысячи песен, сгруппированные по исполнителю и версии.</span>
+            </div>
+            <div class="showcase-controls">
+              <button type="button" data-showcase-prev aria-label="Предыдущий скриншот"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"/></svg></button>
+              <button type="button" data-showcase-next aria-label="Следующий скриншот"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708"/></svg></button>
+            </div>
+          </div>
         </div>
       </div>
     </section>
+
+    <div class="lightbox" data-showcase-lightbox hidden>
+      <div class="lightbox-panel" role="dialog" aria-modal="true" aria-label="Внутри приложения">
+        <button type="button" class="lightbox-close" data-lightbox-close aria-label="Закрыть">×</button>
+        <img data-lightbox-image alt="">
+        <div class="lightbox-caption">
+          <span data-lightbox-counter></span>
+          <strong data-lightbox-title></strong>
+          <p data-lightbox-desc></p>
+        </div>
+      </div>
+    </div>
 
     <section id="features" class="container">
       <div class="section-head">
@@ -233,6 +251,110 @@
       </div>
     </div>
   </footer>
-  <script src="vendor/bootstrap.bundle.min.js"></script>
+  <script>
+    (() => {
+      const root = document.querySelector('[data-showcase]');
+      if (!root) return;
+
+      const slides = [...root.querySelectorAll('[data-showcase-slide]')];
+      const tabs = [...root.querySelectorAll('[data-showcase-tab]')];
+      const counter = root.querySelector('[data-showcase-counter]');
+      const title = root.querySelector('[data-showcase-title]');
+      const desc = root.querySelector('[data-showcase-desc]');
+      const crumb = root.querySelector('[data-showcase-crumb]');
+      const prev = root.querySelector('[data-showcase-prev]');
+      const next = root.querySelector('[data-showcase-next]');
+      const autoplayBtn = root.querySelector('[data-showcase-autoplay]');
+      const autoplayLabel = root.querySelector('[data-autoplay-label]');
+      const viewport = root.querySelector('[data-showcase-viewport]');
+      const expand = root.querySelector('[data-showcase-expand]');
+      const lightbox = document.querySelector('[data-showcase-lightbox]');
+      const lightboxImage = lightbox.querySelector('[data-lightbox-image]');
+      const lightboxCounter = lightbox.querySelector('[data-lightbox-counter]');
+      const lightboxTitle = lightbox.querySelector('[data-lightbox-title]');
+      const lightboxDesc = lightbox.querySelector('[data-lightbox-desc]');
+      let index = 0;
+      let autoplay = true;
+      let timer = null;
+
+      const show = value => {
+        index = (value + slides.length) % slides.length;
+        slides.forEach((slide, i) => {
+          const active = i === index;
+          slide.classList.toggle('active', active);
+          slide.setAttribute('aria-hidden', String(!active));
+        });
+        tabs.forEach((tab, i) => {
+          const active = i === index;
+          tab.classList.toggle('active', active);
+          tab.setAttribute('aria-selected', String(active));
+        });
+        const slide = slides[index];
+        counter.textContent = String(index + 1).padStart(2, '0') + ' / ' + String(slides.length).padStart(2, '0');
+        title.textContent = slide.dataset.title;
+        desc.textContent = slide.dataset.desc;
+        crumb.textContent = slide.dataset.crumb;
+        if (!lightbox.hidden) updateLightbox();
+      };
+
+      const schedule = () => {
+        clearInterval(timer);
+        if (autoplay && lightbox.hidden) timer = setInterval(() => show(index + 1), 6500);
+      };
+
+      const setAutoplay = value => {
+        autoplay = value;
+        autoplayBtn.setAttribute('aria-pressed', String(value));
+        autoplayBtn.classList.toggle('paused', !value);
+        autoplayLabel.textContent = value ? root.dataset.autoplayOn : root.dataset.autoplayOff;
+        schedule();
+      };
+
+      const updateLightbox = () => {
+        const slide = slides[index];
+        const image = slide.querySelector('img');
+        lightboxImage.src = image.src;
+        lightboxImage.alt = image.alt;
+        lightboxCounter.textContent = String(index + 1).padStart(2, '0') + ' / ' + String(slides.length).padStart(2, '0');
+        lightboxTitle.textContent = slide.dataset.title;
+        lightboxDesc.textContent = slide.dataset.desc;
+      };
+
+      const openLightbox = () => {
+        updateLightbox();
+        lightbox.hidden = false;
+        document.body.classList.add('lightbox-open');
+        clearInterval(timer);
+        lightbox.querySelector('[data-lightbox-close]').focus();
+      };
+
+      const closeLightbox = () => {
+        lightbox.hidden = true;
+        document.body.classList.remove('lightbox-open');
+        schedule();
+      };
+
+      prev.addEventListener('click', () => { show(index - 1); schedule(); });
+      next.addEventListener('click', () => { show(index + 1); schedule(); });
+      tabs.forEach(tab => tab.addEventListener('click', () => { show(Number(tab.dataset.showcaseTab)); schedule(); }));
+      viewport.addEventListener('click', openLightbox);
+      expand.addEventListener('click', openLightbox);
+      autoplayBtn.addEventListener('click', () => setAutoplay(!autoplay));
+      lightbox.querySelector('[data-lightbox-close]').addEventListener('click', closeLightbox);
+      lightbox.addEventListener('click', event => { if (event.target === lightbox) closeLightbox(); });
+      viewport.addEventListener('keydown', event => {
+        if (event.key === 'ArrowLeft') { event.preventDefault(); show(index - 1); schedule(); }
+        if (event.key === 'ArrowRight') { event.preventDefault(); show(index + 1); schedule(); }
+      });
+      document.addEventListener('keydown', event => {
+        if (event.key === 'Escape' && !lightbox.hidden) closeLightbox();
+        if (event.key === 'ArrowLeft' && lightbox.hidden && document.activeElement === viewport) { event.preventDefault(); show(index - 1); schedule(); }
+        if (event.key === 'ArrowRight' && lightbox.hidden && document.activeElement === viewport) { event.preventDefault(); show(index + 1); schedule(); }
+      });
+
+      show(0);
+      setAutoplay(true);
+    })();
+  </script>
 </body>
 </html>
