@@ -82,10 +82,10 @@
         <p>Four views from the Windows app: the library, the queue, the phone remote and the settings that connect them.</p>
       </div>
 
-      <div class="carousel" data-carousel aria-roledescription="carousel" aria-label="Tempo Karaoke screenshots">
+      <div id="shotsCarousel" class="carousel slide" data-bs-ride="false" aria-roledescription="carousel" aria-label="Tempo Karaoke screenshots">
         <div class="carousel-inner">
           <figure class="carousel-item active" aria-roledescription="slide" aria-label="1 of 4">
-            <img src="assets/screenshots/library.png" alt="Tempo Karaoke video library with song cards" loading="lazy" width="1938" height="1800">
+            <img src="assets/screenshots/library.png" alt="Tempo Karaoke video library with song cards" loading="lazy" width="1938" height="1200">
             <figcaption class="carousel-caption">
               <span class="slide-count">01 / 04</span>
               <strong>Video library</strong>
@@ -93,7 +93,7 @@
             </figcaption>
           </figure>
           <figure class="carousel-item" aria-roledescription="slide" aria-label="2 of 4" aria-hidden="true">
-            <img src="assets/screenshots/queue.png" alt="Tempo Karaoke playback queue with songs and requester names" loading="lazy" width="1938" height="1800">
+            <img src="assets/screenshots/queue.png" alt="Tempo Karaoke playback queue with songs and requester names" loading="lazy" width="1938" height="1200">
             <figcaption class="carousel-caption">
               <span class="slide-count">02 / 04</span>
               <strong>Playback queue</strong>
@@ -101,7 +101,7 @@
             </figcaption>
           </figure>
           <figure class="carousel-item" aria-roledescription="slide" aria-label="3 of 4" aria-hidden="true">
-            <img src="assets/screenshots/connection.png" alt="Tempo Karaoke remote control connection settings" loading="lazy" width="1938" height="1800">
+            <img src="assets/screenshots/connection.png" alt="Tempo Karaoke remote control connection settings" loading="lazy" width="1938" height="1200">
             <figcaption class="carousel-caption">
               <span class="slide-count">03 / 04</span>
               <strong>Web remote</strong>
@@ -109,7 +109,7 @@
             </figcaption>
           </figure>
           <figure class="carousel-item" aria-roledescription="slide" aria-label="4 of 4" aria-hidden="true">
-            <img src="assets/screenshots/settings.png" alt="Tempo Karaoke settings overview" loading="lazy" width="1938" height="1800">
+            <img src="assets/screenshots/settings.png" alt="Tempo Karaoke settings overview" loading="lazy" width="1938" height="1200">
             <figcaption class="carousel-caption">
               <span class="slide-count">04 / 04</span>
               <strong>Settings</strong>
@@ -117,17 +117,17 @@
             </figcaption>
           </figure>
         </div>
-        <button class="carousel-control-prev" type="button" data-carousel-prev aria-label="Previous screenshot">
+        <button class="carousel-control-prev" type="button" data-bs-target="#shotsCarousel" data-bs-slide="prev" aria-label="Previous screenshot">
           <span aria-hidden="true">&#8249;</span>
         </button>
-        <button class="carousel-control-next" type="button" data-carousel-next aria-label="Next screenshot">
+        <button class="carousel-control-next" type="button" data-bs-target="#shotsCarousel" data-bs-slide="next" aria-label="Next screenshot">
           <span aria-hidden="true">&#8250;</span>
         </button>
         <div class="carousel-indicators">
-          <button type="button" class="active" data-carousel-to="0" aria-label="Screenshot 1" aria-current="true"></button>
-          <button type="button" data-carousel-to="1" aria-label="Screenshot 2"></button>
-          <button type="button" data-carousel-to="2" aria-label="Screenshot 3"></button>
-          <button type="button" data-carousel-to="3" aria-label="Screenshot 4"></button>
+          <button type="button" class="active" data-bs-target="#shotsCarousel" data-bs-slide-to="0" aria-label="Screenshot 1" aria-current="true"></button>
+          <button type="button" data-bs-target="#shotsCarousel" data-bs-slide-to="1" aria-label="Screenshot 2"></button>
+          <button type="button" data-bs-target="#shotsCarousel" data-bs-slide-to="2" aria-label="Screenshot 3"></button>
+          <button type="button" data-bs-target="#shotsCarousel" data-bs-slide-to="3" aria-label="Screenshot 4"></button>
         </div>
       </div>
     </section>
@@ -223,37 +223,6 @@
       </div>
     </div>
   </footer>
-  <script>
-    (() => {
-      for (const root of document.querySelectorAll('[data-carousel]')) {
-        const items = [...root.querySelectorAll('.carousel-item')];
-        const dots = [...root.querySelectorAll('[data-carousel-to]')];
-        let current = 0;
-
-        const show = next => {
-          current = (next + items.length) % items.length;
-          items.forEach((item, index) => {
-            const active = index === current;
-            item.classList.toggle('active', active);
-            item.setAttribute('aria-hidden', String(!active));
-          });
-          dots.forEach((dot, index) => {
-            const active = index === current;
-            dot.classList.toggle('active', active);
-            if (active) dot.setAttribute('aria-current', 'true');
-            else dot.removeAttribute('aria-current');
-          });
-        };
-
-        root.querySelector('[data-carousel-prev]')?.addEventListener('click', () => show(current - 1));
-        root.querySelector('[data-carousel-next]')?.addEventListener('click', () => show(current + 1));
-        dots.forEach(dot => dot.addEventListener('click', () => show(Number(dot.dataset.carouselTo))));
-        root.addEventListener('keydown', event => {
-          if (event.key === 'ArrowLeft') { event.preventDefault(); show(current - 1); }
-          if (event.key === 'ArrowRight') { event.preventDefault(); show(current + 1); }
-        });
-      }
-    })();
-  </script>
+  <script src="vendor/bootstrap.bundle.min.js"></script>
 </body>
 </html>

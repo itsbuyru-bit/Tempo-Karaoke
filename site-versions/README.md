@@ -22,6 +22,7 @@ before replacing it, so a restore can be undone the same way.
 | `2026-11-07-live-remote` | Dark bento landing, real `RemotePage` clone in an iframe, mock search/queue/playback, and app screenshots in a grid. |
 | `2026-11-07-carousel` | Current landing: live remote clone with a dark themed scrollbar, richer layered background, and app screenshots as a swipeable film strip. |
 | `2026-11-07-caption-carousel` | Current landing: Bootstrap-style screenshot carousel with overlaid captions, indicators and prev/next controls. |
+| `2026-11-07-bootstrap-carousel` | Current landing: app screenshots recaptured at two-thirds height, served through the vendored Bootstrap carousel data API. |
 
 Archives are committed so a previous look can be restored without relying on
 the git history of the `site/` directory. To try one without touching the
