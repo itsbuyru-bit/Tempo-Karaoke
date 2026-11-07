@@ -7905,7 +7905,14 @@ public sealed partial class MainPage : Page, IRemoteHost, INotifyPropertyChanged
             }
             else
             {
-                _player.Stop();
+                if (_detached && _playerWindow is not null)
+                {
+                    _playerWindow.Stop();
+                }
+                else
+                {
+                    _player.Stop();
+                }
             }
 
             return;
@@ -7944,9 +7951,21 @@ public sealed partial class MainPage : Page, IRemoteHost, INotifyPropertyChanged
 
     private void PlayPrevious()
     {
-        if (_player.PositionMs > 3000)
+        var activePosition = _detached && _playerWindow is not null
+            ? _playerWindow.PositionMs
+            : _player.PositionMs;
+
+        if (activePosition > 3000)
         {
-            _player.Seek(0);
+            if (_detached && _playerWindow is not null)
+            {
+                _playerWindow.Seek(0);
+            }
+            else
+            {
+                _player.Seek(0);
+            }
+
             return;
         }
 
@@ -7974,7 +7993,14 @@ public sealed partial class MainPage : Page, IRemoteHost, INotifyPropertyChanged
         }
         else
         {
-            _player.Seek(0);
+            if (_detached && _playerWindow is not null)
+            {
+                _playerWindow.Seek(0);
+            }
+            else
+            {
+                _player.Seek(0);
+            }
         }
     }
 
@@ -8827,13 +8853,18 @@ public sealed partial class MainPage : Page, IRemoteHost, INotifyPropertyChanged
         return OnUiAsync(() =>
         {
             var showCurrent = _current is not null;
+            var detached = _detached && _playerWindow is not null;
+            var isPlaying = detached ? _playerWindow!.IsPlaying : _player.IsPlaying;
+            var positionMs = detached ? _playerWindow!.PositionMs : _player.PositionMs;
+            var lengthMs = detached ? _playerWindow!.LengthMs : _player.LengthMs;
+            var volume = detached ? _playerWindow!.Volume : _player.Volume;
             return new RemoteSnapshot(
                 showCurrent ? _current!.DisplayTitle : LocalizationService.Get("Player_NothingPlaying"),
                 showCurrent ? _current!.Subtitle : LocalizationService.Get("Player_ChooseSong"),
-                _player.IsPlaying,
-                _player.PositionMs,
-                _player.LengthMs,
-                _player.Volume,
+                isPlaying,
+                positionMs,
+                lengthMs,
+                volume,
                 _queueIndex >= 0 && _queueIndex < Queue.Count ? _queueIndex : -1,
                 Queue.Select(item => new RemoteQueueItem(
                     item.Path,
@@ -9008,7 +9039,15 @@ public sealed partial class MainPage : Page, IRemoteHost, INotifyPropertyChanged
             switch (action)
             {
                 case "playpause":
-                    TogglePlayback();
+                    if (_detached && _playerWindow is not null)
+                    {
+                        _playerWindow.TogglePlayPause();
+                    }
+                    else
+                    {
+                        TogglePlayback();
+                    }
+
                     break;
                 case "next":
                     PlayNext();
@@ -9017,13 +9056,33 @@ public sealed partial class MainPage : Page, IRemoteHost, INotifyPropertyChanged
                     PlayPrevious();
                     break;
                 case "stop":
-                    _player.Stop();
+                    if (_detached && _playerWindow is not null)
+                    {
+                        _playerWindow.Stop();
+                    }
+                    else
+                    {
+                        _player.Stop();
+                    }
+
                     break;
                 case "volume":
-                    _player.SetVolume((int)Math.Clamp(value, 0, 100));
+                    if (_detached && _playerWindow is not null)
+                    {
+                        _playerWindow.SetVolume((int)Math.Clamp(value, 0, 100));
+                    }
+                    else
+                    {
+                        _player.SetVolume((int)Math.Clamp(value, 0, 100));
+                    }
+
                     break;
                 case "seek":
-                    if (_player.LengthMs > 0)
+                    if (_detached && _playerWindow is not null && _playerWindow.LengthMs > 0)
+                    {
+                        _playerWindow.Seek((long)(_playerWindow.LengthMs * (Math.Clamp(value, 0, 1000) / 1000d)));
+                    }
+                    else if (_player.LengthMs > 0)
                     {
                         _player.Seek((long)(_player.LengthMs * (Math.Clamp(value, 0, 1000) / 1000d)));
                     }

@@ -9,6 +9,16 @@ components (`major.minor.patch.revision`).
 Detailed user-facing release notes for each release live in
 `docs/releases/<tag>.md` and are published together with the GitHub Release.
 
+## [1.10.3.2] — 2026-11-08
+
+Full details: [`docs/releases/v1.10.3.2.md`](docs/releases/v1.10.3.2.md).
+
+### Fixed
+
+- The phone remote controls the detached/fullscreen video window: play/pause,
+  stop, seek and volume use its real position and playback state instead of the
+  paused main player.
+
 ## [1.10.3.1] — 2026-11-07
 
 Full details: [`docs/releases/v1.10.3.1.md`](docs/releases/v1.10.3.1.md).

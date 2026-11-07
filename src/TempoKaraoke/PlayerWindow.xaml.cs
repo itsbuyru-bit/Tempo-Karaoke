@@ -437,6 +437,28 @@ public sealed partial class PlayerWindow : Window
         UpdateTransport();
     }
 
+    /// <summary>Seek from the phone remote or the host UI.</summary>
+    public void Seek(long milliseconds) => SeekTo(milliseconds);
+
+    /// <summary>Set volume from the phone remote.</summary>
+    public void SetVolume(int volume)
+    {
+        _mediaPlayer.Volume = Math.Clamp(volume, 0, 100) / 100.0;
+        UpdateTransport();
+    }
+
+    /// <summary>Stop from the phone remote: pause and rewind to the start.</summary>
+    public void Stop()
+    {
+        _mediaPlayer.Pause();
+        if (_mediaPlayer.PlaybackSession is not null)
+        {
+            _mediaPlayer.PlaybackSession.Position = TimeSpan.Zero;
+        }
+
+        UpdateTransport();
+    }
+
     /// <summary>Останавливает откреплённое воспроизведение перед миграцией.</summary>
     private void Stop_Click(object sender, RoutedEventArgs e)
     {
