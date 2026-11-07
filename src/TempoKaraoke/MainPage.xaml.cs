@@ -569,9 +569,11 @@ public sealed partial class MainPage : Page, IRemoteHost, INotifyPropertyChanged
         var empty = SearchResults.Count == 0;
         SearchResultsList.Visibility = empty ? Visibility.Collapsed : Visibility.Visible;
         SearchResultsEmptyPanel.Visibility = empty ? Visibility.Visible : Visibility.Collapsed;
-        if (SearchResultsEmptyHint is not null)
+        if (SearchResultsEmptyPanel is not null &&
+            SearchResultsEmptyPanel.Children.Count > 1 &&
+            SearchResultsEmptyPanel.Children[1] is TextBlock hint)
         {
-            SearchResultsEmptyHint.Text = clarify
+            hint.Text = clarify
                 ? ClarifySearchText()
                 : LocalizationService.Get("Ui_TryChangingTheQuery.Text");
         }

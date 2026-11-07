@@ -1225,7 +1225,6 @@
                         <TextBlock
  HorizontalAlignment="Center" Style="{StaticResource SubtitleTextBlockStyle}" x:Uid="Ui_NothingFound_50" loc:Localization.Key="Ui_NothingFound_50.Text" />
                         <TextBlock
- x:Name="SearchResultsEmptyHint"
  HorizontalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" x:Uid="Ui_TryChangingTheQuery" loc:Localization.Key="Ui_TryChangingTheQuery.Text" />
                         <Button
  HorizontalAlignment="Center" Click="ResetSearch_Click" Style="{StaticResource AccentButtonStyle}" x:Uid="Ui_ResetSearch_52" loc:Localization.Key="Ui_ResetSearch_52.Content" />

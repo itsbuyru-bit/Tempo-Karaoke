@@ -9,6 +9,17 @@ components (`major.minor.patch.revision`).
 Detailed user-facing release notes for each release live in
 `docs/releases/<tag>.md` and are published together with the GitHub Release.
 
+## [1.10.3.1] — 2026-11-07
+
+Full details: [`docs/releases/v1.10.3.1.md`](docs/releases/v1.10.3.1.md).
+
+### Fixed
+
+- Installed build crashed at startup in `MainPage.Connect` with
+  `InvalidCastException` while connecting the search-empty hint. The hint no
+  longer uses a generated `x:Name` field and is updated through its parent
+  panel, so the application starts normally again.
+
 ## [1.10.3.0] — 2026-11-07
 
 Full details: [`docs/releases/v1.10.3.0.md`](docs/releases/v1.10.3.0.md).
