@@ -3,11 +3,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Tempo Karaoke — караоке-плеер для Windows с пультом в телефоне</title>
-  <meta name="description" content="Нативный караоке-плеер для Windows: локальная медиатека, умный поиск, очередь, плейлисты и веб-пульт для телефонов. Бесплатно и с открытым кодом.">
+  <title>Tempo Karaoke — сканируй, заказывай и пой за секунды</title>
+  <meta name="description" content="Нативный караоке-плеер для Windows: локальная медиатека, умный поиск, очередь, плейлисты и живой веб-пульт для телефонов. Бесплатно и с открытым кодом.">
   <meta property="og:title" content="Tempo Karaoke">
-  <meta property="og:description" content="Ваша караоке-медиатека, умный поиск и пульт в телефоне — на Windows.">
-  <meta property="og:image" content="assets/banner.png">
+  <meta property="og:description" content="Ваша караоке-медиатека, умный поиск и живой пульт в телефоне — на Windows.">
+  <meta property="og:image" content="https://itsbuyru-bit.github.io/Tempo-Karaoke/assets/banner.png">
   <link rel="icon" href="assets/appicon.png">
   <link rel="stylesheet" href="styles.css">
 </head>
@@ -20,7 +20,7 @@
       </a>
       <nav class="nav-links" aria-label="Основная навигация">
         <a href="#features">Возможности</a>
-        <a href="#remote">Пульт</a>
+        <a href="#remote">Живой пульт</a>
         <a href="#download">Скачать</a>
         <a href="https://github.com/itsbuyru-bit/Tempo-Karaoke">GitHub</a>
       </nav>
@@ -33,9 +33,9 @@
 
   <main>
     <section class="container hero">
-      <div>
-        <span class="eyebrow"><span class="dot"></span>Windows 10 / 11 · Бесплатно · MIT</span>
-        <h1>Караоке-медиатека,<br><span class="gradient">умный поиск и пульт в телефоне.</span></h1>
+      <div class="hero-copy">
+        <span class="eyebrow"><span class="dot"></span>Гостям не нужно ничего устанавливать</span>
+        <h1>Сканируй, заказывай<br><span class="gradient">и пой за секунды.</span></h1>
         <p class="lead">Tempo Karaoke превращает любую папку с караоке-видео в быстрый и красивый каталог. Гости ищут и заказывают песни со своих телефонов, а видео играет на большом экране.</p>
         <div class="hero-actions">
           <a class="btn primary" href="https://github.com/itsbuyru-bit/Tempo-Karaoke/releases/latest">
@@ -53,115 +53,120 @@
           <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 12 4 4L19 6"/></svg>VLC уже внутри</span>
         </div>
       </div>
-      <div class="hero-visual">
-        <img src="assets/banner.png" alt="Интерфейс Tempo Karaoke с библиотекой видео и управлением">
-        <span class="visual-badge">Нативный WinUI 3 · LibVLC</span>
+
+      <div class="demo-shell" id="demo"
+           data-queue-label="В очередь"
+           data-queued-label="В очереди"
+           data-empty-label="Очередь пуста"
+           data-play-label="Играть"
+           data-pause-label="Пауза"
+           data-playing-label="Играет"
+           data-paused-label="Пауза"
+           data-nothing-label="Ничего не играет">
+        <div class="demo-head">
+          <span class="demo-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg>
+            Интерактивный пульт
+          </span>
+          <span class="live-pill"><span class="dot"></span>Живое демо</span>
+        </div>
+        <div class="phone">
+          <div class="screen">
+            <div class="screen-top">
+              <span class="screen-brand"><img src="assets/appicon.png" alt="">Tempo Karaoke</span>
+              <span class="role-pill">Гость</span>
+            </div>
+            <label class="demo-search">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+              <input id="demoSearch" type="search" autocomplete="off" placeholder="Песня или исполнитель" aria-label="Песня или исполнитель">
+            </label>
+            <div class="demo-results" id="demoResults"></div>
+            <div class="demo-queue">
+              <div class="queue-head"><span>Очередь</span><span class="queue-count" id="demoQueueCount" aria-live="polite">0</span></div>
+              <ul id="demoQueue" aria-live="polite"></ul>
+              <div class="queue-empty" id="demoQueueEmpty">Очередь пуста</div>
+              <div class="demo-now">
+                <span class="eq" id="demoEq"><i></i><i></i><i></i><i></i></span>
+                <div class="now-copy"><strong id="demoNowTitle">Ничего не играет</strong><span id="demoNowState">Пауза</span></div>
+                <button class="demo-play" id="demoPlay" type="button">Играть</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="demo-hint">Это настоящий интерактивный пример — введите запрос, нажмите <strong>В очередь</strong>, затем <strong>Играть</strong>.</p>
       </div>
+    </section>
+
+    <section class="container stats" aria-label="Коротко о проекте">
+      <div class="stat"><b>4 656</b><span>песен индексируются за секунды в демо-библиотеке</span></div>
+      <div class="stat"><b>0</b><span>приложений нужно ставить гостям</span></div>
+      <div class="stat"><b>1</b><span>QR-код от ноутбука к телевизору</span></div>
     </section>
 
     <section id="features" class="container">
       <div class="section-head">
+        <span class="section-kicker">Для всего вечера</span>
         <h2>Всё для караоке-вечера</h2>
-        <p>Создано для больших локальных коллекций, заказов с телефонов и долгих вечеров — без папок, таблиц и облачных аккаунтов.</p>
+        <p>Большие локальные коллекции, заказы с телефонов и долгие вечера — без папок, таблиц и облачных аккаунтов.</p>
       </div>
-      <div class="feature-grid">
-        <article class="feature">
+      <div class="bento">
+        <article class="card wide accent">
           <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h16v14H4z"/><path d="m4 15 4-4 3 3 3-4 6 6"/></svg></span>
-          <h3>Локальная медиатека</h3>
-          <p>Индексирование любых папок с видео. Кэш SQLite, метаданные и превью делают повторный запуск мгновенным.</p>
+          <h3>Локальная медиатека без ожидания</h3>
+          <p>Индексирование любого числа папок рекурсивно. Кэш SQLite по размеру и времени изменения, фоновые метаданные и превью делают повторный запуск мгновенным даже при тысячах песен.</p>
         </article>
-        <article class="feature">
+        <article class="card wide">
           <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg></span>
-          <h3>Мгновенный поиск</h3>
-          <p>Нечёткое совпадение, транслитерация RU/EN и исправление раскладки. Результаты быстрее следующего кадра.</p>
+          <h3>Поиск, который читает мысли</h3>
+          <p>Нечёткое совпадение, транслитерация RU/EN и исправление раскладки. Результаты появляются быстрее следующего кадра, сортируются по релевантности и группируют версии песен.</p>
         </article>
-        <article class="feature">
+        <article class="card third">
           <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h10"/><path d="m17 16 3 3-3 3"/></svg></span>
           <h3>Очередь и плейлисты</h3>
-          <p>Перетаскивание, «воспроизвести следующим», отмена, импорт/экспорт M3U и очередь, которая переживает перезапуск.</p>
+          <p>«Воспроизвести следующим», перетаскивание, отмена, импорт/экспорт M3U и очередь, которая переживает перезапуск.</p>
         </article>
-        <article class="feature">
-          <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg></span>
-          <h3>Пульт в телефоне</h3>
-          <p>Гости сканируют QR-код, ищут песни и заказывают их. Ведущий управляет воспроизведением по PIN.</p>
-        </article>
-        <article class="feature">
+        <article class="card third">
           <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg></span>
           <h3>Второй экран</h3>
           <p>Открепите видео на телевизор или проектор, оставив панель управления на ноутбуке.</p>
         </article>
-        <article class="feature">
+        <article class="card third">
           <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v3m0 12v3M3 12h3m12 0h3M5.6 5.6l2.1 2.1m8.6 8.6 2.1 2.1m0-12.8-2.1 2.1m-8.6 8.6-2.1 2.1"/><circle cx="12" cy="12" r="3"/></svg></span>
           <h3>Управление плеером</h3>
-          <p>Библиотека, очередь, перемотка, скорость, 10-полосный эквалайзер, перемешивание, повтор и отсчёт между песнями.</p>
+          <p>Перемотка, скорость, 10-полосный эквалайзер, перемешивание, повтор и отсчёт между песнями.</p>
         </article>
-        <article class="feature">
+        <article class="card wide">
           <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a9 9 0 1 0 9 9"/><path d="M12 7v5l3 2"/></svg></span>
-          <h3>Тихие обновления</h3>
-          <p>Автопроверка релизов GitHub, системный тост, плашка обновления и тихий установщик, сохраняющий данные.</p>
+          <h3>Тихие обновления без сюрпризов</h3>
+          <p>Автопроверка релизов GitHub, системный тост, плашка обновления и тихий установщик, сохраняющий настройки, очередь, плейлисты и кэш. Установка — только после подтверждения.</p>
         </article>
-        <article class="feature">
-          <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V9l8-5 8 5v11"/><path d="M9 20v-6h6v6"/></svg></span>
-          <h3>Два языка</h3>
-          <p>Полный русский и английский интерфейс с переключением на лету. Тёмная, светлая и системная темы.</p>
-        </article>
-        <article class="feature">
+        <article class="card wide">
           <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 4 7v5c0 5 3.4 8 8 9 4.6-1 8-4 8-9V7l-8-4Z"/><path d="m9 12 2 2 4-4"/></svg></span>
-          <h3>Приватность</h3>
-          <p>Без загрузки медиа и аккаунтов. PIN хранится как хэш PBKDF2, отчёты маскируют приватные пути.</p>
+          <h3>Приватность по умолчанию</h3>
+          <p>Без загрузки медиа и аккаунтов. PIN хранится как соль + хэш PBKDF2, диагностика маскирует приватные пути, а медиатека никогда не изменяется.</p>
         </article>
       </div>
     </section>
 
     <section id="remote" class="container">
-      <div class="showcase">
-        <div>
-          <span class="eyebrow"><span class="dot"></span>Приложение на телефон не нужно</span>
-          <h2>Вечеринка управляет собой.</h2>
-          <p>Запустите встроенный веб-сервер, покажите QR-код — и гости откроют каталог в браузере. Управление воспроизведением, громкостью и очередью остаётся у вас.</p>
-          <ul class="checklist">
-            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 12 4 4L19 6"/></svg>Гости ищут и заказывают песни</li>
-            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 12 4 4L19 6"/></svg>PIN ведущего: play, pause, seek, skip и громкость</li>
-            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 12 4 4L19 6"/></svg>Модерация заказов и сортировка очереди</li>
-            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 12 4 4L19 6"/></svg>Работа по Wi-Fi или Wi-Fi Direct</li>
-            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 12 4 4L19 6"/></svg>Автопереподключение после сна и смены сети</li>
-          </ul>
-        </div>
-        <div class="phone" aria-hidden="true">
-          <div class="phone-screen">
-            <div class="phone-top"><span>Tempo Karaoke</span><span class="phone-status"><span class="dot"></span>ПАУЗА</span></div>
-            <div class="phone-track"><strong>KIZARU — MONEY LONG</strong><span>Караоке · MP4</span></div>
-            <div class="phone-progress"></div>
-            <div class="phone-times"><span>00:42</span><span>02:22</span></div>
-            <div class="phone-controls"><span>Назад</span><span class="primary">Старт</span><span>Далее</span></div>
-            <div class="phone-queue">
-              <h4>Следующие треки</h4>
-              <div class="phone-row"><b>1</b>MALFA — SO LONG</div>
-              <div class="phone-row"><b>2</b>2Маши — Инея</div>
-              <div class="phone-row"><b>3</b>Волга-Волга — Три белых коня</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="container">
       <div class="section-head">
-        <h2>Готово за три шага</h2>
-        <p>Без установки VLC, конвертации медиа и регистрации.</p>
+        <span class="section-kicker">Один QR-код — все телефоны</span>
+        <h2>Вечеринка управляет собой.</h2>
+        <p>Запустите встроенный веб-сервер, покажите QR-код — и гости откроют каталог в любом современном браузере. Управление воспроизведением, громкостью и очередью остаётся у вас.</p>
       </div>
       <div class="steps">
-        <article class="step"><h3>Установите</h3><p>Запустите установщик для текущего пользователя. .NET и Windows App SDK уже внутри.</p></article>
-        <article class="step"><h3>Добавьте папки</h3><p>Укажите папку с караоке-видео. Tempo Karaoke проиндексирует её локально.</p></article>
-        <article class="step"><h3>Начните вечер</h3><p>Включите песню, откройте пульт и покажите QR-код гостям.</p></article>
+        <article class="step"><span class="num">01</span><h3>Сканируйте</h3><p>Приложение не нужно — работает в iOS и Android через Wi-Fi или Wi-Fi Direct.</p></article>
+        <article class="step"><span class="num">02</span><h3>Заказывайте</h3><p>Гости ищут песни, отправляют заявки и видят свою позицию в живой очереди.</p></article>
+        <article class="step"><span class="num">03</span><h3>Пойте</h3><p>Ведущий приоритизирует заявки, пропускает треки и управляет воспроизведением по PIN.</p></article>
       </div>
     </section>
 
     <section id="download" class="container">
       <div class="download">
         <div>
+          <span class="section-kicker">Бесплатно · открытый код · MIT</span>
           <h2>Скачать Tempo Karaoke</h2>
-          <p>Бесплатно и с открытым кодом. Последний установщик публикуется в GitHub Releases.</p>
+          <p>Последний установщик публикуется в GitHub Releases. Без установки VLC, конвертации медиа и аккаунта.</p>
           <div class="hero-actions">
             <a class="btn primary" href="https://github.com/itsbuyru-bit/Tempo-Karaoke/releases/latest">Последний релиз</a>
             <a class="btn ghost" href="https://github.com/itsbuyru-bit/Tempo-Karaoke/releases">Все релизы</a>
@@ -189,6 +194,6 @@
       </div>
     </div>
   </footer>
-  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+  <script src="app.js"></script>
 </body>
 </html>
