@@ -262,8 +262,16 @@ public sealed partial class MainPage : Page, IRemoteHost, INotifyPropertyChanged
         App.UpdateActionRequested += OnUpdateActionRequested;
         MediaItem.TextResolver = LocalizationService.Get;
         InitializeSettings();
-        NavView.PaneOpened += (_, _) => UpdateHeader();
-        NavView.PaneClosed += (_, _) => UpdateHeader();
+        NavView.PaneOpened += (_, _) =>
+        {
+            UpdateHeader();
+            UpdateBadgeVisibility();
+        };
+        NavView.PaneClosed += (_, _) =>
+        {
+            UpdateHeader();
+            UpdateBadgeVisibility();
+        };
         ShowLibrary();
         StartupTrace.Mark("MainPage ctor done");
     }
@@ -7728,7 +7736,14 @@ public sealed partial class MainPage : Page, IRemoteHost, INotifyPropertyChanged
                 _updateState = UpdateUiState.UpdateAvailable;
                 SettingsService.PendingUpdateVersion = result.Info.Version;
                 UpdateBadgeVisibility();
-                ShowUpdateNotification(result.Info);
+
+                // Тост — только для автоматической проверки при запуске.
+                // Ручная проверка из «Параметров» ограничивается статусом и кнопкой.
+                if (!userInitiated)
+                {
+                    ShowUpdateNotification(result.Info);
+                }
+
                 break;
 
             case UpdateCheckStatus.UpToDate:
@@ -9508,22 +9523,36 @@ public sealed partial class MainPage : Page, IRemoteHost, INotifyPropertyChanged
             }
 
             SettingsUpdatePlaque.Visibility = Visibility.Collapsed;
+            if (SettingsUpdateCompactBadge is not null)
+            {
+                SettingsUpdateCompactBadge.Visibility = Visibility.Collapsed;
+            }
+
             return;
         }
 
         var version = SettingsService.PendingUpdateVersion;
         var ready = UpdateService.IsInstallerDownloaded(version);
         var state = ready ? "new" : "update";
+        var paneOpen = NavView?.IsPaneOpen ?? true;
 
         SettingsUpdatePlaqueText.Text = ready
             ? UpdateToastLocalization.Get("Update_BadgeNew", "Новое", "New")
             : UpdateToastLocalization.Get("Update_BadgeUpdate", "Обновление", "Update");
-        SettingsUpdatePlaque.Visibility = Visibility.Visible;
+        SettingsUpdatePlaque.Visibility = paneOpen ? Visibility.Visible : Visibility.Collapsed;
+
+        // В свёрнутой панели текстовой плашки не видно — показываем значок на шестерёнке.
+        if (SettingsUpdateCompactBadge is not null)
+        {
+            SettingsUpdateCompactBadge.Visibility = paneOpen
+                ? Visibility.Collapsed
+                : Visibility.Visible;
+        }
 
         if (!string.Equals(_updateBadgeState, state, StringComparison.Ordinal))
         {
             _updateBadgeState = state;
-            LogService.Info($"[update] badge state={state} version='{version}'");
+            LogService.Info($"[update] badge state={state} version='{version}' paneOpen={paneOpen}");
         }
     }
 
