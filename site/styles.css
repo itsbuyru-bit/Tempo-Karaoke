@@ -137,12 +137,13 @@ button, input { font: inherit; }
 .hero-glow {
   position: absolute;
   z-index: 0;
-  top: 40px;
-  right: -70px;
-  width: min(600px, 72vw);
-  opacity: .12;
+  top: -10px;
+  left: -140px;
+  right: auto;
+  width: min(760px, 86vw);
+  opacity: .14;
   pointer-events: none;
-  filter: blur(12px) saturate(1.2);
+  filter: blur(18px) saturate(1.2);
 }
 .hero-glow img { display: block; width: 100%; height: auto; }
 
@@ -614,3 +615,15 @@ body.lightbox-open { overflow: hidden; }
   .showcase-controls button { width: 34px; height: 34px; }
   .lightbox { padding: 10px; }
 }
+
+.showcase-expand-float {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 6;
+  background: rgba(7, 9, 14, .82);
+  border-color: rgba(255, 255, 255, .18);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 24px rgba(0,0,0,.35);
+}
+.showcase-expand-float:hover { background: rgba(85,179,255,.2); }

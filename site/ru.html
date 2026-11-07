@@ -98,23 +98,11 @@
         </div>
 
         <div class="showcase-frame">
-          <div class="showcase-titlebar">
-            <div class="showcase-brand">
-              <img src="assets/appicon.png" alt="">
-              <strong>Tempo Karaoke</strong>
-              <span class="showcase-dash">—</span>
-              <span class="showcase-crumb" data-showcase-crumb>Медиатека · 4 656 песен</span>
-            </div>
-            <div class="showcase-tools">
-              <button type="button" class="showcase-expand" data-showcase-expand>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
-                <span>Открыть на весь экран</span>
-              </button>
-              <span class="showcase-window-controls" aria-hidden="true"><i>—</i><i>□</i><i>×</i></span>
-            </div>
-          </div>
-
           <div class="showcase-viewport" tabindex="0" data-showcase-viewport aria-label="Кликните для увеличения">
+            <button type="button" class="showcase-expand showcase-expand-float" data-showcase-expand>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+              <span>Открыть на весь экран</span>
+            </button>
             <figure class="showcase-slide active" data-showcase-slide="0" data-title="Медиатека" data-desc="Тысячи песен, сгруппированные по исполнителю и версии." data-crumb="Медиатека · 4 656 песен" aria-hidden="false">
               <img src="assets/screenshots/library.png" alt="Медиатека Tempo Karaoke" width="1938" height="1160">
             </figure>
@@ -264,8 +252,8 @@
       const crumb = root.querySelector('[data-showcase-crumb]');
       const prev = root.querySelector('[data-showcase-prev]');
       const next = root.querySelector('[data-showcase-next]');
-      const autoplayBtn = root.querySelector('[data-showcase-autoplay]');
-      const autoplayLabel = root.querySelector('[data-autoplay-label]');
+      const autoplayBtn = document.querySelector('[data-showcase-autoplay]');
+      const autoplayLabel = document.querySelector('[data-autoplay-label]');
       const viewport = root.querySelector('[data-showcase-viewport]');
       const expand = root.querySelector('[data-showcase-expand]');
       const lightbox = document.querySelector('[data-showcase-lightbox]');
@@ -293,7 +281,7 @@
         counter.textContent = String(index + 1).padStart(2, '0') + ' / ' + String(slides.length).padStart(2, '0');
         title.textContent = slide.dataset.title;
         desc.textContent = slide.dataset.desc;
-        crumb.textContent = slide.dataset.crumb;
+        if (crumb) crumb.textContent = slide.dataset.crumb;
         if (!lightbox.hidden) updateLightbox();
       };
 
@@ -338,7 +326,7 @@
       next.addEventListener('click', () => { show(index + 1); schedule(); });
       tabs.forEach(tab => tab.addEventListener('click', () => { show(Number(tab.dataset.showcaseTab)); schedule(); }));
       viewport.addEventListener('click', openLightbox);
-      expand.addEventListener('click', openLightbox);
+      expand.addEventListener('click', event => { event.stopPropagation(); openLightbox(); });
       autoplayBtn.addEventListener('click', () => setAutoplay(!autoplay));
       lightbox.querySelector('[data-lightbox-close]').addEventListener('click', closeLightbox);
       lightbox.addEventListener('click', event => { if (event.target === lightbox) closeLightbox(); });

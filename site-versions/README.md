@@ -26,6 +26,7 @@ before replacing it, so a restore can be undone the same way.
 | `2026-11-07-aurora` | Current landing: brighter aurora background (blue, violet, pink, teal and warm glows) behind the Bootstrap carousel. |
 | `2026-11-07-playlists` | Current landing: new app icon, blurred icon glow, Bootstrap chevrons, and a five-slide carousel with the English playlists screen. |
 | `2026-11-07-showcase` | Current landing: tabbed screenshot showcase with window frame, autoplay, keyboard navigation, fullscreen lightbox and the cropped app captures. |
+| `2026-11-07-remote-qr` | Current landing: live QR screenshot for the web remote, left-side enlarged icon glow, no fake window titlebar, and a working fullscreen close button. |
 
 Archives are committed so a previous look can be restored without relying on
 the git history of the `site/` directory. To try one without touching the
