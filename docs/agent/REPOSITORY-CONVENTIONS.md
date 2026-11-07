@@ -48,8 +48,8 @@ Notes for maintainers and agents working in this project.
 ## Website
 
 - Site lives in `site/` and deploys through `.github/workflows/pages.yml`.
-- Site versions are archived in `site-versions/` and managed by
-  `node scripts/site-version.mjs` (`list`, `snapshot`, `restore`).
+- Historical site snapshots are not stored in the repository; `site/` is the
+  only current site source. Use Git history if an older revision is needed.
 - The live remote in the site is a clone of `RemotePage`; keep English controls
   on the English page and Russian controls on the Russian page.
 - Screenshots are captured from the running app and stored in
@@ -72,6 +72,6 @@ Notes for maintainers and agents working in this project.
   MSIX/AppX и Microsoft Store не используются.
 - Локализация: источник — `localization/`; установленная папка читается при
   старте, веб-пульт использует её же с fallback на `public/`.
-- Сайт — `site/`, версии — `site-versions/`, управление —
-  `scripts/site-version.mjs`.
+- Сайт — `site/`; исторические версии сайта в репозитории не хранятся, при
+  необходимости используйте историю Git.
 - Перед коммитом: сборка, тесты, проверка локализации и `git diff --check`.
