@@ -1,100 +1,104 @@
 Русский | [English](../en/DIAGNOSTICS.md)
-# Logging and error reports
+# Логи и отчёты об ошибках
 
-## Log files
+## Файлы логов
 
-Location: `%LocalAppData%\TempoKaraoke\logs\`
+Расположение: `%LocalAppData%\TempoKaraoke\logs\`
 
-Files:
+Файлы:
 
-* `tempo-karaoke-YYYYMMDD.log` — main application log;
-* `tempo-karaoke-wifi-direct.log` — step-by-step log of the isolated Wi-Fi Direct
-  helper process.
+* `tempo-karaoke-YYYYMMDD.log` — основной лог приложения;
+* `tempo-karaoke-wifi-direct.log` — пошаговый лог изолированного
+  helper-процесса Wi-Fi Direct.
 
-The main log rotates at 5 MB and keeps five files (`*.log.1` … `*.log.5`).
+Основной лог ротируется при достижении 5 МБ и хранит пять файлов
+(`*.log.1` … `*.log.5`).
 
-## What is written
+## Что записывается
 
-Every entry has a timestamp, level (`INFO`, `WARN`, `ERROR`, `FATAL`), category,
-session id and optional operation id:
+Каждая запись содержит время, уровень (`INFO`, `WARN`, `ERROR`, `FATAL`),
+категорию, идентификатор сессии и необязательный идентификатор операции:
 
 ```text
 2026-11-06 21:14:02.517 [INFO] [wifi-direct] [session:9f2a11c3] [op:4f8c21aa] Starting Wi-Fi Direct: ..., ssid=T***********
 ```
 
-The session header contains:
+Заголовок сессии содержит:
 
-* application version and Inno Setup install mode;
-* OS description and architectures (OS and process);
-* .NET runtime;
-* current culture, UI culture and selected app language;
-* log directory;
-* host machine name and processor count.
+* версию приложения и режим установки Inno Setup;
+* описание ОС и архитектуры (ОС и процесса);
+* версию .NET runtime;
+* текущую культуру, культуру интерфейса и выбранный язык приложения;
+* каталог логов;
+* имя компьютера и число процессоров.
 
-Wi-Fi related entries contain the adapter state, active infrastructure
-connection (SSID masked), Wi-Fi Direct state machine transition, result and
-`HRESULT` when a native/WinRT call throws. PIN failures log only the role, attempt
-number and lockout state — never the PIN.
+Записи, связанные с Wi-Fi, содержат состояние адаптера, активное подключение
+к инфраструктурной сети (SSID маскируется), переход состояния Wi-Fi Direct,
+результат и `HRESULT`, если нативный вызов или WinRT выбрасывает исключение.
+Ошибки PIN логируют только роль, номер попытки и состояние блокировки — сам PIN
+не записывается никогда.
 
-Normal events are written only when **Settings → Diagnostics → Logging** is on.
-Crashes and user-created reports are written regardless.
+Обычные события записываются только при включённом
+**Параметры → Диагностика → Логирование**. Падения и отчёты, созданные
+пользователем, записываются всегда.
 
-## Global handlers
+## Глобальные обработчики
 
-`App` registers:
+`App` регистрирует:
 
 * `Application.UnhandledException` (WinUI);
 * `AppDomain.CurrentDomain.UnhandledException`;
 * `TaskScheduler.UnobservedTaskException`.
 
-All three write a `FATAL` entry with the exception chain before the process
-terminates. The web remote additionally reports unhandled JS errors and promise
-rejections to `/api/client-error`; the server writes only the first 400 characters
-to the log, without URL tokens.
+Все три обработчика записывают `FATAL` с цепочкой исключений до завершения
+процесса. Веб-пульт дополнительно сообщает о необработанных ошибках JS и
+отклонённых промисах в `/api/client-error`; сервер записывает в лог только
+первые 400 символов, без токенов URL.
 
-## Collecting a report
+## Сбор отчёта
 
-**Settings → Diagnostics → Error report → Create report**.
+**Параметры → Диагностика → Отчёт об ошибке → Создать отчёт**.
 
-The archive is saved as:
+Архив сохраняется как:
 
 ```text
 <LocalAppData>\TempoKaraoke\Reports\tempo-karaoke-report-YYYYMMDD-HHmmss.zip
 ```
 
-(or the packaged equivalent). Contents:
+Содержимое:
 
 ```text
-system-info.txt        version, OS, runtime, locale, Wi-Fi adapter/connection,
-                       Wi-Fi Direct state, localization issues
-settings-summary.txt   theme, language, feature switches, counts
-localization.txt       manifest status, loaded languages, validation issues
+system-info.txt        версия, ОС, runtime, локаль, Wi-Fi-адаптер и подключение,
+                       состояние Wi-Fi Direct, проблемы локализации
+settings-summary.txt   тема, язык, переключатели функций, счётчики
+localization.txt       состояние манифеста, загруженные языки, ошибки проверки
 logs/01-tempo-karaoke-....log
 logs/02-...
 ```
 
-The same dialog offers to open the reports folder. Send the ZIP manually by
-e-mail or attach it to an issue; there is no automatic upload endpoint.
+Тот же диалог предлагает открыть папку отчётов. ZIP отправляется вручную по
+электронной почте или прикладывается к issue; автоматической отправки на сервер
+нет.
 
-## Privacy
+## Приватность
 
-The report and logs deliberately exclude:
+В отчёт и логи намеренно не попадают:
 
-* song titles, artists and media file paths;
-* playlist and guest names;
-* full SSIDs (only the first character is kept);
-* MAC addresses (only vendor and last octet are kept);
-* PINs and PIN hashes;
-* authentication tokens;
-* recent-file lists and library roots.
+* названия песен, исполнители и пути к медиафайлам;
+* названия плейлистов и имена гостей;
+* полные SSID (остаётся только первый символ);
+* MAC-адреса (остаются только производитель и последний октет);
+* PIN-коды и их хеши;
+* токены аутентификации;
+* списки недавних файлов и корни медиатеки.
 
-Media paths are replaced by `<path hidden>`; PIN material by `<pin hidden>`.
-`PrivacyMasking` in `TempoKaraoke.Core/Diagnostics` implements the masks.
+Пути к медиа заменяются на `<path hidden>`, материал PIN — на `<pin hidden>`.
+Маскирование реализовано в `PrivacyMasking` в `TempoKaraoke.Core/Diagnostics`.
 
-## Known limitation: mini-dumps
+## Известное ограничение: мини-дампы
 
-The report does not create a process mini-dump. A dump needs explicit user
-consent and native `MiniDumpWriteDump` interop; the current implementation covers
-the diagnosis with logs, environment, adapter state and exception stacks. If a
-kernel BSOD occurs, Windows writes its own dump under
-`%SystemRoot%\Minidump` — attach that file separately if needed.
+Отчёт не создаёт мини-дамп процесса. Для дампа требуется явное согласие
+пользователя и нативный interop `MiniDumpWriteDump`; текущая реализация
+покрывает диагностику логами, сведениями об окружении, состоянием адаптера и
+стеками исключений. Если происходит BSOD ядра, Windows сохраняет собственный
+дамп в `%SystemRoot%\Minidump` — при необходимости приложите этот файл отдельно.

@@ -1,34 +1,34 @@
 Русский | [English](../en/LOCALIZATION.md)
-# Tempo Karaoke localization guide
+# Руководство по локализации Tempo Karaoke
 
-## 1. Single source of truth
+## 1. Единый источник истины
 
-All UI strings live under `localization/` in the repository root:
+Все строки интерфейса находятся в `localization/` в корне репозитория:
 
 ```text
 localization/
-  manifest.json      ← the only supported-language list
-  en-US.json         ← base / fallback catalog
+  manifest.json      ← единственный список поддерживаемых языков
+  en-US.json         ← базовый / fallback-каталог
   ru-RU.json
-  de-DE.json         ← add a file, add one manifest entry
+  de-DE.json         ← добавьте файл и одну запись в манифест
 ```
 
-The desktop `.resw` files and the web locale files are **generated** from these
-catalogs and are committed for reproducible builds. Do not edit generated files
-by hand:
+Файлы `.resw` для desktop и файлы локалей для веба **генерируются** из этих
+каталогов и коммитятся для воспроизводимых сборок. Не редактируйте
+сгенерированные файлы вручную:
 
 ```text
 localization/<tag>.json
         ↓  node scripts/localization/generate.mjs
 src/TempoKaraoke/Strings/<tag>/Resources.resw       (desktop / MRT)
-src/TempoKaraoke/public/locales/<tag>.json          (web remote)
-src/TempoKaraoke/public/locale-manifest.json        (web language selector)
+src/TempoKaraoke/public/locales/<tag>.json          (веб-пульт)
+src/TempoKaraoke/public/locale-manifest.json        (выбор языка в вебе)
 ```
 
-`manifest.json` is the only place that decides which languages exist, what they
-are called and whether they are enabled.
+`manifest.json` — единственное место, которое определяет, какие языки
+существуют, как они называются и включены ли они.
 
-## 2. Manifest format
+## 2. Формат манифеста
 
 ```json
 {
@@ -53,21 +53,21 @@ are called and whether they are enabled.
 }
 ```
 
-Rules:
+Правила:
 
-* `tag` is a **full BCP 47 tag**: `en-US`, `ru-RU`, `de-DE`, `zh-CN`.
-  Short tags (`de`, `fr`, `es`, `zh`) are rejected by validation and must not be
-  used as file names, folder names or saved settings values.
-* `file` is a plain file name next to `manifest.json` (no folders, no `..`).
-* `nativeName` is shown in the settings selector. It is required.
-* `englishName` is optional metadata for diagnostics and tests.
-* `enabled: false` hides a language without deleting its file.
-* `fallback` must be an enabled language. `en-US` exists by definition.
+* `tag` — **полный тег BCP 47**: `en-US`, `ru-RU`, `de-DE`, `zh-CN`.
+  Короткие теги (`de`, `fr`, `es`, `zh`) отклоняются валидацией; их нельзя
+  использовать как имена файлов, папок или сохранённых значений настроек.
+* `file` — простое имя файла рядом с `manifest.json` (без папок и `..`).
+* `nativeName` показывается в селекторе настроек. Обязательное поле.
+* `englishName` — необязательные метаданные для диагностики и тестов.
+* `enabled: false` скрывает язык, не удаляя его файл.
+* `fallback` должен быть включённым языком. `en-US` существует по определению.
 
-## 3. Catalog format
+## 3. Формат каталога
 
-Each language file is a flat JSON object. Keys never change when a language is
-added; only values are translated:
+Каждый языковой файл — плоский JSON-объект. Ключи не меняются при добавлении
+языка; переводятся только значения:
 
 ```json
 {
@@ -82,55 +82,58 @@ added; only values are translated:
 }
 ```
 
-Placeholders must be preserved exactly: `{0}`, `{1}`, `{count}`, `{name}`,
-`{folder}`, `{0:dd.MM.yyyy}`. Order matters for validation.
+Плейсхолдеры должны сохраняться точно: `{0}`, `{1}`, `{count}`, `{name}`,
+`{folder}`, `{0:dd.MM.yyyy}`. Порядок важен для валидации.
 
-### Key surfaces
+### Виды ключей
 
-One catalog feeds two surfaces. The generator routes by key shape:
+Один каталог обслуживает две поверхности. Генератор распределяет ключи по
+форме:
 
-* **Desktop key** — contains a property suffix (`Navigation_Home.Content`) or
-  uppercase letters (`Plural_SongCount_One`). Goes to `.resw`.
-* **Web key** — lowercase snake_case, no dot (`tab_queue`,
-  `playlist_tracks_one`). Goes to `public/locales/<tag>.json`.
+* **Ключ desktop** — содержит суффикс свойства (`Navigation_Home.Content`) или
+  заглавные буквы (`Plural_SongCount_One`). Попадает в `.resw`.
+* **Ключ веба** — нижний snake_case без точки (`tab_queue`,
+  `playlist_tracks_one`). Попадает в `public/locales/<tag>.json`.
 
-The suffix after the last dot selects the XAML property:
+Суффикс после последней точки выбирает свойство XAML:
 
-* `.Text` — `TextBlock.Text`, `SelectorBarItem.Text`, etc.;
-* `.Content` — `Button.Content`, `NavigationViewItem.Content`, etc.;
+* `.Text` — `TextBlock.Text`, `SelectorBarItem.Text` и т.п.;
+* `.Content` — `Button.Content`, `NavigationViewItem.Content` и т.п.;
 * `.Header` / `.Description` — SettingsCard/SettingsExpander;
-* `.PlaceholderText` — search boxes;
-* `.OnContent` / `.OffContent` — toggles;
-* `.AutomationName` / `.ToolTip` — accessibility and tooltips.
+* `.PlaceholderText` — поля поиска;
+* `.OnContent` / `.OffContent` — переключатели;
+* `.AutomationName` / `.ToolTip` — доступность и подсказки.
 
-## 4. Generating platform files
+## 4. Генерация файлов платформы
 
 ```powershell
-node scripts/localization/generate.mjs          # write artifacts
-node scripts/localization/generate.mjs --check  # fail if artifacts are stale
+node scripts/localization/generate.mjs          # записать артефакты
+node scripts/localization/generate.mjs --check  # упасть, если артефакты устарели
 ```
 
-The generated files are committed. Run the generator after every change to a
-manifest or catalog; `--check` is suitable for CI. The desktop project copies the
-whole `localization/` folder next to the executable, so JSON catalogs are also
-available at runtime.
+Сгенерированные файлы коммитятся. Запускайте генератор после каждого изменения
+манифеста или каталога; `--check` подходит для CI. Desktop-проект копирует всю
+папку `localization/` рядом с исполняемым файлом, поэтому JSON-каталоги
+доступны и во время выполнения.
 
-## 5. Desktop runtime
+## 5. Desktop-среда выполнения
 
 `LocalizationService`:
 
-1. Loads `localization/manifest.json` and every enabled catalog.
-2. Resolves the initial language in this order:
-   saved choice → Windows UI language → language-group match (`ru` → `ru-RU`) →
-   `en-US`.
-3. Saves the resolved full tag to `settings.json` (including automatic choices).
-4. Applies `Windows.Globalization.ApplicationLanguages.PrimaryLanguageOverride`
-   so the initial `x:Uid` MRT render uses the right `.resw` when it exists.
-5. Resolves every runtime string per key:
-   current catalog → `en-US` catalog → compiled MRT resource → key.
+1. Загружает `localization/manifest.json` и каждый включённый каталог.
+2. Определяет исходный язык в таком порядке:
+   сохранённый выбор → язык интерфейса Windows → совпадение языковой группы
+   (`ru` → `ru-RU`) → `en-US`.
+3. Сохраняет разрешённый полный тег в `settings.json` (включая автоматический
+   выбор).
+4. Применяет `Windows.Globalization.ApplicationLanguages.PrimaryLanguageOverride`,
+   чтобы первый рендер `x:Uid` из MRT использовал правильный `.resw`, если он
+   существует.
+5. Разрешает каждую runtime-строку по ключу:
+   текущий каталог → каталог `en-US` → скомпилированный ресурс MRT → ключ.
 
-`x:Uid` still drives the first visual-tree render from `.resw`. Attached
-properties drive live language changes:
+`x:Uid` по-прежнему управляет первым рендером визуального дерева из `.resw`.
+Присоединённые свойства обеспечивают смену языка на лету:
 
 ```xml
 <Button
@@ -140,36 +143,37 @@ properties drive live language changes:
     loc:Localization.AutomationNameKey="Queue_ClearQueueButton.AutomationName" />
 ```
 
-The language selector is populated from `LocalizationService.Languages`, so its
-items are `nativeName` values from the manifest. `en-US` remains the compiled
-fallback for XAML startup; other languages can be added without rebuilding the
-desktop app.
+Селектор языка заполняется из `LocalizationService.Languages`, поэтому его
+элементы — значения `nativeName` из манифеста. `en-US` остаётся
+скомпилированным fallback для запуска XAML; другие языки можно добавлять без
+пересборки desktop-приложения.
 
-If a key is missing in both catalogs, the app returns the key, logs the fact and
-never shows an empty string. In `DEBUG`, missing keys are also written to the
-debug output.
+Если ключ отсутствует в обоих каталогах, приложение возвращает ключ, пишет об
+этом в лог и никогда не показывает пустую строку. В `DEBUG` отсутствующие ключи
+также выводятся в отладочный вывод.
 
-## 6. Web remote
+## 6. Веб-пульт
 
-The web remote uses the same tags:
+Веб-пульт использует те же теги:
 
-1. `localStorage['lang']` → `navigator.language` → manifest fallback (`en-US`).
-2. The language selector and the admin language selector are built from
-   `/locale-manifest.json`; there is no hardcoded `<option>` list.
-3. `/locales/<tag>.json` is generated from the same source. The JS merges the
-   English catalog first and then the selected catalog, which gives per-key
-   fallback.
-4. A failed catalog request leaves English (and the built-in fallback messages)
-   in place.
+1. `localStorage['lang']` → `navigator.language` → fallback манифеста (`en-US`).
+2. Селектор языка и селектор языка администратора строятся из
+   `/locale-manifest.json`; жёстко заданного списка `<option>` нет.
+3. `/locales/<tag>.json` генерируется из того же источника. JS сначала
+   объединяет английский каталог, затем выбранный — так получается fallback по
+   каждому ключу.
+4. Если запрос каталога не удался, остаются английский язык и встроенные
+   fallback-сообщения.
 
-The web remote does not follow the desktop language automatically; the user can
-pick a different language in the header.
+Веб-пульт не следует за языком desktop автоматически; пользователь может
+выбрать другой язык в шапке.
 
-## 7. Adding a language (example: German)
+## 7. Добавление языка (пример: немецкий)
 
-1. Create `localization/de-DE.json` by copying `localization/en-US.json`.
-2. Translate only the values; keep keys, placeholders and plural families.
-3. Add the manifest entry:
+1. Создайте `localization/de-DE.json`, скопировав `localization/en-US.json`.
+2. Переведите только значения; сохраните ключи, плейсхолдеры и семейства
+   множественного числа.
+3. Добавьте запись в манифест:
 
 ```json
 {
@@ -181,83 +185,88 @@ pick a different language in the header.
 }
 ```
 
-4. Run `node scripts/localization/generate.mjs`.
-5. Run `dotnet test tests/TempoKaraoke.Tests/TempoKaraoke.Tests.csproj`.
-6. Start the app (or reload the web remote). The language appears in the
-   selector automatically.
+4. Запустите `node scripts/localization/generate.mjs`.
+5. Запустите `dotnet test tests/TempoKaraoke.Tests/TempoKaraoke.Tests.csproj`.
+6. Запустите приложение (или перезагрузите веб-пульт). Язык появится в селекторе
+   автоматически.
 
-No code changes are needed — not in `LocalizationService`, not in the settings
-XAML, not in the web `#langSelect`.
+Изменения кода не нужны — ни в `LocalizationService`, ни в XAML настроек, ни в
+`#langSelect` веба.
 
-## 8. Plurals
+## 8. Множественное число
 
-Catalog families:
+Семейства каталога:
 
 ```text
 Plural_SongCount_One / _Few / _Many / _Other
 Plural_VideoCount_*
 Selection_Count_*
 
-playlist_tracks_one / _few / _many / _other   (web)
+playlist_tracks_one / _few / _many / _other   (веб)
 ```
 
-* English: `One` and `Other` are required.
-* Russian: `One`, `Few`, `Many`, `Other` are required.
-* If a category is missing, the `Other` form of the same language is used, then
-  the `en-US` value.
-* Use `{0}` (desktop) / `{count}` (web) for the number.
+* Английский: обязательны `One` и `Other`.
+* Русский: обязательны `One`, `Few`, `Many`, `Other`.
+* Если категория отсутствует, используется форма `Other` того же языка, затем
+  значение из `en-US`.
+* Для числа используйте `{0}` (desktop) / `{count}` (веб).
 
-## 9. What not to translate
+## 9. Что не переводить
 
-* song titles, artists, file and folder names;
-* playlist names and guest names;
-* media paths;
-* log messages and raw exception text;
-* protocol/technical values (M3U, MKV, PIN, IP, MAC).
+* названия песен, исполнителей, файлов и папок;
+* названия плейлистов и имена гостей;
+* пути к медиа;
+* сообщения логов и сырой текст исключений;
+* протокольные и технические значения (M3U, MKV, PIN, IP, MAC).
 
-System labels **are** translated: Guest/Host/Computer, Online/Offline, counts,
-date labels, buttons, tooltips and automation names.
+Системные подписи **переводятся**: Guest/Host/Computer, Online/Offline,
+счётчики, подписи дат, кнопки, подсказки и automation names.
 
-## 10. Validation and tests
+## 10. Валидация и тесты
 
-`LocalizationCatalogTests` checks:
+`LocalizationCatalogTests` проверяет:
 
-* the manifest parses; fallback is valid and enabled; every language file exists;
-* all tags are full BCP 47 tags; native names are not empty;
-* `en-US` contains no Cyrillic values;
-* missing keys fall back per key to English;
-* placeholders match English for every translated key;
-* Russian plural families contain all four categories; English has One/Other;
-* language resolution: saved → system, short `ru` → `ru-RU`, unknown → `en-US`;
-* adding a language only needs a manifest entry and a JSON file;
-* generated `.resw` / web locale key sets match the source surfaces.
+* манифест разбирается; fallback валиден и включён; каждый языковой файл
+  существует;
+* все теги — полные BCP 47; native names не пусты;
+* в `en-US` нет кириллических значений;
+* отсутствующие ключи откатываются к английскому по каждому ключу;
+* плейсхолдеры совпадают с английскими для каждого переведённого ключа;
+* русские семейства множественного числа содержат все четыре категории, а
+  английские — `One`/`Other`;
+* разрешение языка: сохранённый → системный, короткий `ru` → `ru-RU`,
+  неизвестный → `en-US`;
+* для нового языка достаточно записи в манифесте и JSON-файла;
+* наборы ключей сгенерированных `.resw` / веб-локалей соответствуют исходным
+  поверхностям.
 
-Useful commands:
+Полезные команды:
 
 ```powershell
 node scripts/localization/generate.mjs --check
 dotnet test tests/TempoKaraoke.Tests/TempoKaraoke.Tests.csproj
 ```
 
-## 11. Checklist for a localization change
+## 11. Чек-лист изменения локализации
 
-- [ ] Keys are unchanged in every language file.
-- [ ] Placeholders and date formats are identical to `en-US`.
-- [ ] Plural categories are complete for the language.
-- [ ] `en-US` has no Cyrillic values.
-- [ ] Generated `.resw` and web locales were regenerated and committed.
-- [ ] The language selector shows `nativeName` values from the manifest.
-- [ ] `dotnet build` and `dotnet test` pass.
-- [ ] Desktop and web were checked in the changed languages.
+- [ ] Ключи не изменены ни в одном языковом файле.
+- [ ] Плейсхолдеры и форматы дат совпадают с `en-US`.
+- [ ] Категории множественного числа заполнены для языка.
+- [ ] В `en-US` нет кириллических значений.
+- [ ] Сгенерированные `.resw` и веб-локали перегенерированы и закоммичены.
+- [ ] Селектор языка показывает значения `nativeName` из манифеста.
+- [ ] `dotnet build` и `dotnet test` проходят.
+- [ ] Desktop и веб проверены на изменённых языках.
 
-## 12. Migration note
+## 12. Примечание о миграции
 
-Before the data-driven mode, desktop keys lived only in
-`Strings/<tag>/Resources.resw` and web keys only in `public/locales/<tag>.json`.
-They were imported once into `localization/<tag>.json` without changing any value
-(531 desktop keys and 123 web keys at the time of migration). From now on the
-catalogs under `localization/` are authoritative; the generated files are build
-artifacts kept in version control for reproducibility.
+До перехода на data-driven режим ключи desktop хранились только в
+`Strings/<tag>/Resources.resw`, а ключи веба — только в
+`public/locales/<tag>.json`. Их один раз импортировали в
+`localization/<tag>.json`, не меняя значений (531 ключ desktop и 123 ключа веба
+на момент миграции). Теперь каталоги в `localization/` — источник истины;
+сгенерированные файлы остаются артефактами сборки в системе контроля версий для
+воспроизводимости.
 
 ## 13. Подхват перевода после перезапуска без пересборки
 

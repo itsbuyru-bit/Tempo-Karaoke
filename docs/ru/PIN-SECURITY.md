@@ -1,24 +1,24 @@
 Русский | [English](../en/PIN-SECURITY.md)
-# Persistent Host and Admin PIN
+# Постоянный PIN ведущего и администратора
 
-## Behaviour
+## Поведение
 
-By default the remote generates a random four-digit PIN for the host and for the
-administrator on every remote session. Settings can store a permanent PIN for
-either role:
+По умолчанию веб-пульт генерирует случайный четырёхзначный PIN для ведущего и
+администратора при каждой сессии. Настройки позволяют сохранить постоянный PIN
+для любой из ролей:
 
-**Settings → Security → Access PIN codes → Permanent PIN**.
+**Параметры → Безопасность → Коды доступа → Постоянный PIN**.
 
-* When the option is off, nothing changes: random PINs are shown in the remote
-  page.
-* When it is on, the remote verifies the entered PIN against the stored hash and
-  shows `••••` instead of the PIN on the desktop.
-* A permanent PIN is 4–8 digits, requires confirmation on save, and must not be
-  empty. Common values such as `1234` are accepted but the settings show a
-  warning.
-* Reset asks for confirmation and returns to random PINs.
+* Когда параметр выключен, ничего не меняется: в веб-пульте показываются
+  случайные PIN-коды.
+* Когда он включён, веб-пульт проверяет введённый PIN по сохранённому хешу и
+  показывает на компьютере `••••` вместо самого PIN.
+* Постоянный PIN состоит из 4–8 цифр, требует подтверждения при сохранении и не
+  может быть пустым. Распространённые значения вроде `1234` принимаются, но
+  настройки показывают предупреждение.
+* Сброс требует подтверждения и возвращает случайные PIN-коды.
 
-## Storage
+## Хранение
 
 `settings.json`:
 
@@ -42,48 +42,51 @@ either role:
 }
 ```
 
-The plaintext PIN is never written to disk, logs or reports. Each record has its
-own 16-byte cryptographically random salt and a 32-byte derived key; verification
-uses `CryptographicOperations.FixedTimeEquals`. Settings are read live, so a new
-PIN applies without restarting the remote server.
+PIN в открытом виде никогда не записывается на диск, в логи или отчёты. Каждая
+запись имеет собственную криптографически случайную соль на 16 байт и
+производный ключ на 32 байта; проверка использует
+`CryptographicOperations.FixedTimeEquals`. Настройки читаются на лету, поэтому
+новый PIN применяется без перезапуска сервера веб-пульта.
 
-## Verification and policy
+## Проверка и политика
 
 `PinAuthentication.Verify`:
 
-1. A role with `UsePersistentPin == true` and a usable `Salt`/`Hash` record is
-   verified with PBKDF2-SHA256.
-2. `UsePersistentPin == false` keeps the old random-PIN comparison.
-3. If the setting is enabled but a role has no usable record, that role falls
-   back to its random PIN and the settings page shows
-   “Permanent PIN is enabled but missing for: …”. This avoids locking the host
-   out while still making the misconfiguration visible. (Rejected alternative:
-   refusing sign-in until a PIN is configured.)
+1. Роль с `UsePersistentPin == true` и пригодной записью `Salt`/`Hash`
+   проверяется через PBKDF2-SHA256.
+2. При `UsePersistentPin == false` сохраняется прежнее сравнение со случайным
+   PIN.
+3. Если параметр включён, но у роли нет пригодной записи, роль возвращается к
+   случайному PIN, а страница настроек показывает
+   «Постоянный PIN включён, но отсутствует для: …». Это не блокирует ведущего,
+   но делает ошибку конфигурации видимой. (Отклонённая альтернатива: отказывать
+   во входе, пока PIN не настроен.)
 
-Remote server rules:
+Правила сервера веб-пульта:
 
-* `/api/auth` checks the admin PIN quietly first, then the host PIN. A successful
-  host sign-in does not consume administrator attempts.
-* Five failed attempts per role trigger a 5-minute lockout; the counter survives
-  cookie removal.
-* Failures are logged with the role and attempt number only. The PIN and its hash
-  are never logged.
+* `/api/auth` сначала тихо проверяет PIN администратора, затем PIN ведущего.
+  Успешный вход ведущего не расходует попытки администратора.
+* Пять неудачных попыток для роли включают блокировку на 5 минут; счётчик
+  сохраняется после удаления cookie.
+* Ошибки логируются только с ролью и номером попытки. PIN и его хеш не
+  записываются в лог никогда.
 
-## Migration
+## Миграция
 
-Existing `settings.json` files need no manual migration: the missing `Security`
-block deserializes as disabled. Resetting writes an empty block.
+Существующие `settings.json` не требуют ручной миграции: отсутствующий блок
+`Security` десериализуется как выключенный. Сброс записывает пустой блок.
 
-## Tests
+## Тесты
 
-`PinSecurityTests` covers:
+`PinSecurityTests` проверяет:
 
-* correct / incorrect PIN;
-* PBKDF2 parameters, unique salts and unique hashes;
-* no plaintext PIN in serialized settings;
-* 4–8 digit policy;
-* persistent vs random selection;
-* missing role record → random fallback + configuration error;
-* no verification against an empty configuration.
+* правильный и неправильный PIN;
+* параметры PBKDF2, уникальные соли и уникальные хеши;
+* отсутствие PIN в открытом виде в сериализованных настройках;
+* политику 4–8 цифр;
+* выбор постоянного или случайного PIN;
+* отсутствие записи роли → случайный fallback + ошибка конфигурации;
+* отсутствие проверки по пустой конфигурации.
 
-See also: [`DIAGNOSTICS.md`](DIAGNOSTICS.md) for the report/log privacy rules.
+См. также [`DIAGNOSTICS.md`](DIAGNOSTICS.md) — правила приватности отчётов и
+логов.

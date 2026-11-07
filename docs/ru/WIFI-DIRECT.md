@@ -1,63 +1,67 @@
 Русский | [English](../en/WIFI-DIRECT.md)
-# Wi-Fi Direct: BSOD risk and safe mode
+# Wi-Fi Direct: риск BSOD и безопасный режим
 
-## Observed problem
+## Наблюдаемая проблема
 
-On one PC the sequence was:
+На одном компьютере последовательность была такой:
 
-1. QR code appears.
-2. The remote window looks like Wi-Fi Direct was never started.
-3. QR code appears again.
-4. A phone connection sometimes ends in `IRQL_NOT_LESS_OR_EQUAL (0xA)` in
-   `ntoskrnl.exe`.
-5. Wi-Fi Direct starts reliably when Wi-Fi is enabled but not associated with an
-   infrastructure network.
-6. When the PC is associated with a Wi-Fi network, the group is created but the
-   phone cannot connect, and the crash risk is higher.
+1. Появляется QR-код.
+2. Окно веб-пульта выглядит так, будто Wi-Fi Direct вообще не запускался.
+3. QR-код появляется снова.
+4. Подключение телефона иногда заканчивается ошибкой
+   `IRQL_NOT_LESS_OR_EQUAL (0xA)` в `ntoskrnl.exe`.
+5. Wi-Fi Direct стабильно запускается, когда Wi-Fi включён, но не подключён к
+   инфраструктурной сети.
+6. Когда компьютер подключён к Wi-Fi-сети, группа создаётся, но телефон не
+   может подключиться, а риск падения выше.
 
-This is consistent with a wireless driver / SoftAP coexistence conflict: the
-adapter is asked to run infrastructure Wi-Fi and Wi-Fi Direct at the same time,
-possibly while it is still in a transitional state. A user-mode application
-cannot guarantee that a kernel driver will not bugcheck. It can only remove the
-risky combinations, serialize adapter operations and leave a useful trail.
+Это согласуется с конфликтом драйвера беспроводного адаптера и SoftAP: адаптер
+одновременно просят работать в инфраструктурной сети и в Wi-Fi Direct, возможно,
+пока он ещё находится в переходном состоянии. Пользовательское приложение не
+может гарантировать, что драйвер ядра не вызовет bugcheck. Оно может только
+убрать рискованные комбинации, сериализовать операции с адаптером и оставить
+понятный след для диагностики.
 
-## What the app does now
+## Что приложение делает сейчас
 
-### Isolated helper process
+### Изолированный helper-процесс
 
-The `WiFiDirectAdvertisementPublisher` runs in a child instance of the executable
-(`--wifi-direct-helper`), not in the WinUI process. The helper owns exactly one
-publisher for its lifetime and stops it on `stop` or when standard input closes.
-It writes every step to `logs/tempo-karaoke-wifi-direct.log`.
+`WiFiDirectAdvertisementPublisher` работает в дочернем экземпляре исполняемого
+файла (`--wifi-direct-helper`), а не в процессе WinUI. Helper владеет ровно
+одним publisher на протяжении своей жизни и останавливает его по команде
+`stop` или когда закрывается стандартный ввод. Каждый шаг записывается в
+`logs/tempo-karaoke-wifi-direct.log`.
 
-### Pre-flight checks
+### Предварительные проверки
 
-Before starting, `WiFiDirectCoordinator` checks:
+Перед запуском `WiFiDirectCoordinator` проверяет:
 
-* is a Wi-Fi radio present and is it on (`Radio.GetRadiosAsync`);
-* is an infrastructure WLAN profile connected (`NetworkInformation`);
-* is a session already active (the coordinator state / helper process);
-* is the adapter in a usable state (radio off/unknown is reported as
-  unsupported).
+* есть ли Wi-Fi-радиомодуль и включён ли он (`Radio.GetRadiosAsync`);
+* подключён ли профиль инфраструктурной WLAN (`NetworkInformation`);
+* не активна ли уже сессия (состояние координатора или helper-процесс);
+* находится ли адаптер в пригодном состоянии (выключенный или неизвестный
+  радиомодуль считается неподдерживаемым).
 
-The adapter's support for simultaneous infrastructure + SoftAP operation is not
-exposed by a reliable public Windows API. The app therefore treats an active
-Wi-Fi connection as the risk signal and uses safe mode as the mitigation.
+Поддержка одновременной работы инфраструктурной сети и SoftAP не
+предоставляется надёжным публичным API Windows. Поэтому приложение считает
+активное Wi-Fi-подключение сигналом риска, а безопасный режим — способом его
+снизить.
 
-### Safe mode (default: on)
+### Безопасный режим (по умолчанию включён)
 
-`Settings → Wi-Fi Direct safe mode`.
+`Параметры → Безопасный режим Wi-Fi Direct`.
 
-| Condition | Safe mode ON | Safe mode OFF |
+| Условие | Безопасный режим включён | Безопасный режим выключен |
 | --- | --- | --- |
-| Wi-Fi disconnected | start | start |
-| Wi-Fi connected | **blocked**, dialog explains why and opens Windows Wi-Fi settings | warning + explicit risk confirmation, then start |
-| Wi-Fi adapter off | blocked with an error | blocked with an error |
+| Wi-Fi отключён | запуск | запуск |
+| Wi-Fi подключён | **заблокировано**, диалог объясняет причину и открывает настройки Wi-Fi Windows | предупреждение и явное подтверждение риска, затем запуск |
+| Wi-Fi-адаптер выключен | заблокировано с ошибкой | заблокировано с ошибкой |
 
-Windows has no public API to disconnect an arbitrary Wi-Fi profile silently, so
-the dialog offers “Open Wi-Fi settings” instead of pretending to disconnect.
+В Windows нет публичного API, позволяющего тихо отключить произвольный
+Wi-Fi-профиль, поэтому диалог предлагает «Открыть настройки Wi-Fi», а не делает
+вид, что отключает сеть.
 
-### State machine
+### Машина состояний
 
 ```text
 Idle → CheckingSupport → Starting → Advertising
@@ -65,55 +69,59 @@ Idle → CheckingSupport → Starting → Advertising
      ↘ Error                         ↘ Stopping → Idle
 ```
 
-The remote page shows this state (`Wi-Fi Direct: advertising/waiting/connected`)
-instead of jumping between a QR code and “not started”. A second click is
-idempotent: it does not restart the publisher and does not recreate the QR
-control.
+Страница веб-пульта показывает это состояние
+(`Wi-Fi Direct: advertising/waiting/connected`), а не перескакивает между
+QR-кодом и сообщением «не запущено». Повторное нажатие идемпотентно: publisher
+не перезапускается и элемент QR-кода не создаётся заново.
 
-### Serialization, timeouts, cleanup
+### Сериализация, таймауты, очистка
 
-* Every operation that changes adapter state (start, stop, listener, QR refresh)
-  runs under one `SemaphoreSlim` in `WiFiDirectCoordinator`.
-* Start has a 35-second budget; the helper must report `started` within 15
-  seconds. Stop waits 4 seconds, then kills the helper.
-* `StopAsync` is called when the remote is stopped, the page unloads and the main
-  window closes, so no publisher/listener survives the screen.
-* Unexpected helper exit becomes `Error` and is surfaced with a retry action.
+* Каждая операция, меняющая состояние адаптера (запуск, остановка, listener,
+  обновление QR), выполняется под одним `SemaphoreSlim` в
+  `WiFiDirectCoordinator`.
+* На запуск отводится 35 секунд; helper должен сообщить `started` в течение
+  15 секунд. Остановка ждёт 4 секунды, затем завершает helper.
+* `StopAsync` вызывается при остановке веб-пульта, выгрузке страницы и закрытии
+  главного окна, поэтому publisher или listener не переживает экран.
+* Неожиданное завершение helper переводит состояние в `Error` и показывает
+  действие «Повторить».
 
-## Diagnostics
+## Диагностика
 
-**Settings → Diagnostics → Wi-Fi Direct diagnostics** shows:
+**Параметры → Диагностика → Диагностика Wi-Fi Direct** показывает:
 
-* adapter name and radio state (or the driver version when available);
-* current Wi-Fi connection with a masked SSID and connectivity level;
-* current Wi-Fi Direct state;
-* last error;
-* a **Create report** button (see [`DIAGNOSTICS.md`](DIAGNOSTICS.md)).
+* имя адаптера и состояние радиомодуля (или версию драйвера, если доступна);
+* текущее Wi-Fi-подключение с замаскированным SSID и уровнем сигнала;
+* текущее состояние Wi-Fi Direct;
+* последнюю ошибку;
+* кнопку **Создать отчёт** (см. [`DIAGNOSTICS.md`](DIAGNOSTICS.md)).
 
-## If the BSOD continues
+## Если BSOD продолжается
 
-Kernel crashes cannot be fixed from the application. If `0xA` still occurs:
+Падения ядра нельзя исправить из приложения. Если `0xA` всё ещё возникает:
 
-1. Update the wireless adapter driver from the laptop/board vendor (not only
-   Windows Update), then reboot.
-2. Update BIOS/UEFI and Windows.
-3. Temporarily disable Wi-Fi on the PC while using Wi-Fi Direct, or use a router
-   and the normal Wi-Fi remote mode.
-4. Collect `%SystemRoot%\Minidump\*.dmp` and the app report ZIP, then contact the
-   adapter vendor with the stop code.
+1. Обновите драйвер беспроводного адаптера с сайта производителя ноутбука или
+   платы (не только через Windows Update), затем перезагрузитесь.
+2. Обновите BIOS/UEFI и Windows.
+3. Временно отключите Wi-Fi на компьютере при использовании Wi-Fi Direct или
+   используйте роутер и обычный режим Wi-Fi-пульта.
+4. Соберите `%SystemRoot%\Minidump\*.dmp` и ZIP-отчёт приложения, затем
+   обратитесь к производителю адаптера, указав stop code.
 
-## Manual test checklist
+## Чек-лист ручной проверки
 
-- [ ] Wi-Fi disconnected, safe mode on: Wi-Fi Direct starts once; QR does not
-      flicker; state shows advertising → waiting → connected.
-- [ ] Wi-Fi connected, safe mode on: start is blocked; the dialog opens Windows
-      Wi-Fi settings; no helper process is left behind.
-- [ ] Wi-Fi connected, safe mode off: risk dialog appears; cancel leaves the
-      adapter untouched; continue starts once.
-- [ ] Double-click “Start access point” quickly: only one start operation runs.
-- [ ] Stop the remote, leave the page, close the app: no `--wifi-direct-helper`
-      process remains (Task Manager → Details).
-- [ ] Toggle safe mode and reopen diagnostics: the toggle persists and the
-      diagnostics card reflects it.
-- [ ] Create a report: the ZIP contains logs, `system-info.txt` and no media
-      paths, SSIDs, MACs or PINs.
+- [ ] Wi-Fi отключён, безопасный режим включён: Wi-Fi Direct запускается один
+      раз; QR-код не мигает; состояние показывает advertising → waiting →
+      connected.
+- [ ] Wi-Fi подключён, безопасный режим включён: запуск заблокирован; диалог
+      открывает настройки Wi-Fi Windows; helper-процесс не остаётся.
+- [ ] Wi-Fi подключён, безопасный режим выключен: появляется диалог риска;
+      отмена не меняет адаптер; продолжение запускает один раз.
+- [ ] Быстрое двойное нажатие «Запустить точку доступа»: выполняется только одна
+      операция запуска.
+- [ ] Остановите веб-пульт, покиньте страницу, закройте приложение: процесс
+      `--wifi-direct-helper` не остаётся (Диспетчер задач → Подробности).
+- [ ] Переключите безопасный режим и откройте диагностику: переключатель
+      сохраняется, карточка диагностики отражает состояние.
+- [ ] Создайте отчёт: ZIP содержит логи, `system-info.txt` и не содержит путей к
+      медиа, SSID, MAC-адресов или PIN-кодов.
