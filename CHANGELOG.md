@@ -9,6 +9,17 @@ components (`major.minor.patch.revision`).
 Detailed user-facing release notes for each release live in
 `docs/releases/<tag>.md` and are published together with the GitHub Release.
 
+## [1.10.3.3] — 2026-11-08
+
+Full details: [`docs/releases/v1.10.3.3.md`](docs/releases/v1.10.3.3.md).
+
+### Changed
+
+- The detached/fullscreen player controls overlay the video instead of taking a
+  separate row, so showing or hiding them never resizes the video.
+- The rounded, semi-transparent overlay appears on mouse movement and hides
+  2.5 seconds after the pointer leaves; phone-remote commands do not open it.
+
 ## [1.10.3.2] — 2026-11-08
 
 Full details: [`docs/releases/v1.10.3.2.md`](docs/releases/v1.10.3.2.md).

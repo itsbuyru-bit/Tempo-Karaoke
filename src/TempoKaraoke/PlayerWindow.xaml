@@ -29,7 +29,6 @@
 
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <MediaPlayerElement
@@ -41,9 +40,14 @@
 
         <Border
             x:Name="ControlsBar"
-            Grid.Row="1"
-            Padding="16,8"
-            Background="{ThemeResource SolidBackgroundFillColorBaseBrush}"
+            Grid.Row="0"
+            Margin="12"
+            Padding="14,8"
+            VerticalAlignment="Bottom"
+            Background="#E6111722"
+            BorderBrush="#44FFFFFF"
+            BorderThickness="1"
+            CornerRadius="10"
             PointerEntered="ControlsBar_PointerEntered"
             PointerExited="ControlsBar_PointerExited">
             <Grid ColumnSpacing="12">
@@ -111,7 +115,7 @@
         <!--  Отсчёт перед следующим треком в откреплённом окне  -->
         <Grid
             x:Name="CountdownOverlay"
-            Grid.RowSpan="2"
+            Grid.Row="0"
             Background="#E6000000"
             Visibility="Collapsed">
             <StackPanel

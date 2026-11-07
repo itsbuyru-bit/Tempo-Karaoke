@@ -80,7 +80,7 @@ public sealed partial class PlayerWindow : Window
         _transportTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(250) };
         _transportTimer.Tick += (_, _) => UpdateTransport();
 
-        _hideTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(3) };
+        _hideTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(2.5) };
         _hideTimer.Tick += (_, _) => HideControls();
 
         _countdownTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
