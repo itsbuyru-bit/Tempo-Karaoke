@@ -621,6 +621,8 @@
   <data name="Ui_WifiRiskTitle" xml:space="preserve"><value>Риск Wi-Fi Direct</value></data>
   <data name="Ui_WifiSafeMode.Description" xml:space="preserve"><value>Блокирует Wi-Fi Direct, пока компьютер подключён к Wi-Fi. Это снижает риск конфликта драйвера и падения системы.</value></data>
   <data name="Ui_WifiSafeMode.Header" xml:space="preserve"><value>Безопасный режим Wi-Fi Direct</value></data>
+  <data name="Ui_WifiSafeModeToggle.OffContent" xml:space="preserve"><value>Выкл.</value></data>
+  <data name="Ui_WifiSafeModeToggle.OnContent" xml:space="preserve"><value>Вкл.</value></data>
   <data name="Ui_YouHaveNoPlaylists.Text" xml:space="preserve"><value>У вас нет списков воспроизведения</value></data>
   <data name="Update_Available" xml:space="preserve"><value>Доступно обновление v{0} (текущая: v{1})</value></data>
   <data name="Update_Badge_AutomationName.AutomationName" xml:space="preserve"><value>Доступно обновление</value></data>

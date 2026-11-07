@@ -414,10 +414,26 @@ public sealed class LocalizationService : DependencyObject
                 }
                 break;
             case "Header":
-                SetProperty(element, "Header", value);
+                if (element is TextBlock headerText)
+                {
+                    headerText.Text = value;
+                }
+                else
+                {
+                    SetProperty(element, "Header", value);
+                }
+
                 break;
             case "Description":
-                SetProperty(element, "Description", value);
+                if (element is TextBlock descriptionText)
+                {
+                    descriptionText.Text = value;
+                }
+                else
+                {
+                    SetProperty(element, "Description", value);
+                }
+
                 break;
             case "PlaceholderText":
                 if (element is TextBox textBox)

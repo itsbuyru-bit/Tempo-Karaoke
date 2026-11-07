@@ -13,15 +13,31 @@
             <ResourceDictionary.ThemeDictionaries>
                 <ResourceDictionary x:Key="Default">
                     <SolidColorBrush x:Key="QueueAlternateRowBrush" Color="#0AFFFFFF" />
+                    <SolidColorBrush x:Key="VideoCardBackgroundBrush" Color="Transparent" />
+                    <SolidColorBrush x:Key="VideoCardBorderBrush" Color="Transparent" />
+                    <SolidColorBrush x:Key="VideoCardHoverBackgroundBrush" Color="#14FFFFFF" />
+                    <SolidColorBrush x:Key="VideoCardHoverBorderBrush" Color="#18FFFFFF" />
                 </ResourceDictionary>
                 <ResourceDictionary x:Key="Dark">
                     <SolidColorBrush x:Key="QueueAlternateRowBrush" Color="#0AFFFFFF" />
+                    <SolidColorBrush x:Key="VideoCardBackgroundBrush" Color="Transparent" />
+                    <SolidColorBrush x:Key="VideoCardBorderBrush" Color="Transparent" />
+                    <SolidColorBrush x:Key="VideoCardHoverBackgroundBrush" Color="#14FFFFFF" />
+                    <SolidColorBrush x:Key="VideoCardHoverBorderBrush" Color="#18FFFFFF" />
                 </ResourceDictionary>
                 <ResourceDictionary x:Key="Light">
                     <SolidColorBrush x:Key="QueueAlternateRowBrush" Color="#06000000" />
+                    <SolidColorBrush x:Key="VideoCardBackgroundBrush" Color="#FFFFFF" />
+                    <SolidColorBrush x:Key="VideoCardBorderBrush" Color="#18000000" />
+                    <SolidColorBrush x:Key="VideoCardHoverBackgroundBrush" Color="#EAECEF" />
+                    <SolidColorBrush x:Key="VideoCardHoverBorderBrush" Color="#40000000" />
                 </ResourceDictionary>
                 <ResourceDictionary x:Key="HighContrast">
                     <SolidColorBrush x:Key="QueueAlternateRowBrush" Color="Transparent" />
+                    <SolidColorBrush x:Key="VideoCardBackgroundBrush" Color="Transparent" />
+                    <SolidColorBrush x:Key="VideoCardBorderBrush" Color="Transparent" />
+                    <SolidColorBrush x:Key="VideoCardHoverBackgroundBrush" Color="Transparent" />
+                    <SolidColorBrush x:Key="VideoCardHoverBorderBrush" Color="Transparent" />
                 </ResourceDictionary>
             </ResourceDictionary.ThemeDictionaries>
             <!-- Other app resources here -->

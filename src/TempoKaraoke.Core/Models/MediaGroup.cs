@@ -33,6 +33,41 @@ public sealed class MediaGroup : INotifyPropertyChanged
     /// <summary>Лучшая версия: сначала по размеру, затем по дате изменения.</summary>
     public MediaItem Best => _best;
 
+    private bool _isSelected;
+    private bool _isSelectionVisible;
+
+    /// <summary>Карточка отмечена в режиме выбора.</summary>
+    public bool IsSelected
+    {
+        get => _isSelected;
+        set
+        {
+            if (_isSelected == value)
+            {
+                return;
+            }
+
+            _isSelected = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsSelected)));
+        }
+    }
+
+    /// <summary>Показывать ли чек-бокс режима выбора на карточке.</summary>
+    public bool IsSelectionVisible
+    {
+        get => _isSelectionVisible;
+        set
+        {
+            if (_isSelectionVisible == value)
+            {
+                return;
+            }
+
+            _isSelectionVisible = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsSelectionVisible)));
+        }
+    }
+
     public string DisplayTitle => _best.DisplayTitle;
 
     public string Subtitle => _best.Subtitle;

@@ -614,6 +614,8 @@
   "Ui_WifiRiskTitle": "Риск Wi-Fi Direct",
   "Ui_WifiSafeMode.Description": "Блокирует Wi-Fi Direct, пока компьютер подключён к Wi-Fi. Это снижает риск конфликта драйвера и падения системы.",
   "Ui_WifiSafeMode.Header": "Безопасный режим Wi-Fi Direct",
+  "Ui_WifiSafeModeToggle.OffContent": "Выкл.",
+  "Ui_WifiSafeModeToggle.OnContent": "Вкл.",
   "Ui_YouHaveNoPlaylists.Text": "У вас нет списков воспроизведения",
   "Update_Available": "Доступно обновление v{0} (текущая: v{1})",
   "Update_Badge_AutomationName.AutomationName": "Доступно обновление",

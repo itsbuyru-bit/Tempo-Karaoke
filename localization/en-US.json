@@ -614,6 +614,8 @@
   "Ui_WifiRiskTitle": "Wi-Fi Direct risk",
   "Ui_WifiSafeMode.Description": "Blocks Wi-Fi Direct while the computer is connected to a Wi-Fi network. This reduces the risk of driver conflicts and system crashes.",
   "Ui_WifiSafeMode.Header": "Wi-Fi Direct safe mode",
+  "Ui_WifiSafeModeToggle.OffContent": "Off",
+  "Ui_WifiSafeModeToggle.OnContent": "On",
   "Ui_YouHaveNoPlaylists.Text": "You have no playlists",
   "Update_Available": "Version v{0} is available (current: v{1})",
   "Update_Badge_AutomationName.AutomationName": "Update available",

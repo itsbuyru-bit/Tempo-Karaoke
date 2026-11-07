@@ -285,7 +285,9 @@
                     x:Name="CardSurface"
                     Margin="2"
                     Padding="4"
-                    Background="Transparent"
+                    Background="{ThemeResource VideoCardBackgroundBrush}"
+                    BorderBrush="{ThemeResource VideoCardBorderBrush}"
+                    BorderThickness="1"
                     CornerRadius="8"
                     VerticalAlignment="Top">
                     <Grid RowSpacing="4">
@@ -351,6 +353,24 @@
                             Text="{Binding DurationCaption}" />
                     </Grid>
                 </Border>
+
+                <Border
+                    x:Name="SelectionRing"
+                    Margin="2"
+                    BorderBrush="{ThemeResource AccentFillColorDefaultBrush}"
+                    BorderThickness="2"
+                    CornerRadius="8"
+                    IsHitTestVisible="False"
+                    Visibility="{Binding IsSelected, Converter={StaticResource BoolToVisibility}}" />
+
+                <CheckBox
+                    x:Name="CardSelectCheck"
+                    Margin="0,10,10,0"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Top"
+                    AutomationProperties.Name="{Binding DisplayTitle}"
+                    IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                    Visibility="{Binding IsSelectionVisible, Converter={StaticResource BoolToVisibility}}" />
             </Grid>
         </DataTemplate>
         <ItemsPanelTemplate x:Key="FolderItemsPanel">
@@ -2521,11 +2541,23 @@
             <Grid
                 x:Name="SettingsView"
                 Grid.Column="0"
+                PointerPressed="SettingsBackground_PointerPressed"
                 Visibility="Collapsed">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
+
+                <Button
+                    x:Name="SettingsFocusSink"
+                    Width="1"
+                    Height="1"
+                    Grid.RowSpan="2"
+                    Opacity="0"
+                    IsHitTestVisible="False"
+                    IsTabStop="False"
+                    TabIndex="-1"
+                    AutomationProperties.AccessibilityView="Raw" />
 
                 <TextBlock
  x:Name="SettingsPageTitle"
@@ -2903,7 +2935,7 @@
                             Orientation="Horizontal"
                             Spacing="12">
                             <NumberBox
- x:Name="CountdownSecondsBox" Width="120" Maximum="60" Minimum="0" SmallChange="1" SpinButtonPlacementMode="Compact" ValueChanged="CountdownSecondsBox_ValueChanged" loc:Localization.AutomationNameKey="Ui_CountdownSeconds_AutomationName.AutomationName" />
+ x:Name="CountdownSecondsBox" Width="120" Maximum="60" Minimum="0" SmallChange="1" SpinButtonPlacementMode="Inline" ValueChanged="CountdownSecondsBox_ValueChanged" loc:Localization.AutomationNameKey="Ui_CountdownSeconds_AutomationName.AutomationName" />
                             <TextBlock
  VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" x:Uid="Ui_Sec" loc:Localization.Key="Ui_Sec.Text" />
                             <ToggleSwitch
@@ -2935,7 +2967,7 @@
                             Orientation="Horizontal"
                             Spacing="12">
                             <NumberBox
- x:Name="RemoteAutoStopMinutesBox" Width="120" Maximum="120" Minimum="1" SmallChange="5" SpinButtonPlacementMode="Compact" ValueChanged="RemoteAutoStopMinutesBox_ValueChanged" loc:Localization.AutomationNameKey="Ui_MinutesWithoutPhones_AutomationName.AutomationName" />
+ x:Name="RemoteAutoStopMinutesBox" Width="120" Maximum="120" Minimum="1" SmallChange="5" SpinButtonPlacementMode="Inline" ValueChanged="RemoteAutoStopMinutesBox_ValueChanged" loc:Localization.AutomationNameKey="Ui_MinutesWithoutPhones_AutomationName.AutomationName" />
                             <TextBlock
  VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" x:Uid="Ui_Min" loc:Localization.Key="Ui_Min.Text" />
                             <ToggleSwitch
@@ -2949,75 +2981,129 @@
                             <FontIcon Glyph="&#xE701;" />
                         </toolkit:SettingsCard.HeaderIcon>
                         <ToggleSwitch
- x:Name="WifiSafeModeToggle" MinWidth="0" Toggled="WifiSafeModeToggle_Toggled" loc:Localization.AutomationNameKey="Ui_WifiSafeMode.Header" />
+ x:Name="WifiSafeModeToggle" MinWidth="0" Toggled="WifiSafeModeToggle_Toggled" loc:Localization.Key="Ui_WifiSafeModeToggle.OffContent" loc:Localization.SecondaryKey="Ui_WifiSafeModeToggle.OnContent" loc:Localization.AutomationNameKey="Ui_WifiSafeMode.Header" />
                     </toolkit:SettingsCard>
                         
-<toolkit:SettingsCard
- x:Uid="Ui_PersistentPin" loc:Localization.Key="Ui_PersistentPin.Description" loc:Localization.SecondaryKey="Ui_PersistentPin.Header">
-                    <toolkit:SettingsCard.HeaderIcon>
-                        <FontIcon Glyph="&#xE72E;" />
-                    </toolkit:SettingsCard.HeaderIcon>
-                    <ToggleSwitch
- x:Name="PersistentPinToggle" MinWidth="0" Toggled="PersistentPinToggle_Toggled" loc:Localization.Key="Ui_PinToggle.OffContent" loc:Localization.SecondaryKey="Ui_PinToggle.OnContent" loc:Localization.AutomationNameKey="Ui_PersistentPin.Header" />
-                </toolkit:SettingsCard>
+<Border
+                    Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                    BorderThickness="1"
+                    CornerRadius="{ThemeResource ControlCornerRadius}">
+                    <StackPanel>
+                        <Grid Padding="16,12" ColumnSpacing="16">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <FontIcon
+                                Grid.Column="0"
+                                VerticalAlignment="Center"
+                                FontSize="16"
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                Glyph="&#xE72E;" />
+                            <StackPanel Grid.Column="1" Spacing="2">
+                                <TextBlock
+                                    Style="{StaticResource BodyStrongTextBlockStyle}"
+                                    loc:Localization.Key="Ui_PersistentPin.Header" />
+                                <TextBlock
+                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                    Style="{StaticResource CaptionTextBlockStyle}"
+                                    TextWrapping="Wrap"
+                                    loc:Localization.Key="Ui_PersistentPin.Description" />
+                            </StackPanel>
+                            <ToggleSwitch
+                                x:Name="PersistentPinToggle"
+                                Grid.Column="2"
+                                MinWidth="0"
+                                VerticalAlignment="Center"
+                                Toggled="PersistentPinToggle_Toggled"
+                                loc:Localization.Key="Ui_PinToggle.OffContent"
+                                loc:Localization.SecondaryKey="Ui_PinToggle.OnContent"
+                                loc:Localization.AutomationNameKey="Ui_PersistentPin.Header" />
+                        </Grid>
 
-                <toolkit:SettingsCard
- x:Name="HostPinCard" x:Uid="Ui_HostPin" loc:Localization.Key="Ui_HostPin.Description" loc:Localization.SecondaryKey="Ui_HostPin.Header">
-                    <toolkit:SettingsCard.HeaderIcon>
-                        <FontIcon Glyph="&#xE7EF;" />
-                    </toolkit:SettingsCard.HeaderIcon>
-                    <StackPanel
-                        VerticalAlignment="Center"
-                        Orientation="Horizontal"
-                        Spacing="8">
-                        <PasswordBox
- x:Name="HostPinBox" Width="160" MaxLength="8" PasswordRevealMode="Hidden" loc:Localization.Key="Ui_HostPin_Placeholder.PlaceholderText" loc:Localization.AutomationNameKey="Ui_HostPin.Header" />
-                        <PasswordBox
- x:Name="HostPinConfirmBox" Width="160" MaxLength="8" PasswordRevealMode="Hidden" loc:Localization.Key="Ui_HostPinConfirm_Placeholder.PlaceholderText" loc:Localization.AutomationNameKey="Ui_HostPinConfirm.Header" />
-                    </StackPanel>
-                </toolkit:SettingsCard>
+                        <StackPanel x:Name="PinDetailsPanel" Visibility="Collapsed">
+                            <Border Height="1" Background="{ThemeResource DividerStrokeColorDefaultBrush}" />
 
-                <toolkit:SettingsCard
- x:Name="AdminPinCard" x:Uid="Ui_AdminPin" loc:Localization.Key="Ui_AdminPin.Description" loc:Localization.SecondaryKey="Ui_AdminPin.Header">
-                    <toolkit:SettingsCard.HeaderIcon>
-                        <FontIcon Glyph="&#xE7EF;" />
-                    </toolkit:SettingsCard.HeaderIcon>
-                    <StackPanel
-                        VerticalAlignment="Center"
-                        Orientation="Horizontal"
-                        Spacing="8">
-                        <PasswordBox
- x:Name="AdminPinBox" Width="160" MaxLength="8" PasswordRevealMode="Hidden" loc:Localization.Key="Ui_AdminPin_Placeholder.PlaceholderText" loc:Localization.AutomationNameKey="Ui_AdminPin.Header" />
-                        <PasswordBox
- x:Name="AdminPinConfirmBox" Width="160" MaxLength="8" PasswordRevealMode="Hidden" loc:Localization.Key="Ui_AdminPinConfirm_Placeholder.PlaceholderText" loc:Localization.AutomationNameKey="Ui_AdminPinConfirm.Header" />
-                    </StackPanel>
-                </toolkit:SettingsCard>
+                            <Grid Padding="16,12" ColumnSpacing="16">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Spacing="2">
+                                    <TextBlock
+                                        Style="{StaticResource BodyStrongTextBlockStyle}"
+                                        loc:Localization.Key="Ui_HostPin.Header" />
+                                    <TextBlock
+                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                        Style="{StaticResource CaptionTextBlockStyle}"
+                                        TextWrapping="Wrap"
+                                        loc:Localization.Key="Ui_HostPin.Description" />
+                                </StackPanel>
+                                <StackPanel
+                                    Grid.Column="1"
+                                    VerticalAlignment="Center"
+                                    Orientation="Horizontal"
+                                    Spacing="8">
+                                    <PasswordBox
+                                        x:Name="HostPinBox" Width="160" MaxLength="8" PasswordRevealMode="Hidden" loc:Localization.Key="Ui_HostPin_Placeholder.PlaceholderText" loc:Localization.AutomationNameKey="Ui_HostPin.Header" />
+                                    <PasswordBox
+                                        x:Name="HostPinConfirmBox" Width="160" MaxLength="8" PasswordRevealMode="Hidden" loc:Localization.Key="Ui_HostPinConfirm_Placeholder.PlaceholderText" loc:Localization.AutomationNameKey="Ui_HostPinConfirm.Header" />
+                                </StackPanel>
+                            </Grid>
 
-                <toolkit:SettingsCard
- x:Uid="Ui_PinActions" loc:Localization.Key="Ui_PinActions.Description" loc:Localization.SecondaryKey="Ui_PinActions.Header">
-                    <toolkit:SettingsCard.HeaderIcon>
-                        <FontIcon Glyph="&#xE8FB;" />
-                    </toolkit:SettingsCard.HeaderIcon>
-                    <StackPanel
-                        VerticalAlignment="Center"
-                        Spacing="8">
-                        <StackPanel
-                            Orientation="Horizontal"
-                            Spacing="8">
-                            <Button
- x:Name="SavePinsButton" Click="SavePins_Click" Style="{StaticResource AccentButtonStyle}" x:Uid="Ui_SavePins" loc:Localization.Key="Ui_SavePins.Content" />
-                            <Button
- x:Name="ResetPinsButton" Click="ResetPins_Click" x:Uid="Ui_ResetPins" loc:Localization.Key="Ui_ResetPins.Content" />
+                            <Border Height="1" Margin="16,0" Background="{ThemeResource DividerStrokeColorDefaultBrush}" />
+
+                            <Grid Padding="16,12" ColumnSpacing="16">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Spacing="2">
+                                    <TextBlock
+                                        Style="{StaticResource BodyStrongTextBlockStyle}"
+                                        loc:Localization.Key="Ui_AdminPin.Header" />
+                                    <TextBlock
+                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                        Style="{StaticResource CaptionTextBlockStyle}"
+                                        TextWrapping="Wrap"
+                                        loc:Localization.Key="Ui_AdminPin.Description" />
+                                </StackPanel>
+                                <StackPanel
+                                    Grid.Column="1"
+                                    VerticalAlignment="Center"
+                                    Orientation="Horizontal"
+                                    Spacing="8">
+                                    <PasswordBox
+                                        x:Name="AdminPinBox" Width="160" MaxLength="8" PasswordRevealMode="Hidden" loc:Localization.Key="Ui_AdminPin_Placeholder.PlaceholderText" loc:Localization.AutomationNameKey="Ui_AdminPin.Header" />
+                                    <PasswordBox
+                                        x:Name="AdminPinConfirmBox" Width="160" MaxLength="8" PasswordRevealMode="Hidden" loc:Localization.Key="Ui_AdminPinConfirm_Placeholder.PlaceholderText" loc:Localization.AutomationNameKey="Ui_AdminPinConfirm.Header" />
+                                </StackPanel>
+                            </Grid>
+
+                            <Border Height="1" Background="{ThemeResource DividerStrokeColorDefaultBrush}" />
+
+                            <StackPanel Padding="16,12" Spacing="8">
+                                <StackPanel
+                                    HorizontalAlignment="Right"
+                                    Orientation="Horizontal"
+                                    Spacing="8">
+                                    <Button
+                                        x:Name="SavePinsButton" Click="SavePins_Click" Style="{StaticResource AccentButtonStyle}" x:Uid="Ui_SavePins" loc:Localization.Key="Ui_SavePins.Content" />
+                                    <Button
+                                        x:Name="ResetPinsButton" Click="ResetPins_Click" x:Uid="Ui_ResetPins" loc:Localization.Key="Ui_ResetPins.Content" />
+                                </StackPanel>
+                                <TextBlock
+                                    x:Name="PinSettingsStatus"
+                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                    Style="{StaticResource CaptionTextBlockStyle}"
+                                    TextWrapping="Wrap"
+                                    Visibility="Collapsed" />
+                            </StackPanel>
                         </StackPanel>
-                        <TextBlock
-                            x:Name="PinSettingsStatus"
-                            MaxWidth="520"
-                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                            Style="{StaticResource CaptionTextBlockStyle}"
-                            TextWrapping="Wrap"
-                            Visibility="Collapsed" />
                     </StackPanel>
-                </toolkit:SettingsCard>
+                </Border>
 </StackPanel>
 
                         

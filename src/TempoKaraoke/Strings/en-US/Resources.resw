@@ -621,6 +621,8 @@
   <data name="Ui_WifiRiskTitle" xml:space="preserve"><value>Wi-Fi Direct risk</value></data>
   <data name="Ui_WifiSafeMode.Description" xml:space="preserve"><value>Blocks Wi-Fi Direct while the computer is connected to a Wi-Fi network. This reduces the risk of driver conflicts and system crashes.</value></data>
   <data name="Ui_WifiSafeMode.Header" xml:space="preserve"><value>Wi-Fi Direct safe mode</value></data>
+  <data name="Ui_WifiSafeModeToggle.OffContent" xml:space="preserve"><value>Off</value></data>
+  <data name="Ui_WifiSafeModeToggle.OnContent" xml:space="preserve"><value>On</value></data>
   <data name="Ui_YouHaveNoPlaylists.Text" xml:space="preserve"><value>You have no playlists</value></data>
   <data name="Update_Available" xml:space="preserve"><value>Version v{0} is available (current: v{1})</value></data>
   <data name="Update_Badge_AutomationName.AutomationName" xml:space="preserve"><value>Update available</value></data>

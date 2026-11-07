@@ -2053,27 +2053,30 @@ public sealed partial class MainPage : Page, IRemoteHost
             position = new Point(0, 0);
         }
 
-        ShowLibraryItemContextMenu(card, group.Best, position);
+        ShowLibraryItemContextMenu(card, group, position);
         args.Handled = true;
     }
 
-    private void ShowLibraryItemContextMenu(FrameworkElement target, MediaItem item, Point position)
+    private void ShowLibraryItemContextMenu(FrameworkElement target, MediaGroup group, Point position)
     {
+        var item = group.Best;
         var flyout = new MenuFlyout();
-        flyout.Items.Add(CreateMenuItem("ContextMenu_Play.Text", "", () => PlayNow(item)));
-        flyout.Items.Add(CreateMenuItem("Menu_PlayNext.Text", "", () => EnqueueItemNext(item)));
-        flyout.Items.Add(CreateMenuItem("ContextMenu_Queue.Text", "", () => AddItemToQueueFromMenu(item)));
+
+        flyout.Items.Add(CreateMenuItem("ContextMenu_Play.Text", "\uE768", () => PlayNow(item)));
+        flyout.Items.Add(CreateMenuItem("Menu_PlayNext.Text", "\uED35", () => EnqueueItemNext(item)));
 
         var addTo = new MenuFlyoutSubItem
         {
             Text = LocalizationService.Get("ContextMenu_AddTo.Text"),
-            Icon = CreateMenuIcon(""),
+            Icon = CreateMenuIcon("\uE710"),
         };
-        addTo.Items.Add(CreateMenuItem("ContextMenu_NewPlaylist.Text", "", () => _ = CreatePlaylistWithItemAsync(item)));
+        addTo.Items.Add(CreateMenuItem("ContextMenu_Queue.Text", "\uE8D6", () => AddItemToQueueFromMenu(item)));
+        addTo.Items.Add(new MenuFlyoutSeparator());
+        addTo.Items.Add(CreateMenuItem("ContextMenu_NewPlaylist.Text", "\uE710", () => _ = CreatePlaylistWithItemAsync(item)));
         foreach (var playlist in Playlists.ToList())
         {
             var targetPlaylist = playlist;
-            addTo.Items.Add(CreateMenuItem(targetPlaylist.Name, "", () => AddItemToPlaylist(targetPlaylist, item), localize: false));
+            addTo.Items.Add(CreateMenuItem(targetPlaylist.Name, "\uE8D6", () => AddItemToPlaylist(targetPlaylist, item), localize: false));
         }
 
         flyout.Items.Add(addTo);
@@ -2081,16 +2084,32 @@ public sealed partial class MainPage : Page, IRemoteHost
         var favorite = LibraryActivityStore.IsFavorite(item.Path);
         flyout.Items.Add(CreateMenuItem(
             favorite ? "ContextMenu_RemoveFavorite" : "ContextMenu_AddFavorite",
-            "",
+            "\uE734",
             () =>
             {
                 LibraryActivityStore.ToggleFavorite(item.Path);
                 RefreshHomeSection();
             }));
+
+        flyout.Items.Add(CreateMenuItem("ContextMenu_Properties.Text", "\uE946", () => _ = ShowPropertiesAsync(item)));
         flyout.Items.Add(new MenuFlyoutSeparator());
-        flyout.Items.Add(CreateMenuItem("ContextMenu_Properties.Text", "", () => _ = ShowPropertiesAsync(item)));
+        flyout.Items.Add(CreateMenuItem("ContextMenu_Select.Text", "\uE73A", () => EnterCardSelection(group)));
 
         flyout.ShowAt(target, position);
+    }
+
+    /// <summary>Включает режим выбора чек-боксами и отмечает карточку.</summary>
+    private void EnterCardSelection(MediaGroup group)
+    {
+        foreach (var collection in new[] { FilteredGroups, Recent, SearchResults })
+        {
+            foreach (var card in collection)
+            {
+                card.IsSelectionVisible = true;
+            }
+        }
+
+        group.IsSelected = true;
     }
 
     private void ShowTrackContextMenu(
@@ -6269,7 +6288,8 @@ public sealed partial class MainPage : Page, IRemoteHost
 
         if (FindElementByName(root, "CardSurface") is Border surface)
         {
-            surface.Background = ThemeBrush("CardBackgroundFillColorDefaultBrush");
+            surface.Background = ThemedBrush(surface, "VideoCardHoverBackgroundBrush");
+            surface.BorderBrush = ThemedBrush(surface, "VideoCardHoverBorderBrush");
         }
     }
 
@@ -6287,7 +6307,8 @@ public sealed partial class MainPage : Page, IRemoteHost
 
         if (FindElementByName(root, "CardSurface") is Border surface)
         {
-            surface.Background = new SolidColorBrush(Windows.UI.Color.FromArgb(0, 0, 0, 0));
+            surface.Background = ThemedBrush(surface, "VideoCardBackgroundBrush");
+            surface.BorderBrush = ThemedBrush(surface, "VideoCardBorderBrush");
         }
     }
 
@@ -6326,48 +6347,10 @@ public sealed partial class MainPage : Page, IRemoteHost
             return;
         }
 
-        var flyout = new MenuFlyout();
-
-        var queueItem = new MenuFlyoutItem { Text = LocalizationService.Get("ContextMenu_Queue.Text") };
-        queueItem.Click += (_, _) => AddToQueue(group.Best);
-        flyout.Items.Add(queueItem);
-
-        var lists = new MenuFlyoutSubItem { Text = LocalizationService.Get("ContextMenu_AddToPlaylist") };
-        foreach (var playlist in Playlists)
-        {
-            var entry = new MenuFlyoutItem { Text = playlist.Name, Tag = playlist };
-            entry.Click += (_, _) => AddToPlaylist(playlist, group.Best);
-            lists.Items.Add(entry);
-        }
-
-        var create = new MenuFlyoutItem { Text = LocalizationService.Get("ContextMenu_CreatePlaylist") };
-        create.Click += (_, _) =>
-        {
-            NavView.SelectedItem = PlaylistsNavItem;
-            ShowPlaylists();
-            ShowCreatePlaylistPanel(new[] { group.Best });
-        };
-        lists.Items.Add(create);
-        flyout.Items.Add(lists);
-
-        if (group.HasMultipleVersions)
-        {
-            var versions = new MenuFlyoutSubItem { Text = group.VersionCountText };
-            foreach (var version in group.Versions.OrderByDescending(item => item.SizeBytes))
-            {
-                var entry = new MenuFlyoutItem
-                {
-                    Text = $"{version.Folder} · {version.Format} · {version.SizeText}",
-                    Tag = version,
-                };
-                entry.Click += (_, _) => PlayNow(version);
-                versions.Items.Add(entry);
-            }
-
-            flyout.Items.Add(versions);
-        }
-
-        flyout.ShowAt(element);
+        ShowLibraryItemContextMenu(
+            element,
+            group,
+            new Point(Math.Max(element.ActualWidth - 8, 0), Math.Max(element.ActualHeight - 8, 0)));
     }
 
     private void AddToPlaylist_Click(object sender, RoutedEventArgs e)
@@ -7051,8 +7034,7 @@ public sealed partial class MainPage : Page, IRemoteHost
         }
 
         var enabled = PersistentPinToggle.IsOn;
-        HostPinCard.IsEnabled = enabled;
-        AdminPinCard.IsEnabled = enabled;
+        PinDetailsPanel.Visibility = enabled ? Visibility.Visible : Visibility.Collapsed;
         HostPinBox.IsEnabled = enabled;
         HostPinConfirmBox.IsEnabled = enabled;
         AdminPinBox.IsEnabled = enabled;
@@ -9115,6 +9097,37 @@ public sealed partial class MainPage : Page, IRemoteHost
     }
 
     private void SettingsBack_Click(object sender, RoutedEventArgs e) => ShowSettingsCatalog();
+
+    /// <summary>
+    /// Клик по пустому месту «Параметров» снимает фокус с полей ввода: числа
+    /// не должны выделяться синим и открывать панель стрелок при клике по фону.
+    /// </summary>
+    private void SettingsBackground_PointerPressed(object sender, PointerRoutedEventArgs e)
+    {
+        if (e.OriginalSource is DependencyObject source && IsInteractiveSource(source))
+        {
+            return;
+        }
+
+        SettingsFocusSink?.Focus(FocusState.Programmatic);
+    }
+
+    private static bool IsInteractiveSource(DependencyObject source)
+    {
+        DependencyObject? current = source;
+        while (current is not null)
+        {
+            if (current is TextBox or PasswordBox or NumberBox or ComboBox or ToggleSwitch or
+                Button or CheckBox or RadioButton or Slider or HyperlinkButton or ListViewItem)
+            {
+                return true;
+            }
+
+            current = VisualTreeHelper.GetParent(current);
+        }
+
+        return false;
+    }
 
     private void SettingsSectionCard_Click(object sender, RoutedEventArgs e)
     {
