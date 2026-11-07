@@ -222,6 +222,11 @@ input,textarea{user-select:text;font-size:16px}
 .confirm-delete:active{background:var(--red);color:#fff}
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(50px);background:#1e2430;border:1px solid var(--primary);box-shadow:0 8px 24px rgba(0,0,0,.4);color:#fff;padding:10px 18px;border-radius:99px;font-size:.85rem;font-weight:600;display:flex;align-items:center;gap:8px;z-index:200;opacity:0;transition:all .25s;pointer-events:none;white-space:nowrap}
 .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+html { scrollbar-color: #334155 #0d1118; scrollbar-width: thin; }
+body::-webkit-scrollbar { width: 7px; height: 7px; }
+body::-webkit-scrollbar-track { background: #0d1118; }
+body::-webkit-scrollbar-thumb { background: #334155; border: 1px solid #0d1118; border-radius: 99px; }
+body::-webkit-scrollbar-thumb:hover { background: #475569; }
 </style>
 </head>
 <body>

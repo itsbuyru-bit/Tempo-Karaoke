@@ -76,12 +76,18 @@
     </section>
 
     <section class="container app-shots" aria-label="Inside the app">
-      <div class="section-head">
-        <span class="section-kicker">Inside the app</span>
-        <h2>Built for a real karaoke night.</h2>
-        <p>Four views from the Windows app: the library, the queue, the phone remote and the settings that connect them.</p>
+      <div class="shots-head">
+        <div class="section-head">
+          <span class="section-kicker">Inside the app</span>
+          <h2>Built for a real karaoke night.</h2>
+          <p>Four views from the Windows app: the library, the queue, the phone remote and the settings that connect them.</p>
+        </div>
+        <div class="shots-nav" aria-label="Screenshot navigation">
+          <button type="button" class="shot-arrow" data-shots-prev aria-label="Previous screenshot">&#8249;</button>
+          <button type="button" class="shot-arrow" data-shots-next aria-label="Next screenshot">&#8250;</button>
+        </div>
       </div>
-      <div class="shots-grid">
+      <div class="shots-rail" data-shots>
         <figure class="shot">
           <img src="assets/screenshots/library.png" alt="Tempo Karaoke video library with song cards" loading="lazy" width="1938" height="1800">
           <figcaption><strong>Video library</strong> Thousands of songs, grouped by artist and version.</figcaption>
@@ -192,5 +198,22 @@
       </div>
     </div>
   </footer>
+  <script>
+    (() => {
+      for (const rail of document.querySelectorAll('[data-shots]')) {
+        const area = rail.closest('.app-shots');
+        const step = () => {
+          const card = rail.querySelector('.shot');
+          return card ? card.getBoundingClientRect().width + 18 : rail.clientWidth * 0.8;
+        };
+        area.querySelector('[data-shots-prev]')?.addEventListener('click', () => {
+          rail.scrollBy({ left: -step(), behavior: 'smooth' });
+        });
+        area.querySelector('[data-shots-next]')?.addEventListener('click', () => {
+          rail.scrollBy({ left: step(), behavior: 'smooth' });
+        });
+      }
+    })();
+  </script>
 </body>
 </html>
