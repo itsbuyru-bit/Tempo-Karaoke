@@ -275,7 +275,7 @@ input,textarea{user-select:text;font-size:16px}
         step="1"
         value="0"
         oninput="seekValueChanged(this.value)"
-        onchange="control('seek', this.value)">
+        onchange="seekCommitted(this.value)">
       <div class="times"><span id="timeCurrent">00:00</span><span id="timeTotal">00:00</span></div>
     </div>
     <div class="host" id="hostControls">
@@ -552,6 +552,10 @@ let requestsTab = 'active';
 let canAdmin = false;
 let searchTimer = null;
 let lastQueueSignature = null;
+let seekDragging = false;
+let socket = null;
+let reconnectTimer = null;
+let reconnectDelay = 1000;
 let guestName = (localStorage.getItem('guest_name') || '').trim();
 
 function normalizeLanguage(value) {
@@ -688,6 +692,31 @@ function hasTrack() {
     title !== t('player_nothing');
 }
 
+function renderPlayback() {
+  if (!state) return;
+  const playing = !!state.isPlaying && hasTrack();
+  $('playIcon').textContent = playing ? '❚❚' : '▶';
+  $('playLabel').textContent = playing ? t('player_pause') : t('player_start');
+  $('playStatus').textContent = !hasTrack()
+    ? t('player_no_track')
+    : (playing ? t('player_now_playing') : t('player_paused'));
+  $('playDot').style.background = playing ? 'var(--primary)' : 'var(--amber)';
+  $('timeTotal').textContent = fmt(state.lengthMs);
+  $('volume').value = state.volume || 0;
+  $('volumeValue').textContent = state.volume || 0;
+
+  // Пока пользователь тянет ползунок, не перебиваем его положение
+  // очередным снимком состояния с компьютера.
+  if (!seekDragging) {
+    $('timeCurrent').textContent = fmt(state.positionMs);
+    const position = state.lengthMs > 0
+      ? Math.max(0, Math.min(1000, Math.round((state.positionMs || 0) / state.lengthMs * 1000)))
+      : 0;
+    $('seek').value = String(position);
+    $('seek').style.setProperty('--seek', (position / 10) + '%');
+  }
+}
+
 
 async function api(path, options) {
   const sep = path.includes('?') ? '&' : '?';
@@ -751,20 +780,7 @@ function apply(data) {
   const title = hasTrack() ? (state.title || t('player_nothing')) : t('player_nothing');
   $('trackTitle').textContent = title;
   $('trackSub').textContent = hasTrack() ? (state.subtitle || '') : t('player_choose_on_pc');
-  const playing = !!state.isPlaying && hasTrack();
-  $('playIcon').textContent = playing ? '❚❚' : '▶';
-  $('playLabel').textContent = playing ? t('player_pause') : t('player_start');
-  $('playStatus').textContent = !hasTrack()
-    ? t('player_no_track')
-    : (playing ? t('player_now_playing') : t('player_paused'));
-  $('playDot').style.background = playing ? 'var(--primary)' : 'var(--amber)';
-  $('timeCurrent').textContent = fmt(state.positionMs);
-  $('timeTotal').textContent = fmt(state.lengthMs);
-  $('volume').value = state.volume || 0;
-  $('volumeValue').textContent = state.volume || 0;
-  const position = state.lengthMs > 0 ? Math.max(0, Math.min(1000, Math.round((state.positionMs || 0) / state.lengthMs * 1000))) : 0;
-  $('seek').value = String(position);
-  $('seek').style.setProperty('--seek', (position / 10) + '%');
+  renderPlayback();
 
   const queue = state.queue || [];
   $('queueCount').textContent = queue.length;
@@ -1044,11 +1060,19 @@ async function moveQueue(from, to) {
 
 async function control(action, value) {
   if (!canControl) return;
+
+  // Кнопка «Старт/Пауза» должна реагировать сразу, не ожидая round-trip.
+  if (action === 'playpause' && state) {
+    state.isPlaying = !state.isPlaying;
+    renderPlayback();
+  }
+
   try {
     await api('/api/control', { method: 'POST', body: JSON.stringify({ action, value: Number(value) || 0 }) });
     await refresh();
   } catch {
     toast(t('toast_command_failed'), '⚠');
+    await refresh();
   }
 }
 
@@ -1057,8 +1081,28 @@ function volumeChanged(value) {
 }
 
 function seekValueChanged(value) {
+  seekDragging = true;
   $('timeCurrent').textContent = fmt((state?.lengthMs || 0) * value / 1000);
   $('seek').style.setProperty('--seek', (Number(value) / 10) + '%');
+}
+
+async function seekCommitted(value) {
+  if (!canControl) {
+    seekDragging = false;
+    return;
+  }
+
+  try {
+    await api('/api/control', {
+      method: 'POST',
+      body: JSON.stringify({ action: 'seek', value: Number(value) || 0 })
+    });
+    seekDragging = false;
+    await refresh();
+  } catch {
+    seekDragging = false;
+    toast(t('toast_command_failed'), '⚠');
+  }
 }
 
 function showFolder(item) {
@@ -1569,16 +1613,67 @@ async function refresh() {
   }
 }
 
+function scheduleReconnect() {
+  if (reconnectTimer) return;
+  reconnectTimer = setTimeout(() => {
+    reconnectTimer = null;
+    connectSocket();
+  }, reconnectDelay);
+  reconnectDelay = Math.min(reconnectDelay * 2, 10000);
+}
+
 function connectSocket() {
+  if (socket && (socket.readyState === WebSocket.OPEN || socket.readyState === WebSocket.CONNECTING)) {
+    return;
+  }
+
+  let ws;
   try {
     const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const socket = new WebSocket(proto + '//' + location.host + '/ws?token=' + encodeURIComponent(token));
-    socket.onmessage = event => apply(JSON.parse(event.data));
-    socket.onclose = () => setTimeout(refresh, 3000);
+    ws = new WebSocket(proto + '//' + location.host + '/ws?token=' + encodeURIComponent(token));
   } catch {
-    // Polling below is enough.
+    scheduleReconnect();
+    return;
   }
+
+  socket = ws;
+  ws.onopen = () => {
+    reconnectDelay = 1000;
+    refresh();
+  };
+  ws.onmessage = event => {
+    try {
+      apply(JSON.parse(event.data));
+    } catch {
+      // Ignore a malformed frame; polling will recover the state.
+    }
+  };
+  ws.onerror = () => {
+    try { ws.close(); } catch { /* already closed */ }
+  };
+  ws.onclose = () => {
+    if (socket === ws) socket = null;
+    refresh();
+    scheduleReconnect();
+  };
 }
+
+// После сна телефона/переключения сети сразу подтягиваем состояние
+// и переподключаем WebSocket, не дожидаясь следующего тика таймера.
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) {
+    refresh();
+    connectSocket();
+  }
+});
+window.addEventListener('pageshow', () => {
+  refresh();
+  connectSocket();
+});
+window.addEventListener('online', () => {
+  refresh();
+  connectSocket();
+});
 
 document.addEventListener('pointerdown', event => {
   const dropdown = $('userProfileDropdown');
@@ -1614,7 +1709,7 @@ window.addEventListener('unhandledrejection', event => {
   await loadLanguage(language, false);
   await refresh();
   connectSocket();
-  setInterval(refresh, 5000);
+  setInterval(refresh, 3000);
 })();
 </script>
 </body>

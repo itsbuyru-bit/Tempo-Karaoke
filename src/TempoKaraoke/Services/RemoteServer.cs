@@ -123,7 +123,11 @@ public sealed class RemoteServer : IAsyncDisposable
             builder.Logging.ClearProviders();
             builder.WebHost.ConfigureKestrel(options => options.Listen(IPAddress.Any, 0));
             var app = builder.Build();
-            app.UseWebSockets();
+            app.UseWebSockets(new WebSocketOptions
+            {
+                // Pings keep NAT/router mappings alive while the phone is idle.
+                KeepAliveInterval = TimeSpan.FromSeconds(20),
+            });
 
             app.MapGet("/appicon.png", async context =>
             {
@@ -845,7 +849,9 @@ public sealed class RemoteServer : IAsyncDisposable
                 clients = _sockets.Values.ToArray();
             }
 
-            foreach (var client in clients)
+            // Отправляем параллельно: медленный телефон не должен задерживать
+            // обновление состояния у остальных пультов.
+            await Task.WhenAll(clients.Select(async client =>
             {
                 try
                 {
@@ -857,8 +863,17 @@ public sealed class RemoteServer : IAsyncDisposable
                     {
                         _sockets.Remove(client.Socket);
                     }
+
+                    try
+                    {
+                        client.Socket.Abort();
+                    }
+                    catch
+                    {
+                        // Сокет мог быть уже закрыт.
+                    }
                 }
-            }
+            }));
         }
         catch
         {
@@ -881,14 +896,21 @@ public sealed class RemoteServer : IAsyncDisposable
             _clients.GetAliasName(client.ClientId) ?? string.Empty,
             _clients.GetFallbackName(client.ClientId) ?? string.Empty);
         var bytes = JsonSerializer.SerializeToUtf8Bytes(payload, RemoteJsonContext.Default.StateResponse);
-        await client.SendLock.WaitAsync(_cts.Token);
+        if (!await client.SendLock.WaitAsync(TimeSpan.FromSeconds(2), _cts.Token))
+        {
+            return;
+        }
+
         try
         {
+            // Полузакрытый сокет не должен блокировать общий цикл рассылки.
+            using var timeout = CancellationTokenSource.CreateLinkedTokenSource(_cts.Token);
+            timeout.CancelAfter(TimeSpan.FromSeconds(4));
             await client.Socket.SendAsync(
                 new ArraySegment<byte>(bytes),
                 WebSocketMessageType.Text,
                 true,
-                _cts.Token);
+                timeout.Token);
         }
         finally
         {

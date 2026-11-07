@@ -25,6 +25,7 @@ public sealed class PlayerService : IDisposable
     private long _lastLengthMs;
     private long _pendingSeekMs;
     private bool _resumeAfterAttach = true;
+    private volatile bool _isPlaying;
     private int _volume = 80;
     private int _volumeBeforeMute = 80;
     private float _rate = 1.0f;
@@ -45,7 +46,11 @@ public sealed class PlayerService : IDisposable
 
     public bool IsAttached => _mediaPlayer is not null;
 
-    public bool IsPlaying => _mediaPlayer?.IsPlaying ?? false;
+    /// <summary>
+    /// Собственный флаг: LibVLCSharp после Pause/Play не всегда обновляет
+    /// <c>MediaPlayer.IsPlaying</c> синхронно, из-за чего пульт «застревал» на паузе.
+    /// </summary>
+    public bool IsPlaying => _isPlaying;
 
     public long PositionMs => _mediaPlayer?.Time ?? _lastPositionMs;
 
@@ -157,7 +162,8 @@ public sealed class PlayerService : IDisposable
         {
             _lastPositionMs = player.Time;
             _lastLengthMs = player.Length;
-            _resumeAfterAttach = player.IsPlaying;
+            _resumeAfterAttach = _isPlaying;
+            _isPlaying = false;
             _volume = player.Volume;
 
             _mediaPlayer = null;
@@ -226,23 +232,31 @@ public sealed class PlayerService : IDisposable
             return;
         }
 
-        if (_mediaPlayer.IsPlaying)
+        if (_isPlaying)
         {
+            _isPlaying = false;
             _mediaPlayer.Pause();
         }
         else
         {
             _resumeAfterAttach = true;
+            _isPlaying = true;
             _mediaPlayer.Play();
         }
+
+        RaiseStateChanged();
     }
 
     public void Pause()
     {
-        if (_mediaPlayer?.IsPlaying == true)
+        if (_mediaPlayer is null || !_isPlaying)
         {
-            _mediaPlayer.Pause();
+            return;
         }
+
+        _isPlaying = false;
+        _mediaPlayer.Pause();
+        RaiseStateChanged();
     }
 
     public void Stop()
@@ -250,6 +264,7 @@ public sealed class PlayerService : IDisposable
         var player = _mediaPlayer;
         _lastPositionMs = 0;
         _resumeAfterAttach = false;
+        _isPlaying = false;
 
         if (player is not null)
         {
@@ -341,6 +356,7 @@ public sealed class PlayerService : IDisposable
             return;
         }
 
+        _isPlaying = play;
         if (!play)
         {
             _ = Task.Run(() =>
@@ -371,6 +387,7 @@ public sealed class PlayerService : IDisposable
 
     private void OnPlaying(object? sender, EventArgs e)
     {
+        _isPlaying = true;
         var seek = _pendingSeekMs;
         _pendingSeekMs = 0;
         var resume = _resumeAfterAttach;
@@ -407,12 +424,21 @@ public sealed class PlayerService : IDisposable
         RaiseStateChanged();
     }
 
-    private void OnPaused(object? sender, EventArgs e) => RaiseStateChanged();
+    private void OnPaused(object? sender, EventArgs e)
+    {
+        _isPlaying = false;
+        RaiseStateChanged();
+    }
 
-    private void OnStopped(object? sender, EventArgs e) => RaiseStateChanged();
+    private void OnStopped(object? sender, EventArgs e)
+    {
+        _isPlaying = false;
+        RaiseStateChanged();
+    }
 
     private void OnEndReached(object? sender, EventArgs e)
     {
+        _isPlaying = false;
         _dispatcher.TryEnqueue(() => EndReached?.Invoke(this, EventArgs.Empty));
     }
 

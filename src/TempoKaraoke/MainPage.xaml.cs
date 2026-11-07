@@ -8823,7 +8823,7 @@ public sealed partial class MainPage : Page, IRemoteHost, INotifyPropertyChanged
     {
         return OnUiAsync(() =>
         {
-            var showCurrent = _current is not null && (_player.IsPlaying || _queueIndex >= 0);
+            var showCurrent = _current is not null;
             return new RemoteSnapshot(
                 showCurrent ? _current!.DisplayTitle : LocalizationService.Get("Player_NothingPlaying"),
                 showCurrent ? _current!.Subtitle : LocalizationService.Get("Player_ChooseSong"),
