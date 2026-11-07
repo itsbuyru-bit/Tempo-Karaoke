@@ -85,7 +85,8 @@ public static class UpdateService
 
             if (release is null)
             {
-                return UpdateCheckResult.Failed("empty release");
+                // 404 / пустой ответ: у репозитория ещё нет релизов — обновляться не до чего.
+                return UpdateCheckResult.UpToDate;
             }
 
             var version = ParseVersion(release.TagName);
@@ -131,6 +132,12 @@ public static class UpdateService
             try
             {
                 using var response = await Http.GetAsync(url, cancellationToken).ConfigureAwait(false);
+                if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                {
+                    // Нет опубликованных релизов: считаем установленную версию актуальной.
+                    return null;
+                }
+
                 if (!response.IsSuccessStatusCode)
                 {
                     throw new HttpRequestException($"HTTP {(int)response.StatusCode}");

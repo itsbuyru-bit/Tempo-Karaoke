@@ -1,25 +1,28 @@
-; Установщик Tempo Karaoke (Inno Setup 6+).
-; Схема как у UniGetUI: установка в профиль пользователя без UAC, а обновление
-; запускается из приложения тем же установщиком в тихом режиме.
+; Установщик Tempo Karaoke (Inno Setup 7+).
+; Схема: установка в профиль пользователя без UAC, а обновление запускается из
+; приложения тем же установщиком в тихом режиме.
 ;
 ; Сборка:
 ;   dotnet publish src\TempoKaraoke\TempoKaraoke.csproj -c Release -p:PublishProfile=portable-x64
-;   iscc installer\TempoKaraoke.iss /DMyAppVersion=1.9.0.0
+;   iscc installer\TempoKaraoke.iss
 ;
+; Версия по умолчанию читается из TempoKaraoke.exe; /DMyAppVersion=… переопределяет.
 ; Сборка self-contained: Windows App SDK и .NET лежат рядом с exe, поэтому
 ; установщик ничего не доустанавливает и не требует прав администратора.
 
 #define MyAppName "Tempo Karaoke"
 #define MyAppPublisher "Cappuccino Dev"
 #define MyAppExeName "TempoKaraoke.exe"
+#define MyAppUrl "https://github.com/itsbuyru-bit/Tempo-Karaoke"
 #define MyAppId "{{8ECFDE07-71F6-4AC1-9968-53F119FF033C}"
-
-#ifndef MyAppVersion
-  #define MyAppVersion "1.9.0.0"
-#endif
 
 #ifndef PublishDir
   #define PublishDir "..\src\TempoKaraoke\bin\Release\net10.0-windows10.0.26100.0\win-x64\portable"
+#endif
+
+; Версия из PE-ресурсов собранного exe: всегда 4 компонента (X.Y.Z.W).
+#ifndef MyAppVersion
+  #define MyAppVersion GetVersionNumbersString(AddBackslash(PublishDir) + MyAppExeName)
 #endif
 
 [Setup]
@@ -28,6 +31,9 @@ AppName={#MyAppName}
 AppVersion={#MyAppVersion}
 AppVerName={#MyAppName} {#MyAppVersion}
 AppPublisher={#MyAppPublisher}
+AppPublisherURL={#MyAppUrl}
+AppSupportURL={#MyAppUrl}/issues
+AppUpdatesURL={#MyAppUrl}/releases
 VersionInfoVersion={#MyAppVersion}
 VersionInfoProductVersion={#MyAppVersion}
 VersionInfoProductName={#MyAppName}
@@ -73,11 +79,16 @@ SetupLogging=yes
 Name: "russian"; MessagesFile: "compiler:Languages\Russian.isl"
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
+[CustomMessages]
+russian.DeleteUserDataPrompt=Удалить также настройки, очередь и кэш библиотеки?%n%1%n%nЕсли оставить (Нет), данные сохранятся для следующей установки.
+english.DeleteUserDataPrompt=Also delete settings, playback queue, and library cache?%n%1%n%nIf you choose No, your data will be kept for future installations.
+
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "{#PublishDir}\*"; DestDir: "{app}"; Excludes: "*.pdb,*.lib"; Flags: ignoreversion recursesubdirs createallsubdirs
+; Исключаем отладочные файлы и случайные локальные конфиги/логи из папки сборки.
+Source: "{#PublishDir}\*"; DestDir: "{app}"; Excludes: "*.pdb,*.lib,settings.json,logs\*,crash-reports\*,Reports\*,media.db,queue.json,playlists.json,remote-clients.json"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
 ; AppUserModelID связывает ярлык с уведомлениями приложения.
@@ -85,19 +96,25 @@ Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; AppUserM
 Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon; AppUserModelID: "CappuccinoDev.TempoKaraoke"
 
 [Run]
-; В тихом режиме (обновление из приложения) тоже перезапускаем новую версию.
-Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall runasoriginaluser
+; Обычная установка: галочка «Запустить» на финальной странице.
+Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall runasoriginaluser; Check: not WizardSilent
+; Тихая установка (обновление из приложения): запускаем новую версию без галочки.
+Filename: "{app}\{#MyAppExeName}"; Flags: nowait runasoriginaluser; Check: WizardSilent
 
 [UninstallRun]
-Filename: "{sys}\taskkill.exe"; Parameters: "/f /im {#MyAppExeName}"; Flags: runhidden skipifdoesntexist; RunOnceId: "KillTempoKaraoke"
+Filename: "{sys}\taskkill.exe"; Parameters: "/f /t /im {#MyAppExeName}"; Flags: runhidden skipifdoesntexist; RunOnceId: "KillTempoKaraoke"
+
+[UninstallDelete]
+; Маркер области установки создаётся кодом, поэтому Inno сам его не удалит.
+Type: files; Name: "{app}\install-scope.txt"
 
 [Code]
 procedure KillRunningApp();
 var
   ResultCode: Integer;
 begin
-  // Полный путь: Exec не ищет в PATH.
-  Exec(ExpandConstant('{sys}\taskkill.exe'), '/f /im {#MyAppExeName}', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+  // Полный путь: Exec не ищет в PATH. /t завершает и дочерние процессы.
+  Exec(ExpandConstant('{sys}\taskkill.exe'), '/f /t /im {#MyAppExeName}', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
   Sleep(700);
 end;
 
@@ -138,11 +155,11 @@ begin
   if UninstallSilent or (not DirExists(UserDataDir)) then
     Exit;
 
+  // Язык сообщения — выбранный в установщике (russian/english).
+  // MB_DEFBUTTON2 делает безопасной кнопку «Нет».
   DeleteUserData := MsgBox(
-    'Удалить также настройки, очередь и кэш библиотеки?' + #13#10 +
-    UserDataDir + #13#10 + #13#10 +
-    'Если оставить (Нет), данные сохранятся для следующей установки.',
-    mbConfirmation, MB_YESNO) = IDYES;
+    FmtMessage(CustomMessage('DeleteUserDataPrompt'), [UserDataDir]),
+    mbConfirmation, MB_YESNO or MB_DEFBUTTON2) = IDYES;
 end;
 
 procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);

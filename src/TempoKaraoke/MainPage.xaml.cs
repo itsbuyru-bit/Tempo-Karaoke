@@ -40,7 +40,7 @@ using Windows.UI.ViewManagement;
 
 namespace TempoKaraoke;
 
-public sealed partial class MainPage : Page, IRemoteHost
+public sealed partial class MainPage : Page, IRemoteHost, INotifyPropertyChanged
 {
     private static readonly HashSet<string> VideoExtensions = new(StringComparer.OrdinalIgnoreCase)
     {
@@ -157,6 +157,56 @@ public sealed partial class MainPage : Page, IRemoteHost
     private bool _remoteDirectMode;
     private bool _isCheckingUpdates;
     private UpdateInfo? _pendingUpdate;
+    private UpdateUiState _updateState = UpdateUiState.Idle;
+    private double _updateDownloadProgress;
+
+    /// <summary>Состояние карточки «Версия приложения» (`Settings > Updates`).</summary>
+    private enum UpdateUiState
+    {
+        /// <summary>Нейтральная подпись текущей сборки до первой проверки.</summary>
+        Idle,
+
+        /// <summary>Идёт запрос к GitHub.</summary>
+        Checking,
+
+        UpToDate,
+
+        UpdateAvailable,
+
+        Downloading,
+
+        Installing,
+
+        InstallFailed,
+
+        /// <summary>Не удалось проверить обновления (сеть, сервер).</summary>
+        Failed,
+
+        Dismissed,
+
+        NotConfigured,
+    }
+
+    /// <summary>
+    /// Идёт проверка или установка обновления. Используется в x:Bind для
+    /// <c>ProgressRing</c> и блокировки кнопок.
+    /// </summary>
+    public bool IsCheckingUpdates
+    {
+        get => _isCheckingUpdates;
+        private set
+        {
+            if (_isCheckingUpdates == value)
+            {
+                return;
+            }
+
+            _isCheckingUpdates = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsCheckingUpdates)));
+        }
+    }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
 
     public FrameworkElement HeaderDragArea => AppTitleBarDragRegion;
 
@@ -741,18 +791,85 @@ public sealed partial class MainPage : Page, IRemoteHost
         ApplyLanguageDeferred(QueueView);
     }
 
-    /// <summary>Пересчитывает локализованные подписи треков после смены языка.</summary>
     /// <summary>Обновляет текст статуса обновлений после смены языка.</summary>
     private void RefreshUpdateStatusText()
     {
-        if (!UpdateService.IsSupported || UpdateStatusText is null)
+        if (UpdateStatusText is null)
         {
             return;
         }
 
-        UpdateStatusText.Text = _pendingUpdate is null
-            ? LocalizationService.Format("Update_UpToDate", AppInfo.DisplayVersion)
-            : LocalizationService.Format("Update_Available", _pendingUpdate.Version, AppInfo.DisplayVersion);
+        var currentVersion = AppInfo.DisplayVersion;
+        var (text, brushKey) = _updateState switch
+        {
+            UpdateUiState.Checking => (
+                LocalizationService.Get("Update_Checking"),
+                "TextFillColorSecondaryBrush"),
+            UpdateUiState.UpToDate => (
+                LocalizationService.Format("Update_UpToDate", currentVersion),
+                "SystemFillColorSuccessBrush"),
+            UpdateUiState.UpdateAvailable => (
+                LocalizationService.Format("Update_Available", _pendingUpdate?.Version ?? string.Empty, currentVersion),
+                "AccentTextFillColorPrimaryBrush"),
+            UpdateUiState.Downloading => (
+                LocalizationService.Format("Update_Downloading", _updateDownloadProgress.ToString("P0")),
+                "AccentTextFillColorPrimaryBrush"),
+            UpdateUiState.Installing => (
+                LocalizationService.Get("Update_Installing"),
+                "AccentTextFillColorPrimaryBrush"),
+            UpdateUiState.InstallFailed => (
+                LocalizationService.Get("Update_InstallFailed"),
+                "SystemFillColorCriticalBrush"),
+            UpdateUiState.Failed => (
+                LocalizationService.Get("Update_NetworkError"),
+                "SystemFillColorCriticalBrush"),
+            UpdateUiState.Dismissed => (
+                LocalizationService.Get("Update_Dismissed.Text"),
+                "TextFillColorSecondaryBrush"),
+            UpdateUiState.NotConfigured => (
+                LocalizationService.Get("Update_NotConfigured"),
+                "TextFillColorSecondaryBrush"),
+            _ => (
+                LocalizationService.Format("Update_CurrentVersion", currentVersion),
+                "TextFillColorSecondaryBrush"),
+        };
+
+        UpdateStatusText.Text = text;
+        if (LookupThemeBrush(brushKey) is { } brush)
+        {
+            UpdateStatusText.Foreground = brush;
+        }
+
+        UpdateUpToDateIcon.Visibility = _updateState == UpdateUiState.UpToDate
+            ? Visibility.Visible
+            : Visibility.Collapsed;
+
+        var hasUpdate = _pendingUpdate is not null;
+        UpdateNowButton.Visibility = hasUpdate ? Visibility.Visible : Visibility.Collapsed;
+        UpdateNotesLink.Visibility = hasUpdate ? Visibility.Visible : Visibility.Collapsed;
+        UpdateLaterButton.Visibility = hasUpdate ? Visibility.Visible : Visibility.Collapsed;
+        if (hasUpdate)
+        {
+            UpdateNowButton.Content = LocalizationService.Format(
+                "Settings_UpdatesInstallButton.Content",
+                _pendingUpdate!.Version);
+        }
+
+        CheckUpdatesButton.IsEnabled = !_isCheckingUpdates;
+        UpdateNowButton.IsEnabled = !_isCheckingUpdates;
+    }
+
+    /// <summary>Тематическая кисть по ключу; null, если ресурс недоступен.</summary>
+    private static Brush? LookupThemeBrush(string key)
+    {
+        try
+        {
+            return Application.Current.Resources[key] as Brush;
+        }
+        catch
+        {
+            return null;
+        }
     }
 
     private void RefreshLocalizedMediaText()
@@ -2703,7 +2820,9 @@ public sealed partial class MainPage : Page, IRemoteHost
         {
             CheckUpdatesToggle.IsOn = SettingsService.CheckUpdatesOnStartup;
             UpdateBadgeVisibility();
-            UpdateStatusText.Text = LocalizationService.Format("Update_UpToDate", AppInfo.DisplayVersion);
+            // До первой ручной проверки показываем нейтральную подпись текущей сборки.
+            _updateState = _pendingUpdate is null ? UpdateUiState.Idle : UpdateUiState.UpdateAvailable;
+            RefreshUpdateStatusText();
         }
         else
         {
@@ -2773,6 +2892,9 @@ public sealed partial class MainPage : Page, IRemoteHost
         {
             root.RequestedTheme = elementTheme;
         }
+
+        // Кисти статуса обновлений взяты из темы — перекрашиваем после смены.
+        RefreshUpdateStatusText();
     }
 
     private void RefreshVideoRoots()
@@ -7296,17 +7418,30 @@ public sealed partial class MainPage : Page, IRemoteHost
             return;
         }
 
-        _isCheckingUpdates = true;
-        UpdateNowButton.IsEnabled = false;
-        CheckUpdatesButton.IsEnabled = false;
+        if (!await ConfirmInstallUpdateAsync(_pendingUpdate))
+        {
+            return;
+        }
+
+        IsCheckingUpdates = true;
+        _updateDownloadProgress = 0;
+        _updateState = UpdateUiState.Downloading;
+        RefreshUpdateStatusText();
 
         try
         {
             var progress = new Progress<double>(value =>
-                UpdateStatusText.Text = LocalizationService.Format("Update_Downloading", value.ToString("P0")));
+            {
+                _updateDownloadProgress = value;
+                if (_updateState == UpdateUiState.Downloading)
+                {
+                    RefreshUpdateStatusText();
+                }
+            });
             var installer = await UpdateService.DownloadAsync(_pendingUpdate, progress);
 
-            UpdateStatusText.Text = LocalizationService.Get("Update_Installing");
+            _updateState = UpdateUiState.Installing;
+            RefreshUpdateStatusText();
             if (UpdateService.LaunchInstaller(installer))
             {
                 // Установщик закроет приложение, заменит файлы и запустит новую версию.
@@ -7314,17 +7449,47 @@ public sealed partial class MainPage : Page, IRemoteHost
                 return;
             }
 
-            UpdateStatusText.Text = LocalizationService.Get("Update_InstallFailed");
+            _updateState = UpdateUiState.InstallFailed;
         }
         catch (Exception ex)
         {
-            UpdateStatusText.Text = LocalizationService.Format("Update_Failed", ex.Message);
+            LogService.Warn($"Не удалось установить обновление: {ex.Message}");
+            _updateState = UpdateUiState.InstallFailed;
         }
         finally
         {
-            _isCheckingUpdates = false;
-            UpdateNowButton.IsEnabled = true;
-            CheckUpdatesButton.IsEnabled = true;
+            IsCheckingUpdates = false;
+            RefreshUpdateStatusText();
+        }
+    }
+
+    /// <summary>Подтверждение скачивания и запуска установщика из assets релиза.</summary>
+    private async Task<bool> ConfirmInstallUpdateAsync(UpdateInfo info)
+    {
+        var dialog = new ContentDialog
+        {
+            Title = LocalizationService.Format("Update_ConfirmTitle", info.Version),
+            Content = LocalizationService.Format(
+                "Update_ConfirmMessage",
+                info.Version,
+                AppInfo.DisplayVersion),
+            PrimaryButtonText = LocalizationService.Format(
+                "Settings_UpdatesInstallButton.Content",
+                info.Version),
+            CloseButtonText = LocalizationService.Get("Common_Cancel"),
+            DefaultButton = ContentDialogButton.Primary,
+            XamlRoot = XamlRoot,
+        };
+
+        try
+        {
+            // ShowDialogAsync выставляет RequestedTheme = RootLayout.ActualTheme.
+            return await ShowDialogAsync(dialog) == ContentDialogResult.Primary;
+        }
+        catch (Exception ex)
+        {
+            LogService.Warn($"Cannot show the update confirmation: {ex.Message}");
+            return false;
         }
     }
 
@@ -7362,82 +7527,85 @@ public sealed partial class MainPage : Page, IRemoteHost
         {
             if (userInitiated)
             {
-                UpdateStatusText.Text = LocalizationService.Get("Update_NotConfigured");
+                _updateState = UpdateUiState.NotConfigured;
+                RefreshUpdateStatusText();
             }
 
             return;
         }
 
-        var previousStatus = UpdateStatusText.Text;
-        _isCheckingUpdates = true;
-        CheckUpdatesButton.IsEnabled = false;
-        UpdateStatusText.Text = LocalizationService.Get("Update_Checking");
+        IsCheckingUpdates = true;
+        _updateState = UpdateUiState.Checking;
+        RefreshUpdateStatusText();
 
         try
         {
-            var result = await UpdateService.CheckAsync();
-            switch (result.Status)
+            var check = UpdateService.CheckAsync();
+
+            // Минимальная задержка: при мгновенном ответе сети пользователь должен
+            // видеть, что проверка действительно выполнялась.
+            if (userInitiated)
             {
-                case UpdateCheckStatus.UpdateAvailable when result.Info is not null:
-                    _pendingUpdate = result.Info;
-                    UpdateStatusText.Text = LocalizationService.Format(
-                        "Update_Available",
-                        result.Info.Version,
-                        AppInfo.DisplayVersion);
-                    UpdateNowButton.Content = LocalizationService.Format(
-                        "Settings_UpdatesInstallButton.Content",
-                        result.Info.Version);
-                    UpdateNowButton.Visibility = Visibility.Visible;
-                    UpdateNotesLink.Visibility = Visibility.Visible;
-                    UpdateLaterButton.Visibility = Visibility.Visible;
-                    SettingsService.PendingUpdateVersion = result.Info.Version;
-                    UpdateBadgeVisibility();
-                    ShowUpdateNotification(result.Info.Version);
-                    break;
+                await Task.Delay(400);
+            }
 
-                case UpdateCheckStatus.UpToDate:
-                    _pendingUpdate = null;
-                    UpdateNowButton.Visibility = Visibility.Collapsed;
-                    UpdateNotesLink.Visibility = Visibility.Collapsed;
-                    UpdateLaterButton.Visibility = Visibility.Collapsed;
-                    SettingsService.PendingUpdateVersion = string.Empty;
-                    UpdateBadgeVisibility();
-                    UpdateStatusText.Text = LocalizationService.Format(
-                        "Update_UpToDate",
-                        AppInfo.DisplayVersion);
-                    break;
-
-                case UpdateCheckStatus.NotConfigured:
-                    if (userInitiated)
-                    {
-                        UpdateStatusText.Text = LocalizationService.Get("Update_NotConfigured");
-                    }
-                    else
-                    {
-                        UpdateStatusText.Text = previousStatus;
-                    }
-
-                    break;
-
-                case UpdateCheckStatus.Failed:
-                    if (userInitiated)
-                    {
-                        UpdateStatusText.Text = LocalizationService.Format(
-                            "Update_Failed",
-                            result.Error ?? string.Empty);
-                    }
-                    else
-                    {
-                        UpdateStatusText.Text = previousStatus;
-                    }
-
-                    break;
+            ApplyUpdateCheckResult(await check, userInitiated);
+        }
+        catch (OperationCanceledException)
+        {
+            // Таймаут HttpClient (нет токена отмены) — показываем сетевую ошибку.
+            if (userInitiated)
+            {
+                _updateState = UpdateUiState.Failed;
             }
         }
         finally
         {
-            _isCheckingUpdates = false;
-            CheckUpdatesButton.IsEnabled = true;
+            IsCheckingUpdates = false;
+            RefreshUpdateStatusText();
+        }
+    }
+
+    private void ApplyUpdateCheckResult(UpdateCheckResult result, bool userInitiated)
+    {
+        switch (result.Status)
+        {
+            case UpdateCheckStatus.UpdateAvailable when result.Info is not null:
+                _pendingUpdate = result.Info;
+                _updateState = UpdateUiState.UpdateAvailable;
+                SettingsService.PendingUpdateVersion = result.Info.Version;
+                UpdateBadgeVisibility();
+                ShowUpdateNotification(result.Info.Version);
+                break;
+
+            case UpdateCheckStatus.UpToDate:
+                _pendingUpdate = null;
+                SettingsService.PendingUpdateVersion = string.Empty;
+                UpdateBadgeVisibility();
+                _updateState = userInitiated ? UpdateUiState.UpToDate : UpdateUiState.Idle;
+                break;
+
+            case UpdateCheckStatus.NotConfigured:
+                if (userInitiated)
+                {
+                    _updateState = UpdateUiState.NotConfigured;
+                }
+
+                break;
+
+            case UpdateCheckStatus.Failed:
+                // Детали — в лог, пользователю — понятное сообщение о подключении.
+                if (!string.IsNullOrWhiteSpace(result.Error))
+                {
+                    LogService.Warn($"Update check failed: {result.Error}");
+                }
+
+                if (userInitiated)
+                {
+                    _updateState = UpdateUiState.Failed;
+                }
+
+                break;
         }
     }
 
@@ -9169,11 +9337,10 @@ public sealed partial class MainPage : Page, IRemoteHost
     {
         var version = _pendingUpdate?.Version ?? SettingsService.PendingUpdateVersion;
         SettingsService.DismissUpdate(version);
-        SettingsUpdateBadge.Visibility = Visibility.Collapsed;
-        UpdateNowButton.Visibility = Visibility.Collapsed;
-        UpdateNotesLink.Visibility = Visibility.Collapsed;
-        UpdateLaterButton.Visibility = Visibility.Collapsed;
-        UpdateStatusText.Text = LocalizationService.Get("Update_Dismissed");
+        UpdateBadgeVisibility();
+        _pendingUpdate = null;
+        _updateState = UpdateUiState.Dismissed;
+        RefreshUpdateStatusText();
     }
 
     /// <summary>Кнопки в системном уведомлении: установить или отложить.</summary>

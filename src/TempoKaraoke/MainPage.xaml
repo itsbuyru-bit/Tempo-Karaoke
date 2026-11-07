@@ -3269,8 +3269,32 @@
                             HorizontalAlignment="Right"
                             Orientation="Vertical"
                             Spacing="8">
-                            <TextBlock
-     x:Name="UpdateStatusText" HorizontalAlignment="Right" VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" />
+                            <StackPanel
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Center"
+                                Orientation="Horizontal"
+                                Spacing="6">
+                                <ProgressRing
+                                    x:Name="UpdateProgressRing"
+                                    Width="16"
+                                    Height="16"
+                                    IsActive="{x:Bind IsCheckingUpdates, Mode=OneWay}"
+                                    Visibility="{x:Bind IsCheckingUpdates, Mode=OneWay, Converter={StaticResource BoolToVisibility}}" />
+                                <FontIcon
+                                    x:Name="UpdateUpToDateIcon"
+                                    VerticalAlignment="Center"
+                                    FontFamily="{ThemeResource SymbolThemeFontFamily}"
+                                    FontSize="14"
+                                    Foreground="{ThemeResource SystemFillColorSuccessBrush}"
+                                    Glyph="&#xE73E;"
+                                    Visibility="Collapsed" />
+                                <TextBlock
+                                    x:Name="UpdateStatusText"
+                                    VerticalAlignment="Center"
+                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                    Style="{StaticResource CaptionTextBlockStyle}"
+                                    TextWrapping="Wrap" />
+                            </StackPanel>
                             <StackPanel
                                 HorizontalAlignment="Right"
                                 Orientation="Horizontal"

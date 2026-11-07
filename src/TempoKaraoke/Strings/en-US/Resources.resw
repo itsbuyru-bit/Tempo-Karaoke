@@ -325,7 +325,7 @@
   <data name="Settings_UpdatesCheck.Description" xml:space="preserve"><value>The installer closes the app, replaces files and starts the new version. Library, queue and settings are kept.</value></data>
   <data name="Settings_UpdatesCheck.Header" xml:space="preserve"><value>App version</value></data>
   <data name="Settings_UpdatesCheckButton.Content" xml:space="preserve"><value>Check for updates</value></data>
-  <data name="Settings_UpdatesInstallButton.Content" xml:space="preserve"><value>Update to v{0}</value></data>
+  <data name="Settings_UpdatesInstallButton.Content" xml:space="preserve"><value>Install v{0}</value></data>
   <data name="Settings_UpdatesLater.Content" xml:space="preserve"><value>Remind me later</value></data>
   <data name="Settings_UpdatesNotes.Content" xml:space="preserve"><value>What's new</value></data>
   <data name="Settings_UseSystemLanguage" xml:space="preserve"><value>Use system settings</value></data>
@@ -624,21 +624,25 @@
   <data name="Ui_WifiSafeModeToggle.OffContent" xml:space="preserve"><value>Off</value></data>
   <data name="Ui_WifiSafeModeToggle.OnContent" xml:space="preserve"><value>On</value></data>
   <data name="Ui_YouHaveNoPlaylists.Text" xml:space="preserve"><value>You have no playlists</value></data>
-  <data name="Update_Available" xml:space="preserve"><value>Version v{0} is available (current: v{1})</value></data>
+  <data name="Update_Available" xml:space="preserve"><value>New version available: v{0} (current: v{1})</value></data>
   <data name="Update_Badge_AutomationName.AutomationName" xml:space="preserve"><value>Update available</value></data>
   <data name="Update_Badge_ToolTip.ToolTip" xml:space="preserve"><value>Update available</value></data>
-  <data name="Update_Checking" xml:space="preserve"><value>Checking for updates…</value></data>
+  <data name="Update_Checking" xml:space="preserve"><value>Checking for updates...</value></data>
+  <data name="Update_ConfirmMessage" xml:space="preserve"><value>Download the v{0} installer and install it now? The app will close; settings and library are kept.</value></data>
+  <data name="Update_ConfirmTitle" xml:space="preserve"><value>Update to v{0}</value></data>
+  <data name="Update_CurrentVersion" xml:space="preserve"><value>Current version: v{0}</value></data>
   <data name="Update_Dismissed.Text" xml:space="preserve"><value>Reminder hidden until the next release</value></data>
   <data name="Update_Downloading" xml:space="preserve"><value>Downloading update… {0}</value></data>
   <data name="Update_Failed" xml:space="preserve"><value>Could not check for updates: {0}</value></data>
   <data name="Update_InstallFailed" xml:space="preserve"><value>Could not start the update installer.</value></data>
   <data name="Update_Installing" xml:space="preserve"><value>Starting the installer…</value></data>
+  <data name="Update_NetworkError" xml:space="preserve"><value>Failed to check for updates. Check your internet connection.</value></data>
   <data name="Update_NotConfigured" xml:space="preserve"><value>Update channel is not configured.</value></data>
   <data name="Update_ToastBody.Text" xml:space="preserve"><value>Version {0} is ready to install</value></data>
   <data name="Update_ToastInstall.Content" xml:space="preserve"><value>Install</value></data>
   <data name="Update_ToastLater.Content" xml:space="preserve"><value>Later</value></data>
   <data name="Update_ToastTitle.Text" xml:space="preserve"><value>New update available</value></data>
-  <data name="Update_UpToDate" xml:space="preserve"><value>Up to date (v{0})</value></data>
+  <data name="Update_UpToDate" xml:space="preserve"><value>You have the latest version installed (v{0})</value></data>
   <data name="Wifi_DiagnosticsTemplate" xml:space="preserve"><value>Adapter: {0} ({1})
 Connection: {2}
 Wi-Fi Direct: {3}

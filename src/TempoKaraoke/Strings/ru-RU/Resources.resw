@@ -325,7 +325,7 @@
   <data name="Settings_UpdatesCheck.Description" xml:space="preserve"><value>Установщик закроет приложение, заменит файлы и запустит новую версию. Библиотека, очередь и настройки сохранятся.</value></data>
   <data name="Settings_UpdatesCheck.Header" xml:space="preserve"><value>Версия приложения</value></data>
   <data name="Settings_UpdatesCheckButton.Content" xml:space="preserve"><value>Проверить обновления</value></data>
-  <data name="Settings_UpdatesInstallButton.Content" xml:space="preserve"><value>Обновить до v{0}</value></data>
+  <data name="Settings_UpdatesInstallButton.Content" xml:space="preserve"><value>Установить v{0}</value></data>
   <data name="Settings_UpdatesLater.Content" xml:space="preserve"><value>Напомнить позже</value></data>
   <data name="Settings_UpdatesNotes.Content" xml:space="preserve"><value>Что нового</value></data>
   <data name="Settings_UseSystemLanguage" xml:space="preserve"><value>Использовать параметры системы</value></data>
@@ -624,21 +624,25 @@
   <data name="Ui_WifiSafeModeToggle.OffContent" xml:space="preserve"><value>Выкл.</value></data>
   <data name="Ui_WifiSafeModeToggle.OnContent" xml:space="preserve"><value>Вкл.</value></data>
   <data name="Ui_YouHaveNoPlaylists.Text" xml:space="preserve"><value>У вас нет списков воспроизведения</value></data>
-  <data name="Update_Available" xml:space="preserve"><value>Доступно обновление v{0} (текущая: v{1})</value></data>
+  <data name="Update_Available" xml:space="preserve"><value>Доступна новая версия: v{0} (текущая: v{1})</value></data>
   <data name="Update_Badge_AutomationName.AutomationName" xml:space="preserve"><value>Доступно обновление</value></data>
   <data name="Update_Badge_ToolTip.ToolTip" xml:space="preserve"><value>Доступно обновление</value></data>
-  <data name="Update_Checking" xml:space="preserve"><value>Проверка обновлений…</value></data>
+  <data name="Update_Checking" xml:space="preserve"><value>Проверка обновлений...</value></data>
+  <data name="Update_ConfirmMessage" xml:space="preserve"><value>Скачать установщик v{0} и установить его сейчас? Приложение закроется, настройки и библиотека сохранятся.</value></data>
+  <data name="Update_ConfirmTitle" xml:space="preserve"><value>Обновление до v{0}</value></data>
+  <data name="Update_CurrentVersion" xml:space="preserve"><value>Текущая версия: v{0}</value></data>
   <data name="Update_Dismissed.Text" xml:space="preserve"><value>Напоминание скрыто до следующего релиза</value></data>
   <data name="Update_Downloading" xml:space="preserve"><value>Скачиваю обновление… {0}</value></data>
   <data name="Update_Failed" xml:space="preserve"><value>Не удалось проверить обновления: {0}</value></data>
   <data name="Update_InstallFailed" xml:space="preserve"><value>Не удалось запустить установщик обновления.</value></data>
   <data name="Update_Installing" xml:space="preserve"><value>Запускаю установщик…</value></data>
+  <data name="Update_NetworkError" xml:space="preserve"><value>Не удалось проверить обновления. Проверьте подключение к интернету.</value></data>
   <data name="Update_NotConfigured" xml:space="preserve"><value>Канал обновлений не настроен.</value></data>
   <data name="Update_ToastBody.Text" xml:space="preserve"><value>Версия {0} готова к установке</value></data>
   <data name="Update_ToastInstall.Content" xml:space="preserve"><value>Установить</value></data>
   <data name="Update_ToastLater.Content" xml:space="preserve"><value>Позже</value></data>
   <data name="Update_ToastTitle.Text" xml:space="preserve"><value>Доступно новое обновление</value></data>
-  <data name="Update_UpToDate" xml:space="preserve"><value>Установлена последняя версия v{0}</value></data>
+  <data name="Update_UpToDate" xml:space="preserve"><value>У вас установлена актуальная версия (v{0})</value></data>
   <data name="Wifi_DiagnosticsTemplate" xml:space="preserve"><value>Адаптер: {0} ({1})
 Подключение: {2}
 Wi-Fi Direct: {3}
