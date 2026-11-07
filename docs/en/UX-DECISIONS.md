@@ -183,7 +183,7 @@ Status: the UX interview was completed on 2026-10-28. The decisions below are th
 
 ## Not blocking v1 (accepted defaults)
 
-- Distribution: a portable build first, MSIX later.
+- Distribution: a portable build with the Inno Setup installer.
 - History and favorites: after v1; v1 has only the queue and named playlists.
 - Playback position: always from the beginning; for karaoke this is expected.
 - Storage: SQLite; the search index is SQLite FTS5 or in-memory, decided at

@@ -1,13 +1,6 @@
 # Build output
 **/bin/
 **/obj/
-**/AppPackages/
-**/BundleArtifacts/
-*.msix
-*.msixupload
-*.appx
-*.appxbundle
-*.appxupload
 publish/
 
 # Signing material (never commit certificates)

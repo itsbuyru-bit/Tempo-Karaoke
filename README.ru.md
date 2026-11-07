@@ -93,7 +93,7 @@ Tempo Karaoke создан для организации караоке-вече
 
 ### Хранение данных
 
-Пользовательские данные сохраняются в папке приложения (`%LocalAppData%\TempoKaraoke` для portable-версии или `LocalState` для пакета MSIX):
+Пользовательские данные сохраняются в `%LocalAppData%\TempoKaraoke`:
 * `media.db` — SQLite-база со свойствами проиндексированных файлов и путями к обложкам.
 * `settings.json` — настройки приложения (тема, пути к медиатеке, логика пульта).
 * `queue.json` — сохраненная очередь с привязкой к отправителям.
@@ -125,10 +125,8 @@ Tempo Karaoke создан для организации караоке-вече
     dotnet publish src/TempoKaraoke -c Release -p:Platform=x64 -p:RuntimeIdentifier=win-x64
 
 ### Скрипты упаковки
-* `.\scripts\build-installer.ps1` — сборка классического установщика через Inno Setup
-* `.\scripts\make-cert.ps1` — генерация локального сертификата разработки
-* `.\scripts\build-msix.ps1 -Mode sideload` — формирование подписанного пакета MSIX
-* `.\scripts\install-msix.cmd` — быстрая установка MSIX-пакета на рабочий ПК
+* `.\scripts\build-installer.ps1` — публикация portable-сборки и сборка установщика Inno Setup
+* `iscc installer\TempoKaraoke.iss` — собрать установщик напрямую через Inno Setup
 
 Подробности процесса описаны в [`docs/ru/PACKAGING.md`](docs/ru/PACKAGING.md).
 
@@ -172,8 +170,7 @@ Windows (если он есть в манифесте), ручной выбор 
 
 ## 📝 Диагностика, логи и отчёты
 
-* Логи: `%LocalAppData%\TempoKaraoke\logs\` (portable) или `LocalState\logs\`
-  (MSIX). Основной лог ротируется по 5 МБ, хранится 5 файлов.
+* Логи: `%LocalAppData%\TempoKaraoke\logs\`. Основной лог ротируется по 5 МБ, хранится 5 файлов.
 * В лог попадают версия, ОС, архитектура, язык, состояние Wi-Fi-адаптера и
   подключения, шаги Wi-Fi Direct, исключения с `HRESULT` и идентификаторы
   операций.

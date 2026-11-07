@@ -91,7 +91,7 @@ The real value here isn't just file playback. It's **a catalogue that's a pleasu
 
 ### Data storage
 
-User data lives in the app's data folder (`%LocalAppData%\TempoKaraoke` for the portable build, or `LocalState` for the MSIX package):
+User data lives in `%LocalAppData%\TempoKaraoke`:
 * `media.db` — SQLite database holding indexed file properties and artwork paths.
 * `settings.json` — app settings (theme, media library paths, remote behaviour).
 * `queue.json` — the saved queue, with tracks attributed to whoever requested them.
@@ -123,10 +123,8 @@ User data lives in the app's data folder (`%LocalAppData%\TempoKaraoke` for the 
     dotnet publish src/TempoKaraoke -c Release -p:Platform=x64 -p:RuntimeIdentifier=win-x64
 
 ### Packaging scripts
-* `.\scripts\build-installer.ps1` — build the classic installer with Inno Setup
-* `.\scripts\make-cert.ps1` — generate a local development certificate
-* `.\scripts\build-msix.ps1 -Mode sideload` — produce a signed MSIX package
-* `.\scripts\install-msix.cmd` — install the MSIX package on your machine in one step
+* `.\scripts\build-installer.ps1` — publish the portable build and compile the Inno Setup installer
+* `iscc installer\TempoKaraoke.iss` — compile the installer directly with Inno Setup
 
 The full process is described in [`docs/en/PACKAGING.md`](docs/en/PACKAGING.md).
 
@@ -170,8 +168,7 @@ For details, see [`docs/en/LOCALIZATION.md`](docs/en/LOCALIZATION.md).
 
 ## 📝 Diagnostics, Logs and Reports
 
-* Logs: `%LocalAppData%\TempoKaraoke\logs\` (portable) or `LocalState\logs\`
-  (MSIX). The main log rotates at 5 MB and keeps 5 files.
+* Logs: `%LocalAppData%\TempoKaraoke\logs\`. The main log rotates at 5 MB and keeps 5 files.
 * Entries record the version, OS, architecture, language, Wi-Fi adapter and connection
   state, Wi-Fi Direct steps, exceptions with `HRESULT`, and operation identifiers.
 * Crashes (`AppDomain`, `TaskScheduler`, WinUI) are always logged, even when regular

@@ -16,7 +16,6 @@
 | `winui-design` | Перед написанием любого XAML: выбор контролов, Fluent, темы, доступность, `x:Bind`, типичные ошибки |
 | `winui-code-review` | Ревью WinUI-кода: MVVM, биндинги, темы, a11y, безопасность, производительность |
 | `winui-dev-workflow` | Создание, сборка, запуск и починка WinUI 3 приложения (`winapp new/run`) |
-| `winui-packaging` | MSIX, подпись, Native AOT, self-contained, CI/CD |
 | `winui-setup` | Установка и проверка .NET SDK, WinApp CLI, Developer Mode |
 | `winui-ui-testing` | UI-тесты через `winapp ui` (UIA), в том числе в Windows Sandbox |
 | `winui-wpf-migration` | Если позже понадобится переезд с WPF на WinUI 3 |
@@ -29,9 +28,7 @@
 | Скилл | Когда использовать |
 |---|---|
 | `winapp-setup` | Подключить Windows SDK / Windows App SDK к проекту, `winapp init/restore` |
-| `winapp-package` | Собрать MSIX из build output |
-| `winapp-signing` | Подписать `.msix`/`.exe`, сертификаты, Azure Trusted Signing |
-| `winapp-manifest` | `Package.appxmanifest`: ассоциации файлов, протоколы, capabilities |
+| `winapp-signing` | Подписать `.exe`, сертификаты, Azure Trusted Signing |
 | `winapp-identity` | Package identity для toast/background/share target |
 | `winapp-find-api` | Проверить реальный Windows/WinRT API вместо догадок |
 | `winapp-find-ui` | Найти подходящий WinUI-контрол и компилируемый пример |

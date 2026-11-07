@@ -4,10 +4,7 @@ English | [Русский](../ru/DIAGNOSTICS.md)
 
 ## Log files
 
-Location:
-
-* MSIX build: `%LocalAppData%\Packages\<package>\LocalState\logs\`
-* portable build: `%LocalAppData%\TempoKaraoke\logs\`
+Location: `%LocalAppData%\TempoKaraoke\logs\`
 
 Files:
 
@@ -28,7 +25,7 @@ session id and optional operation id:
 
 The session header contains:
 
-* application version and install mode (MSIX / portable);
+* application version and Inno Setup install mode;
 * OS description and architectures (OS and process);
 * .NET runtime;
 * current culture, UI culture and selected app language;

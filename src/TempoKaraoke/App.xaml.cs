@@ -175,26 +175,9 @@ public partial class App : Application
 
     private static void SetupSingleInstance()
     {
-        try
-        {
-            _mainInstance = AppInstance.FindOrRegisterForKey(SingleInstanceKey);
-            if (!_mainInstance.IsCurrent)
-            {
-                // Второй процесс передаёт аргументы первому и завершается.
-                var activation = AppInstance.GetCurrent().GetActivatedEventArgs();
-                _mainInstance.RedirectActivationToAsync(activation).AsTask().GetAwaiter().GetResult();
-                Environment.Exit(0);
-            }
-
-            _mainInstance.Activated += OnRedirectedActivation;
-            return;
-        }
-        catch (Exception ex)
-        {
-            // Ограниченные окружения могут не поддерживать AppLifecycle.
-            Services.LogService.Warn($"AppLifecycle single-instance unavailable: {ex.Message}");
-        }
-
+        // Mutex first: this path is stable in unpackaged Inno builds. AppLifecycle's
+        // RedirectActivationToAsync can raise a native stowed exception
+        // (CoreMessagingXP / 0xc000027b) when a second process starts.
         try
         {
             _singleInstanceMutex = new Mutex(
@@ -205,11 +188,26 @@ public partial class App : Application
             {
                 ActivateExistingWindow();
                 Environment.Exit(0);
+                return;
             }
         }
         catch (Exception ex)
         {
             Services.LogService.Warn($"Single-instance mutex unavailable: {ex.Message}");
+        }
+
+        // Keep AppLifecycle activation routing for the first instance only.
+        try
+        {
+            _mainInstance = AppInstance.FindOrRegisterForKey(SingleInstanceKey);
+            if (_mainInstance.IsCurrent)
+            {
+                _mainInstance.Activated += OnRedirectedActivation;
+            }
+        }
+        catch (Exception ex)
+        {
+            Services.LogService.Warn($"AppLifecycle activation unavailable: {ex.Message}");
         }
     }
 
@@ -286,7 +284,23 @@ public partial class App : Application
             if (handle != IntPtr.Zero)
             {
                 ShowWindow(handle, 9 /* SW_RESTORE */);
-                SetForegroundWindow(handle);
+                if (!SetForegroundWindow(handle))
+                {
+                    // Windows may refuse SetForegroundWindow while the new
+                    // process is still becoming foreground. Raise the window
+                    // explicitly and try once more.
+                    BringWindowToTop(handle);
+                    SetWindowPos(
+                        handle,
+                        IntPtr.Zero,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0x0001 | 0x0002 | 0x0040 /* NOSIZE | NOMOVE | SHOWWINDOW */);
+                    SetForegroundWindow(handle);
+                }
+
                 return;
             }
 
@@ -302,4 +316,17 @@ public partial class App : Application
 
     [DllImport("user32.dll")]
     private static extern bool SetForegroundWindow(IntPtr window);
+
+    [DllImport("user32.dll")]
+    private static extern bool BringWindowToTop(IntPtr window);
+
+    [DllImport("user32.dll")]
+    private static extern bool SetWindowPos(
+        IntPtr window,
+        IntPtr insertAfter,
+        int x,
+        int y,
+        int width,
+        int height,
+        uint flags);
 }

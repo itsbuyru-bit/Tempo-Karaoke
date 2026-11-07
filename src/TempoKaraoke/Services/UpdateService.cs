@@ -12,9 +12,6 @@ namespace TempoKaraoke.Services;
 
 public enum UpdateCheckStatus
 {
-    /// <summary>MSIX-сборка: обновления ставятся средствами Windows, не установщиком.</summary>
-    NotSupported,
-
     /// <summary>В сборке не задан репозиторий с релизами.</summary>
     NotConfigured,
 
@@ -35,8 +32,6 @@ public sealed record UpdateInfo(
 
 public sealed record UpdateCheckResult(UpdateCheckStatus Status, UpdateInfo? Info = null, string? Error = null)
 {
-    public static readonly UpdateCheckResult NotSupported = new(UpdateCheckStatus.NotSupported);
-
     public static readonly UpdateCheckResult NotConfigured = new(UpdateCheckStatus.NotConfigured);
 
     public static readonly UpdateCheckResult UpToDate = new(UpdateCheckStatus.UpToDate);
@@ -48,9 +43,8 @@ public sealed record UpdateCheckResult(UpdateCheckStatus Status, UpdateInfo? Inf
 
 /// <summary>
 /// Проверка обновлений через GitHub Releases и запуск установщика Inno Setup.
-/// Схема как у UniGetUI: приложение скачивает Setup.exe и запускает его молча,
-/// установщик закрывает приложение, заменяет файлы и запускает новую версию.
-/// В MSIX-сборке самообновление не используется — пакет обновляет Windows.
+/// Приложение скачивает Setup.exe и запускает его молча; установщик закрывает
+/// приложение, заменяет файлы и запускает новую версию.
 /// </summary>
 public static class UpdateService
 {
@@ -65,8 +59,8 @@ public static class UpdateService
 
     private static readonly HttpClient Http = CreateHttpClient();
 
-    /// <summary>Обновление установщиком возможно только вне MSIX.</summary>
-    public static bool IsSupported => !AppInfo.IsPackaged;
+    /// <summary>Самообновление доступно: приложение всегда ставится Inno Setup.</summary>
+    public static bool IsSupported => true;
 
     public static bool IsConfigured =>
         !string.IsNullOrWhiteSpace(RepositoryOwner) && !string.IsNullOrWhiteSpace(RepositoryName);
@@ -74,11 +68,6 @@ public static class UpdateService
     /// <summary>Спрашивает у GitHub последний релиз и сравнивает версии.</summary>
     public static async Task<UpdateCheckResult> CheckAsync(CancellationToken cancellationToken = default)
     {
-        if (!IsSupported)
-        {
-            return UpdateCheckResult.NotSupported;
-        }
-
         if (!IsConfigured)
         {
             return UpdateCheckResult.NotConfigured;

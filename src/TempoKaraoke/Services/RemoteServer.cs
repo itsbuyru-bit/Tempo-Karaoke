@@ -145,8 +145,11 @@ public sealed class RemoteServer : IAsyncDisposable
 
             app.MapGet("/locale-manifest.json", async context =>
             {
-                var path = Path.Combine(AppContext.BaseDirectory, "public", "locale-manifest.json");
-                if (!File.Exists(path))
+                // Prefer the editable localization folder next to the app. This
+                // lets a new language appear after an app restart without a rebuild;
+                // the generated public copy is only a fallback.
+                var path = ResolveLocaleAsset("manifest.json");
+                if (path is null)
                 {
                     context.Response.StatusCode = StatusCodes.Status404NotFound;
                     return;
@@ -169,9 +172,9 @@ public sealed class RemoteServer : IAsyncDisposable
                     return;
                 }
 
-                var localesRoot = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "public", "locales"));
-                var path = Path.GetFullPath(Path.Combine(localesRoot, $"{lang}.json"));
-                if (!path.StartsWith(localesRoot, StringComparison.OrdinalIgnoreCase) || !File.Exists(path))
+                var path = ResolveLocaleAsset($"locales/{lang}.json")
+                    ?? ResolveLocaleAsset($"{lang}.json");
+                if (path is null)
                 {
                     context.Response.StatusCode = StatusCodes.Status404NotFound;
                     return;
@@ -1002,6 +1005,34 @@ public sealed class RemoteServer : IAsyncDisposable
             : device;
     }
 
+    private static string? ResolveLocaleAsset(string relativePath)
+    {
+        var relative = relativePath.Replace('/', Path.DirectorySeparatorChar);
+        var candidates = new[]
+        {
+            Path.Combine(LocalizationPaths.FindCatalogDirectory(), relative),
+            Path.Combine(AppContext.BaseDirectory, "public", relative)
+        };
+
+        foreach (var candidate in candidates)
+        {
+            try
+            {
+                var full = Path.GetFullPath(candidate);
+                if (File.Exists(full))
+                {
+                    return full;
+                }
+            }
+            catch
+            {
+                // Ignore malformed paths and fall through to the next location.
+            }
+        }
+
+        return null;
+    }
+
     private static string? DeviceNameFromUserAgent(string userAgent)
     {
         if (string.IsNullOrWhiteSpace(userAgent))
@@ -1432,7 +1463,7 @@ public sealed class RemoteServer : IAsyncDisposable
         var path = Path.Combine(folder, $"{prefix}-{Guid.NewGuid():N}.png");
         File.WriteAllBytes(path, bytes);
 
-        // Старые QR-файлы не нужны: иначе LocalState растёт с каждым обновлением адреса.
+        // Старые QR-файлы не нужны: иначе папка данных растёт с каждым обновлением адреса.
         try
         {
             foreach (var old in Directory.EnumerateFiles(folder, $"{prefix}*.png"))

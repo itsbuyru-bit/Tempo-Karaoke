@@ -265,3 +265,38 @@ They were imported once into `localization/<tag>.json` without changing any valu
 (531 desktop keys and 123 web keys at the time of migration). From now on the
 catalogs under `localization/` are authoritative; the generated files are build
 artifacts kept in version control for reproducibility.
+
+## 13. Restart-time pickup without rebuilding
+
+The desktop app reads `localization/manifest.json` and the flat catalogs from the
+`localization` folder shipped next to `TempoKaraoke.exe` (the Inno Setup
+installation keeps a copy there). To add or edit a language without rebuilding:
+
+1. Edit `manifest.json` in that installed `localization` folder.
+2. Add or update the matching `<tag>.json` catalog next to it.
+3. Restart Tempo Karaoke.
+
+The language selector is rebuilt from the manifest at startup, and runtime strings
+prefer the JSON catalog. The web remote also serves the installed `localization`
+folder directly, so it sees the same change. `node scripts/localization/generate.mjs`
+is still needed when preparing repository artifacts for a new build (`.resw` and
+the `public/` fallback files), but not for a runtime-only language change on an
+already installed app.
+
+## 14. Translation pull requests
+
+Use `.github/PULL_REQUEST_TEMPLATE/translation.md` (append
+`?template=translation.md` to the compare URL) and include the tag, native name,
+catalog file and whether the translation is full or partial.
+
+The `localization` workflow validates `manifest.json`, JSON syntax, BCP 47 tags,
+placeholders, non-empty values and the generated `.resw`/`public` artifacts:
+
+```powershell
+node scripts/localization/validate.mjs
+node scripts/localization/generate.mjs --check
+```
+
+Generated files are committed, so a translation PR must include regenerated
+`src/TempoKaraoke/Strings/<tag>/Resources.resw` and
+`src/TempoKaraoke/public/locales/<tag>.json`.

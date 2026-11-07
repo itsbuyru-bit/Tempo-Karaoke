@@ -2947,19 +2947,11 @@ public sealed partial class MainPage : Page, IRemoteHost, INotifyPropertyChanged
         }
         LoggingToggle.IsOn = SettingsService.LoggingEnabled;
         _ = RefreshWifiDiagnosticsAsync();
-        if (UpdateService.IsSupported)
-        {
-            CheckUpdatesToggle.IsOn = SettingsService.CheckUpdatesOnStartup;
-            UpdateBadgeVisibility();
-            // До первой ручной проверки показываем нейтральную подпись текущей сборки.
-            _updateState = _pendingUpdate is null ? UpdateUiState.Idle : UpdateUiState.UpdateAvailable;
-            RefreshUpdateStatusText();
-        }
-        else
-        {
-            // MSIX-сборка обновляется средствами Windows/Store, установщик не нужен.
-            SectionUpdates.Visibility = Visibility.Collapsed;
-        }
+        CheckUpdatesToggle.IsOn = SettingsService.CheckUpdatesOnStartup;
+        UpdateBadgeVisibility();
+        // До первой ручной проверки показываем нейтральную подпись текущей сборки.
+        _updateState = _pendingUpdate is null ? UpdateUiState.Idle : UpdateUiState.UpdateAvailable;
+        RefreshUpdateStatusText();
         _isInitializingSettings = false;
         ApplyTheme(SettingsService.Theme);
     }
@@ -4850,30 +4842,10 @@ public sealed partial class MainPage : Page, IRemoteHost, INotifyPropertyChanged
             return bmpCandidate;
         }
 
-        // Recovery path for installations where AppStorage selected a different
-        // writable folder than the package LocalState used for older previews.
+        // Older portable builds may have written the same cache under LocalAppData.
         try
         {
             var local = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-            var packages = Path.Combine(local, "Packages");
-            if (Directory.Exists(packages))
-            {
-                foreach (var package in Directory.EnumerateDirectories(packages))
-                {
-                    var recovered = Path.Combine(package, "LocalState", "Thumbnails", hash);
-                    if (File.Exists(recovered))
-                    {
-                        return recovered;
-                    }
-
-                    var recoveredBmp = Path.ChangeExtension(recovered, ".bmp");
-                    if (File.Exists(recoveredBmp))
-                    {
-                        return recoveredBmp;
-                    }
-                }
-            }
-
             var portable = Path.Combine(local, "TempoKaraoke", "Thumbnails", hash);
             if (File.Exists(portable))
             {
@@ -9772,7 +9744,7 @@ public sealed partial class MainPage : Page, IRemoteHost, INotifyPropertyChanged
     {
         var builder = new StringBuilder();
         builder.AppendLine($"{LocalizationService.Get("Diagnostics_LabelVersion")}: {AppInfo.DisplayVersion}");
-        builder.AppendLine($"{LocalizationService.Get("Diagnostics_LabelMode")}: {(AppInfo.IsPackaged ? "MSIX" : "portable")}");
+        builder.AppendLine($"{LocalizationService.Get("Diagnostics_LabelMode")}: Inno Setup");
         builder.AppendLine($"{LocalizationService.Get("Diagnostics_LabelOs")}: {System.Runtime.InteropServices.RuntimeInformation.OSDescription} · {System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture}");
 
         var displays = WindowPlacementService.GetDisplays();

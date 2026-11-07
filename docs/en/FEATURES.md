@@ -215,8 +215,7 @@ Settings are organized as a catalog of sections:
 
 ## Data and privacy
 
-- User data is stored in `%LocalAppData%\TempoKaraoke` (portable build) or in the
-  package `LocalState` (MSIX):
+- User data is stored in `%LocalAppData%\TempoKaraoke`:
   - `media.db` — indexed media metadata
   - `settings.json` — settings, window placement, update state
   - `queue.json` — saved queue
@@ -234,8 +233,6 @@ Settings are organized as a catalog of sections:
 
 - **Portable + Inno Setup installer** — per-user installation without UAC by
   default; the folder can be changed; optional all-users mode.
-- **MSIX** — for Microsoft Store or managed deployment; updates are delivered by
-  Windows/Store.
 - The installer removes only its own files; user data is kept by default.
 - Build scripts and release process: [PACKAGING.md](PACKAGING.md).
 - Architecture decisions: [UX-DECISIONS.md](UX-DECISIONS.md).

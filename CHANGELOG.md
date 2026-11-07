@@ -9,6 +9,28 @@ components (`major.minor.patch.revision`).
 Detailed user-facing release notes for each release live in
 `docs/releases/<tag>.md` and are published together with the GitHub Release.
 
+## [1.10.2.7] — 2026-11-07
+
+Full details: [`docs/releases/v1.10.2.7.md`](docs/releases/v1.10.2.7.md).
+
+### Changed
+
+- Distribution is now **Inno Setup only**: MSIX/AppX manifest, packaging scripts,
+  package-only assets and Microsoft Store instructions were removed.
+- User data always lives in `%LocalAppData%\TempoKaraoke`.
+
+### Fixed
+
+- Single-instance handling is Mutex-first; a second launch restores and focuses
+  the existing window. Removed the AppLifecycle redirect that could crash with a
+  `CoreMessagingXP.dll` stowed exception (`0xc000027b`).
+
+### Localization
+
+- The installed `localization` folder is read at startup and by the web remote;
+  adding a manifest entry and catalog there is picked up after restarting the app
+  without rebuilding that installed copy.
+
 ## [1.10.2.6] — 2026-11-07
 
 Full details: [`docs/releases/v1.10.2.6.md`](docs/releases/v1.10.2.6.md).

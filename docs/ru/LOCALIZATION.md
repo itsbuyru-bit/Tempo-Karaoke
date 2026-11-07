@@ -258,3 +258,38 @@ They were imported once into `localization/<tag>.json` without changing any valu
 (531 desktop keys and 123 web keys at the time of migration). From now on the
 catalogs under `localization/` are authoritative; the generated files are build
 artifacts kept in version control for reproducibility.
+
+## 13. Подхват перевода после перезапуска без пересборки
+
+Desktop-приложение читает `localization/manifest.json` и плоские каталоги из
+папки `localization`, установленной рядом с `TempoKaraoke.exe` (Inno Setup
+кладёт её туда вместе с приложением). Чтобы добавить или поправить язык без
+пересборки:
+
+1. Отредактируйте `manifest.json` в установленной папке `localization`.
+2. Положите рядом нужный каталог `<tag>.json`.
+3. Перезапустите Tempo Karaoke.
+
+Список языков в настройках строится из манифеста при старте, а runtime-строки
+берутся из JSON-каталога. Веб-пульт также читает установленную папку
+`localization`, поэтому видит то же изменение. `node scripts/localization/generate.mjs`
+нужен при подготовке артефактов для новой сборки (`.resw` и fallback-файлы в
+`public/`), но не для изменения языка в уже установленном приложении.
+
+## 14. Pull request с переводом
+
+Используйте `.github/PULL_REQUEST_TEMPLATE/translation.md` (добавьте
+`?template=translation.md` к ссылке сравнения) и укажите тег, самоназвание,
+файл каталога и полноту перевода.
+
+Workflow `localization` проверяет `manifest.json`, синтаксис JSON, теги BCP 47,
+плейсхолдеры, непустые значения и сгенерированные артефакты `.resw`/`public`:
+
+```powershell
+node scripts/localization/validate.mjs
+node scripts/localization/generate.mjs --check
+```
+
+Сгенерированные файлы коммитятся, поэтому PR с переводом должен содержать
+обновлённые `src/TempoKaraoke/Strings/<tag>/Resources.resw` и
+`src/TempoKaraoke/public/locales/<tag>.json`.

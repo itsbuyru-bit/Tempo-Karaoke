@@ -65,8 +65,7 @@ winapp run src/TempoKaraoke --arch x64
 
 Релизы выпускаются из `main`:
 
-1. Поднимите `<Version>` в `src/TempoKaraoke/TempoKaraoke.csproj` и
-   `Identity/@Version` в `Package.appxmanifest`.
+1. Поднимите `<Version>` в `src/TempoKaraoke/TempoKaraoke.csproj`.
 2. Добавьте `docs/releases/vX.Y.Z.W.md` с пользовательскими заметками.
 3. Добавьте версию в `CHANGELOG.md` и `CHANGELOG.ru.md`.
 4. Закоммитьте, поставьте тег `vX.Y.Z.W` и отправьте его. Workflow релиза соберёт

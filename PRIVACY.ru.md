@@ -20,8 +20,8 @@ Tempo Karaoke **не собирает, не передаёт и не прода�
 - очередь (`queue.json`), плейлисты (`playlists.json`), история и избранное;
 - имена устройств, подключавшихся к веб-пульту (`remote-clients.json`).
 
-Все эти данные хранятся локально: `%LocalAppData%\TempoKaraoke` в портативной
-версии или в `LocalState` пакета MSIX. Разработчик к ним доступа не имеет.
+Все эти данные хранятся локально в `%LocalAppData%\TempoKaraoke`. Разработчик к ним
+доступа не имеет.
 
 Приложение читает видеофайлы только в папках, которые вы добавили в настройках.
 Оно не копирует и не изменяет ваши файлы.
@@ -53,9 +53,7 @@ Tempo Karaoke **не собирает, не передаёт и не прода�
 
 - удаление приложения (установщик или «Параметры → Приложения») убирает файлы
   программы;
-- пользовательские данные удаляются вместе с папкой `%LocalAppData%\TempoKaraoke`
-  (портативная версия) или сбросом данных приложения в параметрах Windows
-  (версия MSIX).
+- пользовательские данные удаляются вместе с папкой `%LocalAppData%\TempoKaraoke`.
 
 Резервных копий на стороне Разработчика не существует.
 
@@ -98,8 +96,8 @@ The app only works with data you provide:
 - playback queue (`queue.json`), playlists (`playlists.json`), history, favorites;
 - names of devices that connected to the web remote (`remote-clients.json`).
 
-All of it is stored locally: `%LocalAppData%\TempoKaraoke` for the portable build or
-the package's `LocalState` for the MSIX build. The Developer has no access to it.
+All of it is stored locally in `%LocalAppData%\TempoKaraoke`. The Developer has
+no access to it.
 
 The app reads video files only from folders you add in settings. It does not copy
 or modify your files.
@@ -128,8 +126,7 @@ Developer. The only external request is the GitHub update check described above.
 Data stays on your device until you remove it:
 
 - uninstalling the app (installer or Settings → Apps) removes the program files;
-- user data is removed with the `%LocalAppData%\TempoKaraoke` folder (portable
-  build) or by resetting the app's data in Windows settings (MSIX build).
+- user data is removed with the `%LocalAppData%\TempoKaraoke` folder.
 
 The Developer keeps no backups.
 

@@ -29,20 +29,17 @@ public static class Program
             LogService.Startup("[window] --reset-window requested");
         }
 
-        if (!AppInfo.IsPackaged)
-        {
-            // Стабильный AUMID нужен группировке на панели задач и привязке ярлыка.
-            TrySetAppUserModelId();
+        // Приложение всегда unpackaged (Inno Setup): стабильный AUMID нужен
+        // группировке на панели задач и привязке ярлыка.
+        TrySetAppUserModelId();
 
-            if (!HasLocalWindowsAppRuntime())
-            {
-                // Портативная сборка (WindowsPackageType=None): Windows App SDK не
-                // инициализируется автоматически (WindowsAppSdkAutoInitialize=false),
-                // поэтому поднимаем рантайм вручную. 0x00020006 — Windows App SDK 2.6.
-                // Self-contained сборке bootstrap не нужен: он поднял бы установленный
-                // рантайм вместо локального.
-                global::Microsoft.Windows.ApplicationModel.DynamicDependency.Bootstrap.TryInitialize(0x00020006, out _);
-            }
+        if (!HasLocalWindowsAppRuntime())
+        {
+            // WindowsPackageType=None: Windows App SDK не инициализируется
+            // автоматически, поэтому поднимаем рантайм вручную.
+            // 0x00020006 — Windows App SDK 2.6. Self-contained сборке bootstrap
+            // не нужен: он поднял бы установленный рантайм вместо локального.
+            global::Microsoft.Windows.ApplicationModel.DynamicDependency.Bootstrap.TryInitialize(0x00020006, out _);
         }
 
         global::WinRT.ComWrappersSupport.InitializeComWrappers();

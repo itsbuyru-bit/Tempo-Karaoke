@@ -1,15 +1,14 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
-using Windows.Storage;
 
 namespace TempoKaraoke.Services;
 
 /// <summary>
-/// Единое место для локальных файлов приложения. В упакованном режиме это
-/// LocalState, в портативном (без identity) — %LocalAppData%\TempoKaraoke.
+/// Единое место для локальных файлов приложения.
+/// Приложение поставляется только как unpackaged-сборка Inno Setup,
+/// поэтому данные всегда лежат в %LocalAppData%\TempoKaraoke.
 /// </summary>
 public static class AppStorage
 {
@@ -21,33 +20,12 @@ public static class AppStorage
 
     private static string CreateFolder()
     {
-        try
+        var local = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+        var candidates = new[]
         {
-            var folder = ApplicationData.Current.LocalFolder.Path;
-            Directory.CreateDirectory(folder);
-            return folder;
-        }
-        catch
-        {
-            // Портативный режим или ограниченное окружение.
-        }
-
-        var candidates = new List<string>();
-        try
-        {
-            candidates.Add(ApplicationData.Current.LocalCacheFolder.Path);
-            candidates.Add(ApplicationData.Current.TemporaryFolder.Path);
-            candidates.Add(ApplicationData.Current.LocalFolder.Path);
-        }
-        catch
-        {
-            // Identity недоступна в этом окружении.
-        }
-
-        candidates.Add(Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "TempoKaraoke"));
-        candidates.Add(Path.Combine(Path.GetTempPath(), "TempoKaraoke"));
+            Path.Combine(local, "TempoKaraoke"),
+            Path.Combine(Path.GetTempPath(), "TempoKaraoke")
+        };
 
         foreach (var folder in candidates)
         {
@@ -62,9 +40,7 @@ public static class AppStorage
             }
         }
 
-        // Degraded mode: every known location is read-only in this environment.
-        // Return the last candidate so the app can start; writes are guarded by
-        // their callers and will simply be skipped until storage is available.
+        // Degraded mode: вернём последний кандидат, чтобы приложение стартовало.
         return candidates[^1];
     }
 }

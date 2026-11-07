@@ -23,8 +23,7 @@ The app works only with data that you have provided yourself:
 - the names of devices that have connected to the web remote
   (`remote-clients.json`).
 
-All of this data is stored locally: in `%LocalAppData%\TempoKaraoke` for the
-portable version, or in the MSIX package's `LocalState` folder. The Developer has
+All of this data is stored locally in `%LocalAppData%\TempoKaraoke`. The Developer has
 no access to it.
 
 The app reads video files only from the folders you have added in settings. It does
@@ -56,9 +55,7 @@ Data is stored on your device until you delete it:
 
 - uninstalling the app (through the installer or Settings → Apps) removes the
   program's files;
-- user data is deleted together with the `%LocalAppData%\TempoKaraoke` folder
-  (portable version), or by resetting the app's data in Windows settings (MSIX
-  version).
+- user data is deleted together with the `%LocalAppData%\TempoKaraoke` folder.
 
 No backups exist on the Developer's side.
 

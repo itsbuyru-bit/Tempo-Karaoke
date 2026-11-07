@@ -63,8 +63,7 @@ switch line at the top.
 
 Releases are cut from `main`:
 
-1. Bump `<Version>` in `src/TempoKaraoke/TempoKaraoke.csproj` and
-   `Identity/@Version` in `Package.appxmanifest`.
+1. Bump `<Version>` in `src/TempoKaraoke/TempoKaraoke.csproj`.
 2. Add `docs/releases/vX.Y.Z.W.md` (user-facing release notes).
 3. Add the same version to `CHANGELOG.md` and `CHANGELOG.ru.md`.
 4. Commit, tag `vX.Y.Z.W`, and push the tag. The release workflow builds the

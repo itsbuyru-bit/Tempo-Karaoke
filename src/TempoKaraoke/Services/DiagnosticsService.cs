@@ -183,8 +183,8 @@ public static class DiagnosticsService
 
     private static void AppendApplication(StringBuilder builder)
     {
-        builder.AppendLine($"Application: Tempo Karaoke {AppInfo.DisplayVersion} ({AppInfo.PackageVersion})");
-        builder.AppendLine($"Install mode: {(AppInfo.IsPackaged ? "MSIX" : "portable")}");
+        builder.AppendLine($"Application: Tempo Karaoke {AppInfo.DisplayVersion}");
+        builder.AppendLine("Install mode: Inno Setup");
         builder.AppendLine($"OS: {RuntimeInformation.OSDescription} ({RuntimeInformation.OSArchitecture})");
         builder.AppendLine($"Process architecture: {RuntimeInformation.ProcessArchitecture}");
         builder.AppendLine($"Runtime: {RuntimeInformation.FrameworkDescription}");

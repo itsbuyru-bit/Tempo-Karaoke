@@ -1,0 +1,37 @@
+name: localization
+
+on:
+  pull_request:
+    paths:
+      - 'localization/**'
+      - 'scripts/localization/**'
+      - '.github/workflows/localization.yml'
+      - '.github/pull_request_template.md'
+      - '.github/PULL_REQUEST_TEMPLATE/**'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Validate catalogs
+        run: node scripts/localization/validate.mjs
+
+      # Generated .resw/public files are committed. Regenerate them and fail if
+      # the pull request did not include the resulting artifacts.
+      - name: Check generated artifacts
+        run: |
+          node scripts/localization/generate.mjs
+          git diff --exit-code -- src/TempoKaraoke/Strings src/TempoKaraoke/public
+
+      - name: Show regeneration command on failure
+        if: failure()
+        run: echo "Run 'node scripts/localization/generate.mjs' and commit the generated Resources.resw and public/locale files."
