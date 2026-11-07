@@ -9,6 +9,19 @@ components (`major.minor.patch.revision`).
 Detailed user-facing release notes for each release live in
 `docs/releases/<tag>.md` and are published together with the GitHub Release.
 
+## [1.10.3.4] — 2026-11-08
+
+Full details: [`docs/releases/v1.10.3.4.md`](docs/releases/v1.10.3.4.md).
+
+### Fixed
+
+- Update badges compare versions semantically, so a previously stored
+  three-component pending version (`1.10.3`) no longer marks an installed
+  four-component release (`1.10.3.3`) as new.
+- New update metadata keeps four-component versions.
+- An explicit language choice is preserved when a translation catalog is
+  temporarily unavailable, instead of being overwritten by the fallback.
+
 ## [1.10.3.3] — 2026-11-08
 
 Full details: [`docs/releases/v1.10.3.3.md`](docs/releases/v1.10.3.3.md).

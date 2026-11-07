@@ -97,7 +97,7 @@ public static class UpdateService
             }
 
             var info = new UpdateInfo(
-                version.ToString(3),
+                version.Revision > 0 ? version.ToString(4) : version.ToString(3),
                 asset.BrowserDownloadUrl!,
                 release.HtmlUrl!,
                 asset.Size,

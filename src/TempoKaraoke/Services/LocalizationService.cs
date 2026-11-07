@@ -94,8 +94,11 @@ public sealed class LocalizationService : DependencyObject
         var resolution = LanguageResolver.Resolve(Catalog, saved, ReadSystemLanguages());
         ApplyLanguage(resolution.Tag, persist: false);
 
-        if (resolution.ShouldPersist ||
-            !string.Equals(SettingsService.Language, resolution.Tag, StringComparison.Ordinal))
+        // An explicit user choice must survive a temporary catalog/load problem.
+        // Only persist the resolved language when the user has not chosen one.
+        if (saved is null &&
+            (!string.Equals(SettingsService.Language, resolution.Tag, StringComparison.Ordinal) ||
+             resolution.ShouldPersist))
         {
             SettingsService.Language = resolution.Tag;
         }

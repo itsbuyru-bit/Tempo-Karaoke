@@ -22,7 +22,20 @@ public static class UpdateBadgePolicy
             return false;
         }
 
-        return string.IsNullOrWhiteSpace(installedVersion) ||
-               !string.Equals(pendingVersion, installedVersion, StringComparison.OrdinalIgnoreCase);
+        if (string.IsNullOrWhiteSpace(installedVersion))
+        {
+            return true;
+        }
+
+        // Older releases stored three-component versions (1.10.3), while the
+        // installed assembly exposes four (1.10.3.3). Compare semantically so an
+        // already-installed release never leaves an eternal "Update" badge.
+        if (Version.TryParse(pendingVersion, out var pending) &&
+            Version.TryParse(installedVersion, out var installed))
+        {
+            return pending > installed;
+        }
+
+        return !string.Equals(pendingVersion, installedVersion, StringComparison.OrdinalIgnoreCase);
     }
 }
