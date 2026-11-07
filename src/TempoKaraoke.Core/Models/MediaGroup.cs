@@ -35,6 +35,7 @@ public sealed class MediaGroup : INotifyPropertyChanged
 
     private bool _isSelected;
     private bool _isSelectionVisible;
+    private bool _isHovered;
 
     /// <summary>Карточка отмечена в режиме выбора.</summary>
     public bool IsSelected
@@ -49,6 +50,7 @@ public sealed class MediaGroup : INotifyPropertyChanged
 
             _isSelected = value;
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsSelected)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ShowSelectionCheck)));
         }
     }
 
@@ -65,8 +67,32 @@ public sealed class MediaGroup : INotifyPropertyChanged
 
             _isSelectionVisible = value;
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsSelectionVisible)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ShowSelectionCheck)));
         }
     }
+
+    /// <summary>Курсор над карточкой: чек-бокс показывается только при наведении.</summary>
+    public bool IsHovered
+    {
+        get => _isHovered;
+        set
+        {
+            if (_isHovered == value)
+            {
+                return;
+            }
+
+            _isHovered = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsHovered)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ShowSelectionCheck)));
+        }
+    }
+
+    /// <summary>
+    /// Чек-бокс виден у выбранной карточки или при наведении; на остальных
+    /// карточках он не занимает место.
+    /// </summary>
+    public bool ShowSelectionCheck => _isSelected || _isHovered;
 
     public string DisplayTitle => _best.DisplayTitle;
 

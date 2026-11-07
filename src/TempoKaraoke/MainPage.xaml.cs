@@ -85,6 +85,8 @@ public sealed partial class MainPage : Page, IRemoteHost, INotifyPropertyChanged
     private long _resumePositionMs;
     private DateTime _lastPositionSave = DateTime.MinValue;
     private bool _updatingSelectAll;
+    private bool _updatingLibrarySelectAll;
+    private bool _playPauseHovered;
     private readonly PlayerService _player;
     private readonly DispatcherTimer _timer;
     private readonly DispatcherTimer _countdownTimer;
@@ -2229,6 +2231,116 @@ public sealed partial class MainPage : Page, IRemoteHost, INotifyPropertyChanged
         }
 
         group.IsSelected = true;
+        UpdateLibrarySelectionBar();
+    }
+
+    private void CardSelectCheck_Changed(object sender, RoutedEventArgs e)
+    {
+        UpdateLibrarySelectionBar();
+    }
+
+    /// <summary>Панель управления выделенными карточками библиотеки.</summary>
+    private void UpdateLibrarySelectionBar()
+    {
+        if (LibrarySelectionBar is null || LibrarySelectionText is null || LibraryToolbar is null)
+        {
+            return;
+        }
+
+        var groups = FilteredGroups;
+        var selected = groups.Count(group => group.IsSelected);
+        var active = selected > 0;
+
+        LibrarySelectionBar.Visibility = active ? Visibility.Visible : Visibility.Collapsed;
+        LibraryToolbar.Visibility = active ? Visibility.Collapsed : Visibility.Visible;
+        LibrarySelectionText.Text = LocalizationService.FormatPlural("Selection_Count", selected, selected);
+
+        if (LibrarySelectAllCheck is not null)
+        {
+            _updatingLibrarySelectAll = true;
+            LibrarySelectAllCheck.IsChecked = groups.Count > 0 && selected == groups.Count;
+            _updatingLibrarySelectAll = false;
+        }
+    }
+
+    private void LibrarySelectAllCheck_Changed(object sender, RoutedEventArgs e)
+    {
+        if (_updatingLibrarySelectAll)
+        {
+            return;
+        }
+
+        var select = LibrarySelectAllCheck.IsChecked == true;
+        foreach (var group in FilteredGroups)
+        {
+            group.IsSelectionVisible = true;
+            group.IsSelected = select;
+        }
+
+        UpdateLibrarySelectionBar();
+    }
+
+    private void ClearLibrarySelection_Click(object sender, RoutedEventArgs e)
+    {
+        foreach (var group in FilteredGroups)
+        {
+            group.IsSelected = false;
+            group.IsSelectionVisible = false;
+        }
+
+        UpdateLibrarySelectionBar();
+    }
+
+    private List<MediaItem> SelectedLibraryItems() =>
+        FilteredGroups.Where(group => group.IsSelected).Select(group => group.Best).ToList();
+
+    private void PlaySelectedLibraryNext_Click(object sender, RoutedEventArgs e)
+    {
+        var items = SelectedLibraryItems();
+        if (items.Count == 0)
+        {
+            return;
+        }
+
+        // Вставляем с конца, чтобы итоговый порядок совпал с порядком карточек.
+        for (var index = items.Count - 1; index >= 0; index--)
+        {
+            EnqueueItemNext(items[index]);
+        }
+    }
+
+    private void AddSelectedLibraryToQueue_Click(object sender, RoutedEventArgs e)
+    {
+        var items = SelectedLibraryItems();
+        if (items.Count == 0)
+        {
+            return;
+        }
+
+        var added = 0;
+        foreach (var item in items)
+        {
+            if (Queue.Any(entry => string.Equals(entry.Path, item.Path, StringComparison.OrdinalIgnoreCase)))
+            {
+                continue;
+            }
+
+            AddToQueue(item);
+            added++;
+        }
+
+        SetPlaylistStatus(LocalizationService.Get(
+            added > 0 ? "Playlist_StatusAddedToQueue" : "Playlist_StatusAlreadyInQueue"));
+    }
+
+    private void AddSelectedLibraryToPlaylist_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is not FrameworkElement element)
+        {
+            return;
+        }
+
+        ShowAddToPlaylistFlyout(element, SelectedLibraryItems());
     }
 
     private void ShowTrackContextMenu(
@@ -4379,6 +4491,7 @@ public sealed partial class MainPage : Page, IRemoteHost, INotifyPropertyChanged
         StatusText.Visibility = Visibility.Visible;
         UpdateLibraryEmptyState();
         RefreshRecentMetadata();
+        UpdateLibrarySelectionBar();
     }
 
     private void StartDurationScan()
@@ -5581,7 +5694,12 @@ public sealed partial class MainPage : Page, IRemoteHost, INotifyPropertyChanged
             return;
         }
 
-        var items = SelectedQueueItems();
+        ShowAddToPlaylistFlyout(element, SelectedQueueItems());
+    }
+
+    /// <summary>Общий флайаут «Добавить в плейлист» для очереди и библиотеки.</summary>
+    private void ShowAddToPlaylistFlyout(FrameworkElement target, IReadOnlyList<MediaItem> items)
+    {
         if (items.Count == 0)
         {
             return;
@@ -5609,7 +5727,7 @@ public sealed partial class MainPage : Page, IRemoteHost, INotifyPropertyChanged
         };
         flyout.Items.Add(create);
 
-        flyout.ShowAt(element);
+        flyout.ShowAt(target);
     }
 
     private void AddItemsToPlaylist(Playlist playlist, IEnumerable<MediaItem> items)
@@ -6426,6 +6544,11 @@ public sealed partial class MainPage : Page, IRemoteHost, INotifyPropertyChanged
             return;
         }
 
+        if (root.DataContext is MediaGroup group)
+        {
+            group.IsHovered = true;
+        }
+
         if (FindElementByName(root, "CardOverlay") is Grid overlay)
         {
             overlay.Opacity = 1;
@@ -6443,6 +6566,11 @@ public sealed partial class MainPage : Page, IRemoteHost, INotifyPropertyChanged
         if (sender is not FrameworkElement root)
         {
             return;
+        }
+
+        if (root.DataContext is MediaGroup group)
+        {
+            group.IsHovered = false;
         }
 
         if (FindElementByName(root, "CardOverlay") is Grid overlay)
@@ -7827,6 +7955,34 @@ public sealed partial class MainPage : Page, IRemoteHost, INotifyPropertyChanged
     {
         TogglePlayback();
         UpdateTransport();
+    }
+
+    private void PlayPause_PointerEntered(object sender, PointerRoutedEventArgs e)
+    {
+        _playPauseHovered = true;
+        SetPlayPauseHighlight(true);
+    }
+
+    private void PlayPause_PointerExited(object sender, PointerRoutedEventArgs e)
+    {
+        _playPauseHovered = false;
+        SetPlayPauseHighlight(PlayPauseButton.FocusState != FocusState.Unfocused);
+    }
+
+    private void PlayPause_GotFocus(object sender, RoutedEventArgs e) => SetPlayPauseHighlight(true);
+
+    private void PlayPause_LostFocus(object sender, RoutedEventArgs e) => SetPlayPauseHighlight(_playPauseHovered);
+
+    /// <summary>Меняет направление градиента кольца, когда кнопка в фокусе/под курсором.</summary>
+    private void SetPlayPauseHighlight(bool active)
+    {
+        if (PlayPauseRing is null)
+        {
+            return;
+        }
+
+        PlayPauseRing.BorderBrush = (Brush)Resources[active ? "EmptyStateGradientHover" : "EmptyStateGradient"];
+        PlayPauseRing.BorderThickness = new Thickness(active ? 4 : 3);
     }
 
     private void TogglePlayback()

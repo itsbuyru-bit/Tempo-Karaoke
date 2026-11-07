@@ -39,6 +39,12 @@
             <GradientStop Color="#FF905ECD" Offset="0.65" />
             <GradientStop Color="#FFD82684" Offset="1" />
         </LinearGradientBrush>
+        <LinearGradientBrush x:Key="EmptyStateGradientHover" StartPoint="1,0" EndPoint="0,1">
+            <GradientStop Color="#FFD82684" Offset="0" />
+            <GradientStop Color="#FF905ECD" Offset="0.35" />
+            <GradientStop Color="#FF659EE2" Offset="0.67" />
+            <GradientStop Color="#FF6EDEFC" Offset="1" />
+        </LinearGradientBrush>
         <converters:BoolToVisibilityConverter x:Key="BoolToVisibility" />
         <converters:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibility" />
         <Style x:Key="QueuePlayButtonStyle" TargetType="Button">
@@ -277,6 +283,7 @@
             <Grid
                 Width="230"
                 Height="200"
+                ContextRequested="MediaCard_ContextRequested"
                 HorizontalAlignment="Center"
                 PointerEntered="VideoCard_PointerEntered"
                 PointerExited="VideoCard_PointerExited"
@@ -316,7 +323,7 @@
                                     VerticalAlignment="Center"
                                     Visibility="{Binding HasNoThumbnail, Converter={StaticResource BoolToVisibility}}" />
                                 <Button
- Margin="4" Padding="6,2" HorizontalAlignment="Left" VerticalAlignment="Top" AutomationProperties.Name="{Binding VersionCountText}" Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}" Click="Versions_Click" CornerRadius="4" MinHeight="24" Tag="{Binding}" Visibility="{Binding HasMultipleVersions, Converter={StaticResource BoolToVisibility}}" loc:Localization.ToolTipKey="Ui_Versions_ToolTip.ToolTip">
+ Margin="4,4,4,0" Padding="6,2" HorizontalAlignment="Right" VerticalAlignment="Top" AutomationProperties.Name="{Binding VersionCountText}" Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}" Click="Versions_Click" CornerRadius="4" MinHeight="24" Tag="{Binding}" Visibility="{Binding HasMultipleVersions, Converter={StaticResource BoolToVisibility}}" loc:Localization.ToolTipKey="Ui_Versions_ToolTip.ToolTip">
                                     <TextBlock
                                         FontSize="12"
                                         Text="{Binding VersionCountText}" />
@@ -365,12 +372,14 @@
 
                 <CheckBox
                     x:Name="CardSelectCheck"
-                    Margin="0,10,10,0"
-                    HorizontalAlignment="Right"
+                    Margin="10,10,0,0"
+                    HorizontalAlignment="Left"
                     VerticalAlignment="Top"
                     AutomationProperties.Name="{Binding DisplayTitle}"
+                    Checked="CardSelectCheck_Changed"
                     IsChecked="{Binding IsSelected, Mode=TwoWay}"
-                    Visibility="{Binding IsSelectionVisible, Converter={StaticResource BoolToVisibility}}" />
+                    Unchecked="CardSelectCheck_Changed"
+                    Visibility="{Binding ShowSelectionCheck, Converter={StaticResource BoolToVisibility}}" />
             </Grid>
         </DataTemplate>
         <ItemsPanelTemplate x:Key="FolderItemsPanel">
@@ -785,7 +794,11 @@
                             <Grid.RenderTransform>
                                 <TranslateTransform x:Name="AllVideosTransform" />
                             </Grid.RenderTransform>
-                                <Grid Grid.Row="0" Padding="20,16,20,8" ColumnSpacing="12">
+                                <Grid
+                                    x:Name="LibraryToolbar"
+                                    Grid.Row="0"
+                                    Padding="20,16,20,8"
+                                    ColumnSpacing="12">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="Auto" />
                                         <ColumnDefinition Width="*" />
@@ -824,6 +837,56 @@
  x:Name="FolderFilter" MinWidth="160" SelectionChanged="FolderFilter_SelectionChanged" x:Uid="Ui_FilterByFolder" loc:Localization.Key="Ui_FilterByFolder.PlaceholderText" loc:Localization.AutomationNameKey="Ui_FilterByFolder_AutomationName.AutomationName" />
                                     </StackPanel>
                                 </Grid>
+
+                                <Border
+                                    x:Name="LibrarySelectionBar"
+                                    Grid.Row="0"
+                                    Margin="20,16,20,8"
+                                    Padding="8"
+                                    VerticalAlignment="Center"
+                                    Background="{ThemeResource LayerFillColorDefaultBrush}"
+                                    CornerRadius="8"
+                                    Visibility="Collapsed">
+                                    <StackPanel
+                                        VerticalAlignment="Center"
+                                        Orientation="Horizontal"
+                                        Spacing="8">
+                                        <CheckBox
+                                            x:Name="LibrarySelectAllCheck"
+                                            Width="32"
+                                            Height="32"
+                                            MinWidth="0"
+                                            Padding="0"
+                                            VerticalAlignment="Center"
+                                            Checked="LibrarySelectAllCheck_Changed"
+                                            Unchecked="LibrarySelectAllCheck_Changed"
+                                            loc:Localization.AutomationNameKey="Ui_SelectAllTracks_AutomationName.AutomationName" />
+                                        <TextBlock
+                                            x:Name="LibrarySelectionText"
+                                            VerticalAlignment="Center"
+                                            Style="{StaticResource BodyStrongTextBlockStyle}" />
+                                        <Button
+                                            x:Name="LibraryClearSelectionButton"
+                                            Click="ClearLibrarySelection_Click"
+                                            Style="{StaticResource TextButtonStyle}"
+                                            loc:Localization.Key="Ui_Clear_65.Content" />
+                                        <Button
+                                            x:Name="LibraryPlaySelectedNextButton"
+                                            Click="PlaySelectedLibraryNext_Click"
+                                            Style="{StaticResource CompactButtonStyle}"
+                                            loc:Localization.Key="ContextMenu_PlayNext.Content" />
+                                        <Button
+                                            x:Name="LibraryAddSelectedToQueueButton"
+                                            Click="AddSelectedLibraryToQueue_Click"
+                                            Style="{StaticResource CompactButtonStyle}"
+                                            loc:Localization.Key="ContextMenu_Queue.Content" />
+                                        <Button
+                                            x:Name="LibraryAddSelectedToPlaylistButton"
+                                            Click="AddSelectedLibraryToPlaylist_Click"
+                                            Style="{StaticResource CompactButtonStyle}"
+                                            loc:Localization.Key="Ui_AddTo_67.Content" />
+                                    </StackPanel>
+                                </Border>
                                 <GridView
                                     x:Name="LibraryList"
                                     Grid.Row="1"
@@ -3648,13 +3711,14 @@
                         </Button>
                         <Grid Width="64" Height="64">
                             <Border
+                                x:Name="PlayPauseRing"
                                 Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                                 BorderBrush="{StaticResource EmptyStateGradient}"
                                 BorderThickness="3"
                                 CornerRadius="32"
                                 IsHitTestVisible="False" />
                             <Button
- x:Name="PlayPauseButton" Width="64" Height="64" Padding="0" HorizontalAlignment="Center" VerticalAlignment="Center" Background="Transparent" BorderThickness="0" Click="PlayPause_Click" CornerRadius="32" loc:Localization.AutomationNameKey="Ui_PlayOrPause_AutomationName.AutomationName" loc:Localization.ToolTipKey="Ui_PlayOrPause_ToolTip.ToolTip">
+ x:Name="PlayPauseButton" Width="64" Height="64" Padding="0" HorizontalAlignment="Center" VerticalAlignment="Center" Background="Transparent" BorderThickness="0" Click="PlayPause_Click" CornerRadius="32" GotFocus="PlayPause_GotFocus" LostFocus="PlayPause_LostFocus" PointerEntered="PlayPause_PointerEntered" PointerExited="PlayPause_PointerExited" loc:Localization.AutomationNameKey="Ui_PlayOrPause_AutomationName.AutomationName" loc:Localization.ToolTipKey="Ui_PlayOrPause_ToolTip.ToolTip">
                                 <SymbolIcon x:Name="PlayPauseIcon" Symbol="Play" />
                             </Button>
                         </Grid>

@@ -37,6 +37,7 @@
   "ContextMenu_Play_AutomationName.AutomationName": "Play",
   "ContextMenu_Play_ToolTip.ToolTip": "Play",
   "ContextMenu_Properties.Text": "Properties",
+  "ContextMenu_Queue.Content": "Queue",
   "ContextMenu_Queue.Text": "Queue",
   "ContextMenu_RemoveFavorite": "Remove from favorites",
   "ContextMenu_Rename.Text": "Rename",

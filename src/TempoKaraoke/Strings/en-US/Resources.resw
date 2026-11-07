@@ -42,6 +42,7 @@
   <data name="ContextMenu_Play_AutomationName.AutomationName" xml:space="preserve"><value>Play</value></data>
   <data name="ContextMenu_Play_ToolTip.ToolTip" xml:space="preserve"><value>Play</value></data>
   <data name="ContextMenu_Properties.Text" xml:space="preserve"><value>Properties</value></data>
+  <data name="ContextMenu_Queue.Content" xml:space="preserve"><value>Queue</value></data>
   <data name="ContextMenu_Queue.Text" xml:space="preserve"><value>Queue</value></data>
   <data name="ContextMenu_RemoveFavorite" xml:space="preserve"><value>Remove from favorites</value></data>
   <data name="ContextMenu_Rename.Text" xml:space="preserve"><value>Rename</value></data>

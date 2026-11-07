@@ -37,6 +37,7 @@
   "ContextMenu_Play_AutomationName.AutomationName": "Воспроизвести",
   "ContextMenu_Play_ToolTip.ToolTip": "Воспроизвести",
   "ContextMenu_Properties.Text": "Свойства",
+  "ContextMenu_Queue.Content": "В очередь",
   "ContextMenu_Queue.Text": "В очередь",
   "ContextMenu_RemoveFavorite": "Убрать из избранного",
   "ContextMenu_Rename.Text": "Переименовать",
