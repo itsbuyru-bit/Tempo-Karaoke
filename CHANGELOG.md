@@ -1,154 +1,160 @@
+English | [Русский](CHANGELOG.ru.md)
+
 # Changelog
 
-Все заметные изменения проекта. Формат основан на
-[Keep a Changelog](https://keepachangelog.com/ru/1.1.0/), версии — четыре
-компонента (`major.minor.patch.revision`).
+All notable changes to this project. The format is based on
+[Keep a Changelog](https://keepachangelog.com/ru/1.1.0/), and versions use four
+components (`major.minor.patch.revision`).
 
-Подробные пользовательские заметки к каждому релизу лежат в
-`docs/releases/<tag>.md` и публикуются вместе с GitHub Release.
+Detailed user-facing release notes for each release live in
+`docs/releases/<tag>.md` and are published together with the GitHub Release.
 
 ## [1.10.2.6] — 2026-11-07
 
-Подробно: [`docs/releases/v1.10.2.6.md`](docs/releases/v1.10.2.6.md).
+Full details: [`docs/releases/v1.10.2.6.md`](docs/releases/v1.10.2.6.md).
 
-### Исправлено
+### Fixed
 
-- Кнопка «Старт/Пауза» на пульте больше не застревает: воспроизведение
-  отслеживается собственным флагом плеера, кнопка и статус меняются сразу.
-- Ползунок времени двигается и выполняет seek; входящие обновления не
-  перебивают перетаскивание.
-- Текущий трек остаётся видимым на паузе.
-- WebSocket переподключается автоматически, состояние опрашивается каждые 3 с,
-  обновление запрашивается при возврате вкладки/сети; сервер шлёт keepalive и
-  рассылает снимки параллельно с таймаутом.
+- The Start/Pause button on the remote no longer gets stuck: playback is tracked
+  by the player's own flag, so the button and the status change immediately.
+- The time slider moves and performs a seek; incoming updates no longer
+  interrupt dragging.
+- The current track stays visible while paused.
+- WebSocket reconnects automatically, state is polled every 3 s, and a refresh
+  is requested when the tab or the network comes back; the server sends
+  keepalives and broadcasts snapshots in parallel with a timeout.
 
 ## [1.10.2.5] — 2026-11-07
 
-Подробно: [`docs/releases/v1.10.2.5.md`](docs/releases/v1.10.2.5.md).
+Full details: [`docs/releases/v1.10.2.5.md`](docs/releases/v1.10.2.5.md).
 
-### Исправлено
+### Fixed
 
-- Контекстное меню по правой кнопке на карточке видео больше не оставляет
-  «занятый» курсор: во время открытого меню показывается обычная стрелка,
-  после закрытия курсор восстанавливается.
+- The right-click context menu on a video card no longer leaves the cursor
+  "busy": the normal arrow is shown while the menu is open, and the cursor is
+  restored once it closes.
 
 ## [1.10.2.4] — 2026-11-07
 
-Подробно: [`docs/releases/v1.10.2.4.md`](docs/releases/v1.10.2.4.md).
+Full details: [`docs/releases/v1.10.2.4.md`](docs/releases/v1.10.2.4.md).
 
-### Исправлено
+### Fixed
 
-- В свёрнутой панели навигации у «Параметры» показывается значок доступного
-  обновления; в развёрнутой — прежняя плашка «Обновление»/«Новое».
-- Тост об обновлении появляется только при автоматической проверке при запуске,
-  а не при нажатии «Проверить обновления».
+- In the collapsed navigation pane, an update-available badge is shown on
+  "Settings"; in the expanded pane, the previous "Update"/"New" chip is kept.
+- The update toast now appears only during the automatic check at startup, not
+  when "Check for updates" is clicked.
 
 ## [1.10.2.3] — 2026-11-07
 
-Подробно: [`docs/releases/v1.10.2.3.md`](docs/releases/v1.10.2.3.md).
+Full details: [`docs/releases/v1.10.2.3.md`](docs/releases/v1.10.2.3.md).
 
-### Добавлено
+### Added
 
-- Контекстное меню по правой кнопке на карточке видео.
-- Панель управления выделенными карточками библиотеки: счётчик, очистка,
-  «Воспроизвести следующим», «В очередь», «Добавить в», выбор всех.
+- Right-click context menu on video cards.
+- Control panel for selected library cards: counter, clear, "Play next",
+  "Add to queue", "Add to", and select all.
 
-### Изменено
+### Changed
 
-- Чек-бокс выбора — в левом верхнем углу и только при наведении/выборе;
-  счётчик версий перенесён в правый верхний угол.
-- Кольцо кнопки «Играть» меняет градиент при наведении и фокусе.
+- The selection checkbox is now in the top-left corner and appears only on
+  hover/selection; the version counter has moved to the top-right corner.
+- The "Play" button ring changes its gradient on hover and focus.
 
 ## [1.10.2.2] — 2026-11-07
 
-Подробно: [`docs/releases/v1.10.2.2.md`](docs/releases/v1.10.2.2.md).
+Full details: [`docs/releases/v1.10.2.2.md`](docs/releases/v1.10.2.2.md).
 
-### Исправлено
+### Fixed
 
-- В светлой теме кнопки «свернуть/развернуть/закрыть» больше не теряются на
-  светлом фоне: цвета системного заголовка задаются по теме окна и обновляются
-  при её переключении.
+- In the light theme, the "minimize/maximize/close" buttons no longer get lost
+  against the light background: the system caption colors are set from the
+  window theme and updated when it is switched.
 
 ## [1.10.2.1] — 2026-11-07
 
-Подробно: [`docs/releases/v1.10.2.1.md`](docs/releases/v1.10.2.1.md).
+Full details: [`docs/releases/v1.10.2.1.md`](docs/releases/v1.10.2.1.md).
 
-### Исправлено
+### Fixed
 
-- Тост собирает многострочные пункты changelog в первое предложение; версии и
-  размер установщика видны с первой строки.
-- Холодный старт из тоста: регистрация уведомлений до создания окна, очередь
-  `PendingUpdateAction`, аргументы командной строки и защита от двойной
-  обработки.
-- Диагностика активации в логе.
+- The toast now collapses multi-line changelog entries into the first sentence;
+  the version and the installer size are visible from the first line.
+- Cold start from the toast: notifications are registered before the window is
+  created, a `PendingUpdateAction` queue, command-line arguments, and protection
+  against double handling.
+- Activation diagnostics in the log.
 
 ## [1.10.2.0] — 2026-11-07
 
-Подробно: [`docs/releases/v1.10.2.0.md`](docs/releases/v1.10.2.0.md).
+Full details: [`docs/releases/v1.10.2.0.md`](docs/releases/v1.10.2.0.md).
 
-### Добавлено
+### Added
 
-- Информативный тост об обновлении: версии, changelog, размер, дата публикации,
-  логотип, Tag/Group и срок 24 часа.
-- Клик по телу тоста открывает «Параметры › Обновления»; кнопки
-  «Установить»/«Позже»/«Что нового», холодный старт и AppLifecycle-редирект.
-- Плашка «Обновление»/«Новое» у пункта «Параметры» вместо серой точки.
-- Тестируемый `UpdateToastBuilder` и тесты разметки/разбора changelog.
+- Informative update toast: versions, changelog, size, publication date, logo,
+  Tag/Group, and a 24-hour lifetime.
+- Clicking the toast body opens "Settings › Updates"; the
+  "Install"/"Later"/"What's new" buttons, cold start, and an AppLifecycle
+  redirect.
+- An "Update"/"New" chip on the "Settings" item instead of a grey dot.
+- A testable `UpdateToastBuilder` and tests for changelog markup and parsing.
 
-### Исправлено
+### Fixed
 
-- Тост больше не показывает ключи `Update_ToastTitle`/`Update_ToastBody`:
-  строки разрешаются до сборки XML, с fallback-литералами.
-- Повторное уведомление заменяет прежнее (Tag/Group), а не дублируется.
+- The toast no longer shows the `Update_ToastTitle`/`Update_ToastBody` keys:
+  strings are resolved before the XML is built, with fallback literals.
+- A repeated notification replaces the previous one (Tag/Group) instead of
+  duplicating it.
 
 ## [1.10.1.0] — 2026-11-07
 
-Подробно: [`docs/releases/v1.10.1.0.md`](docs/releases/v1.10.1.0.md).
+Full details: [`docs/releases/v1.10.1.0.md`](docs/releases/v1.10.1.0.md).
 
-### Добавлено
+### Added
 
-- Полноценная проверка обновлений в «Параметры › Обновления»: индикатор
-  загрузки, блокировка кнопки, состояния «проверка», «актуальная версия»,
-  «доступно обновление» и «ошибка сети».
-- Подтверждение скачивания и установки обновления в `ContentDialog` с темой
-  окна; кнопка «Установить vX».
-- Локализованные статусы обновлений (RU/EN) с обновлением без перезапуска.
-- Улучшения установщика Inno Setup: двуязычный вопрос об удалении данных,
-  безопасная кнопка по умолчанию, автоопределение версии, ссылки GitHub,
-  `taskkill /t`, удаление `install-scope.txt`, автоматический запуск после
-  тихого обновления.
+- Full update checking in "Settings › Updates": a loading indicator, a disabled
+  button, and the "checking", "up to date", "update available", and
+  "network error" states.
+- Confirmation of the update download and installation in a `ContentDialog`
+  matching the window theme; an "Install vX" button.
+- Localized update statuses (RU/EN) that refresh without a restart.
+- Inno Setup installer improvements: a bilingual question about deleting data, a
+  safe default button, automatic version detection, GitHub links,
+  `taskkill /t`, removal of `install-scope.txt`, and automatic launch after a
+  silent update.
 
-### Исправлено
+### Fixed
 
-- `404 Not Found` от GitHub больше не показывается как ошибка сети.
-- Статус обновлений больше не остаётся пустым в карточке «Версия приложения».
+- A `404 Not Found` from GitHub is no longer reported as a network error.
+- The update status no longer stays empty in the "App version" card.
 
 ## [1.9.0.0] — 2026-11-06
 
-Подробно: [`docs/releases/v1.9.0.0.md`](docs/releases/v1.9.0.0.md).
+Full details: [`docs/releases/v1.9.0.0.md`](docs/releases/v1.9.0.0.md).
 
-### Добавлено
+### Added
 
-- Data-driven локализация: `localization/manifest.json`, JSON-каталоги,
-  генерация `.resw` и веб-локалей, выбор языка ОС, fallback по ключу.
-- Постоянный PIN Host/Admin с PBKDF2-SHA256 и разделом безопасности.
-- Логи с ротацией и ZIP-отчёт об ошибке с маскированием приватных данных.
-- Безопасный режим Wi-Fi Direct, машина состояний, сериализация операций и
-  диагностика адаптера.
-- Отчёт web-пульта об ошибках JS.
+- Data-driven localization: `localization/manifest.json`, JSON catalogs,
+  generation of `.resw` files and web locales, OS language selection, and
+  per-key fallback.
+- A persistent Host/Admin PIN with PBKDF2-SHA256 and a security section.
+- Rotating logs and a ZIP error report with masking of private data.
+- Wi-Fi Direct safe mode, a state machine, operation serialization, and adapter
+  diagnostics.
+- JS error reporting from the web remote.
 
-### Изменено
+### Changed
 
-- Селекторы языка desktop и web строятся из манифеста.
-- Английские plural-формы `One` используют `{0}`.
-- `/api/auth` больше не расходует попытки администратора при успешном входе
-  ведущего.
+- The desktop and web language selectors are built from the manifest.
+- English plural forms `One` use `{0}`.
+- `/api/auth` no longer consumes admin attempts when the host signs in
+  successfully.
 
-### Исправлено
+### Fixed
 
-- Наложение вложенных плейлистов и остатки предыдущего экрана при навигации.
-- Устаревшие отложенные рендеры после быстрой смены раздела.
+- Overlapping nested playlists and leftovers from the previous screen during
+  navigation.
+- Stale deferred renders after a fast section switch.
 
-## [1.8.22.3] — ранее
+## [1.8.22.3] — earlier
 
-История до 1.9.0.0 доступна в тегах и GitHub Releases.
+History before 1.9.0.0 is available in the tags and GitHub Releases.

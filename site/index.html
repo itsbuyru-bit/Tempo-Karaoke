@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tempo Karaoke — karaoke player for Windows with a phone remote</title>
+  <meta name="description" content="Native Windows karaoke player for your local video library: smart search, queue, playlists and a browser remote for phones. Free and open source.">
+  <meta property="og:title" content="Tempo Karaoke">
+  <meta property="og:description" content="Your karaoke library, smart search and a phone remote — on Windows.">
+  <meta property="og:image" content="assets/banner.png">
+  <link rel="icon" href="assets/appicon.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container nav">
+      <a class="brand" href="index.html">
+        <img src="assets/appicon.png" alt="">
+        <span>Tempo Karaoke</span>
+      </a>
+      <nav class="nav-links" aria-label="Main">
+        <a href="#features">Features</a>
+        <a href="#remote">Phone remote</a>
+        <a href="#download">Download</a>
+        <a href="https://github.com/itsbuyru-bit/Tempo-Karaoke">GitHub</a>
+      </nav>
+      <div class="nav-actions">
+        <span class="lang"><a class="active" href="index.html">EN</a><a href="ru.html">RU</a></span>
+        <a class="btn primary" href="https://github.com/itsbuyru-bit/Tempo-Karaoke/releases/latest">Download</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="container hero">
+      <div>
+        <span class="eyebrow"><span class="dot"></span>Windows 10 / 11 · Free · MIT</span>
+        <h1>Your karaoke library,<br><span class="gradient">smart search and a phone remote.</span></h1>
+        <p class="lead">Tempo Karaoke turns any folder of karaoke videos into a fast, beautiful catalog. Guests search and queue songs from their phones while the video plays on the big screen.</p>
+        <div class="hero-actions">
+          <a class="btn primary" href="https://github.com/itsbuyru-bit/Tempo-Karaoke/releases/latest">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4"/><path d="M5 20h14"/></svg>
+            Download for Windows
+          </a>
+          <a class="btn ghost" href="https://github.com/itsbuyru-bit/Tempo-Karaoke">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2.18c-3.2.7-3.88-1.36-3.88-1.36-.52-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.76 2.7 1.25 3.36.96.1-.75.4-1.25.73-1.54-2.56-.29-5.25-1.28-5.25-5.7 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.12 3.05.74.81 1.19 1.84 1.19 3.1 0 4.43-2.7 5.4-5.27 5.69.41.36.78 1.05.78 2.13v3.16c0 .31.2.67.8.56A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5Z"/></svg>
+            View on GitHub
+          </a>
+        </div>
+        <div class="hero-meta">
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 12 4 4L19 6"/></svg>No account or cloud</span>
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 12 4 4L19 6"/></svg>Library stays read-only</span>
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 12 4 4L19 6"/></svg>VLC bundled</span>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <img src="assets/banner.png" alt="Tempo Karaoke interface with a video library and playback controls">
+        <span class="visual-badge">Native WinUI 3 · LibVLC</span>
+      </div>
+    </section>
+
+    <section id="features" class="container">
+      <div class="section-head">
+        <h2>Everything a karaoke night needs</h2>
+        <p>Built for large local collections, remote requests and long evenings — without folders, spreadsheets or cloud accounts.</p>
+      </div>
+      <div class="feature-grid">
+        <article class="feature">
+          <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h16v14H4z"/><path d="m4 15 4-4 3 3 3-4 6 6"/></svg></span>
+          <h3>Local library</h3>
+          <p>Index any video folders recursively. SQLite cache, metadata and thumbnails make repeat launches instant.</p>
+        </article>
+        <article class="feature">
+          <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg></span>
+          <h3>Instant smart search</h3>
+          <p>Fuzzy matching, RU/EN transliteration and keyboard-layout correction. Results before the next frame.</p>
+        </article>
+        <article class="feature">
+          <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h10"/><path d="m17 16 3 3-3 3"/></svg></span>
+          <h3>Queue &amp; playlists</h3>
+          <p>Drag-and-drop order, play-next, undo, M3U import/export and a queue that survives restarts.</p>
+        </article>
+        <article class="feature">
+          <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg></span>
+          <h3>Phone remote</h3>
+          <p>Guests scan a QR code, search the catalog and order songs. The host controls playback with a PIN.</p>
+        </article>
+        <article class="feature">
+          <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg></span>
+          <h3>Second screen</h3>
+          <p>Detach the video to a TV or projector and keep the control panel on the laptop.</p>
+        </article>
+        <article class="feature">
+          <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v3m0 12v3M3 12h3m12 0h3M5.6 5.6l2.1 2.1m8.6 8.6 2.1 2.1m0-12.8-2.1 2.1m-8.6 8.6-2.1 2.1"/><circle cx="12" cy="12" r="3"/></svg></span>
+          <h3>Playback controls</h3>
+          <p>Library, queue, seek, speed, 10-band equalizer, shuffle, repeat and a countdown between songs.</p>
+        </article>
+        <article class="feature">
+          <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a9 9 0 1 0 9 9"/><path d="M12 7v5l3 2"/></svg></span>
+          <h3>Silent updates</h3>
+          <p>Automatic GitHub release checks, a native toast, an update badge and a silent installer that keeps your data.</p>
+        </article>
+        <article class="feature">
+          <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V9l8-5 8 5v11"/><path d="M9 20v-6h6v6"/></svg></span>
+          <h3>Two languages</h3>
+          <p>Full Russian and English UI, switchable at runtime. Dark, light and system themes.</p>
+        </article>
+        <article class="feature">
+          <span class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 4 7v5c0 5 3.4 8 8 9 4.6-1 8-4 8-9V7l-8-4Z"/><path d="m9 12 2 2 4-4"/></svg></span>
+          <h3>Private by design</h3>
+          <p>No media uploads, no account. PINs are stored as PBKDF2 hashes; diagnostic reports mask private paths.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="remote" class="container">
+      <div class="showcase">
+        <div>
+          <span class="eyebrow"><span class="dot"></span>No app install on the phone</span>
+          <h2>The party controls itself.</h2>
+          <p>Start the built-in web server, show the QR code and let guests browse the catalog from their browser. You keep control of playback, volume and the queue.</p>
+          <ul class="checklist">
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 12 4 4L19 6"/></svg>Search and order songs as a guest</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 12 4 4L19 6"/></svg>Host PIN for play, pause, seek, skip and volume</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 12 4 4L19 6"/></svg>Moderate requests and reorder the queue</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 12 4 4L19 6"/></svg>Works over Wi-Fi or Wi-Fi Direct</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 12 4 4L19 6"/></svg>Reconnects automatically after sleep or network changes</li>
+          </ul>
+        </div>
+        <div class="phone" aria-hidden="true">
+          <div class="phone-screen">
+            <div class="phone-top"><span>Tempo Karaoke</span><span class="phone-status"><span class="dot"></span>PAUSED</span></div>
+            <div class="phone-track"><strong>KIZARU — MONEY LONG</strong><span>Karaoke · MP4</span></div>
+            <div class="phone-progress"></div>
+            <div class="phone-times"><span>00:42</span><span>02:22</span></div>
+            <div class="phone-controls"><span>Back</span><span class="primary">Start</span><span>Next</span></div>
+            <div class="phone-queue">
+              <h4>Next tracks</h4>
+              <div class="phone-row"><b>1</b>MALFA — SO LONG</div>
+              <div class="phone-row"><b>2</b>2Маши — Инея</div>
+              <div class="phone-row"><b>3</b>Volga — Three White Horses</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="container">
+      <div class="section-head">
+        <h2>Ready in three steps</h2>
+        <p>No VLC installation, no media conversion and no account.</p>
+      </div>
+      <div class="steps">
+        <article class="step"><h3>Install</h3><p>Run the per-user installer. .NET and Windows App SDK are bundled.</p></article>
+        <article class="step"><h3>Add folders</h3><p>Point Tempo Karaoke at your karaoke video folder. The library is indexed locally.</p></article>
+        <article class="step"><h3>Start the party</h3><p>Play a song, open the remote and share the QR code with your guests.</p></article>
+      </div>
+    </section>
+
+    <section id="download" class="container">
+      <div class="download">
+        <div>
+          <h2>Download Tempo Karaoke</h2>
+          <p>Free and open source. The latest installer is published on GitHub Releases.</p>
+          <div class="hero-actions">
+            <a class="btn primary" href="https://github.com/itsbuyru-bit/Tempo-Karaoke/releases/latest">Get the latest release</a>
+            <a class="btn ghost" href="https://github.com/itsbuyru-bit/Tempo-Karaoke/releases">All releases</a>
+          </div>
+        </div>
+        <div class="requirements">
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h16v14H4z"/></svg>Windows 10 (1809+) or Windows 11, x64</span>
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><path d="M12 8v8M8 12h8"/></svg>No separate VLC install</span>
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0 4-4m-4 4-4-4"/><path d="M5 20h14"/></svg>About 110 MB, installer keeps your data</span>
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 4 7v5c0 5 3.4 8 8 9 4.6-1 8-4 8-9V7l-8-4Z"/></svg>MIT license</span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div>© <span id="year">2026</span> Tempo Karaoke · Made for karaoke nights.</div>
+      <div class="footer-links">
+        <a href="https://github.com/itsbuyru-bit/Tempo-Karaoke">GitHub</a>
+        <a href="https://github.com/itsbuyru-bit/Tempo-Karaoke/blob/main/docs/en/FEATURES.md">Feature guide</a>
+        <a href="https://github.com/itsbuyru-bit/Tempo-Karaoke/blob/main/PRIVACY.md">Privacy</a>
+        <a href="https://github.com/itsbuyru-bit/Tempo-Karaoke/blob/main/LICENSE">License</a>
+        <a href="ru.html">Русский</a>
+      </div>
+    </div>
+  </footer>
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>

@@ -1,3 +1,4 @@
+Русский | [English](../en/PIN-SECURITY.md)
 # Persistent Host and Admin PIN
 
 ## Behaviour

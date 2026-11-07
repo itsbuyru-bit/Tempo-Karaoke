@@ -1,3 +1,4 @@
+Русский | [English](../en/LOCALIZATION.md)
 # Tempo Karaoke localization guide
 
 ## 1. Single source of truth

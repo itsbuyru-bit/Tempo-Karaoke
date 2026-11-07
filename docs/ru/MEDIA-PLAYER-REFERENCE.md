@@ -1,3 +1,4 @@
+Русский | [English](../en/MEDIA-PLAYER-REFERENCE.md)
 # Microsoft Media Player — референс UI и кодеков
 
 Дата осмотра: 2026-10-28.

@@ -1,3 +1,4 @@
+Русский | [English](../en/DIAGNOSTICS.md)
 # Logging and error reports
 
 ## Log files

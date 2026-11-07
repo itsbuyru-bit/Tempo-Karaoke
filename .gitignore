@@ -8,27 +8,27 @@
 *.appx
 *.appxbundle
 *.appxupload
+publish/
 
-# Signing material (never commit dev certificates)
+# Signing material (never commit certificates)
 *.pfx
 *.cer
+certs/
 
-# Reasonix runtime state and agent-only skills
+# Local agent tooling and runtime state
 .reasonix/
-
-# Agent tooling config (локальная настройка MCP)
 .mcp.json
 
-# Исходники иконок и скриншоты — не нужны для сборки приложения
+# Icon sources and local screenshots (not needed for the app build)
 /ico/
 /screenshot.png
 /thumb-test.png
 
-# Постеры-макеты с чужой медиатекой: остаются локально, в репозиторий не идут
+# Poster mockups that contain third-party media stay local
 /poster/*.jpg
 /poster/store/
 
-# IDE / user
+# IDE / user files
 .vs/
 .idea/
 *.user
@@ -40,22 +40,14 @@
 *.binlog
 crash/
 
-# Publish output
-publish/
-
 # Installer output
 artifacts/
 
-# Signing material (never commit dev certificates)
-*.pfx
-*.cer
-certs/
-
-# OS
+# OS files
 .DS_Store
 Thumbs.db
 
-# Local scratch/export files (not part of the app)
+# Local scratch/export files
 export.json
 Export.md
 tempokaraoke_mobile_remote.html

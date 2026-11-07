@@ -1,3 +1,5 @@
+English | [Русский](../ru/WIFI-DIRECT.md)
+
 # Wi-Fi Direct: BSOD risk and safe mode
 
 ## Observed problem

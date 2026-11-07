@@ -1,232 +1,234 @@
-# 🎤 Tempo Karaoke — караоке-плеер с умным поиском
+English | [Русский](README.ru.md)
+
+# 🎤 Tempo Karaoke — a karaoke player with smart search
 
 [![Platform](https://img.shields.io/badge/platform-Windows%2010%20%2F%2011-blue?style=flat-square)](https://microsoft.com)
 [![Framework](https://img.shields.io/badge/.NET-10.0-purple?style=flat-square)](https://dotnet.microsoft.com/)
 [![UI](https://img.shields.io/badge/UI-WinUI%203-blue?style=flat-square)](https://learn.microsoft.com/windows/apps/winui/winui3/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](LICENSE)
 
-Современный нативный видео-караоке плеер для Windows с поддержкой произвольных локальных медиатек, настраиваемой очереди воспроизведения, умного поиска и управления со смартфонов через веб-пульт.
+A modern, native video karaoke player for Windows that works with any local media library. It combines a customizable playback queue and instant search with phone-based control through a built-in web remote.
 
-* Стек: **WinUI 3 (Windows App SDK, .NET) + LibVLCSharp + SQLite**
-* Архитектура и UX: [`docs/UX-DECISIONS.md`](docs/UX-DECISIONS.md)
-* Сборка и упаковка: [`docs/PACKAGING.md`](docs/PACKAGING.md)
-* Окно, DPI и запуск: [`docs/WINDOW-PLACEMENT.md`](docs/WINDOW-PLACEMENT.md)
-* Что нового: [`CHANGELOG.md`](CHANGELOG.md)
-* Руководство по переводу: [`LOCALIZATION_GUIDE.md`](LOCALIZATION_GUIDE.md)
+* Stack: **WinUI 3 (Windows App SDK, .NET) + LibVLCSharp + SQLite**
+* Website: [Tempo Karaoke](https://itsbuyru-bit.github.io/Tempo-Karaoke/)
+* Architecture and UX: [`docs/en/UX-DECISIONS.md`](docs/en/UX-DECISIONS.md)
+* Build and packaging: [`docs/en/PACKAGING.md`](docs/en/PACKAGING.md)
+* Window, DPI and startup: [`docs/en/WINDOW-PLACEMENT.md`](docs/en/WINDOW-PLACEMENT.md)
+* What's new: [`CHANGELOG.md`](CHANGELOG.md)
+* Complete feature guide: [`docs/en/FEATURES.md`](docs/en/FEATURES.md)
+* Localization guide: [`docs/en/LOCALIZATION.md`](docs/en/LOCALIZATION.md)
 
 ![Tempo Karaoke Banner](docs/assets/banner.png)
 
 ---
 
-## 📑 Содержание
+## 📑 Table of Contents
 
-- [О проекте](#-о-проекте)
-- [Ключевые возможности](#-ключевые-возможности)
-- [Архитектура приложения](#-архитектура-приложения)
-- [Сборка и запуск](#-сборка-и-запуск)
-- [Первоначальная настройка](#-первоначальная-настройка)
-- [Локализация (i18n)](#-локализация-i18n)
-- [Участие в разработке](#-участие-в-разработке-contributing)
-- [Лицензия](#-лицензия)
-
----
-
-## 📌 О проекте
-
-Tempo Karaoke создан для организации караоке-вечеринок дома, в заведениях или на выездных мероприятиях. 
-
-Главная ценность приложения — не просто воспроизведение файлов, а **удобная работа с каталогом, мгновенный поиск и совместное управление очередью**. Больше не нужно толпиться у одного монитора или передавать мышь:
-* Видеоряд выводится на основной монитор, телевизор или проектор (включая режим отдельного окна).
-* Гости и ведущий ищут песни и управляют воспроизведением прямо со своих смартфонов через браузер.
-
-> ℹ️ **Примечание**: Репозиторий содержит исключительно плеер и сопутствующие сервисы. Медиатека не входит в комплект поставки — приложение индексирует любые локальные видеофайлы пользователя.
+- [About the Project](#-about-the-project)
+- [Key Features](#-key-features)
+- [Application Architecture](#-application-architecture)
+- [Building and Running](#-building-and-running)
+- [Initial Setup](#-initial-setup)
+- [Localization (i18n)](#-localization-i18n)
+- [Contributing](#-contributing)
+- [License](#-license)
 
 ---
 
-## ✨ Ключевые возможности
+## 📌 About the Project
 
-* 🎬 **Воспроизведение видео**: поддержка форматов `.mkv`, `.mp4` и других через движок LibVLC (включая аппаратное декодирование и встроенные субтитры/текст).
-* 📁 **Локальная медиатека**:
-  * Сканирование произвольных пользовательских папок.
-  * Быстрый кэш в SQLite (`media.db`) по `mtime` и размеру файла — мгновенный старт при повторных запусках.
-  * Автоматическое извлечение метаданных (разрешение, длительность, обложки).
-* 🔍 **Умный поиск на лету**:
-  * Отклик быстрее одного кадра благодаря индексу в оперативной памяти.
-  * Очистка названий от технического мусора, тегов и пометок качества.
-  * Двойная транслитерация (RU ↔ EN) и автоисправление неверной раскладки клавиатуры.
-  * Устойчивость к опечаткам (алгоритмы нечеткого поиска) и ранжирование по релевантности.
-  * Автоматическая группировка дубликатов и разных версий одной песни в единую карточку.
-* 📋 **Очередь и плейлисты**:
-  * Сохранение очереди между перезапусками приложения.
-  * Drag-and-drop сортировка, плавный переход к следующему треку.
-  * Создание именованных списков, импорт и экспорт плейлистов в формате **M3U/M3U8**.
-* 🖥 **Режимы отображения**:
-  * Полноэкранный режим.
-  * Открепление видеопотока в отдельное окно для вывода на второй монитор, проектор или ТВ с сохранением панели управления на основном экране.
-* 📱 **Веб-пульт со смартфона (Web Remote)**:
-  * Встроенный HTTP/WebSocket сервер: подключение по QR-коду без установки сторонних приложений.
-  * Работает внутри локальной сети Wi-Fi или через Wi-Fi Direct (прямое подключение без роутера).
-  * Разделение ролей:
-    * **Гость**: поиск по каталогу, просмотр списка ожидания, заказ треков.
-    * **Ведущий**: авторизация по 4-значному PIN-коду, полный транспортный контроль (плей, пауза, стоп, громкость, пропуск), модерация и сортировка очереди.
-    * Отображение имени заказчика в очереди треков.
-* 🔐 **Постоянный PIN**: в настройках можно заменить случайный PIN ведущего и
-  администратора постоянным. Хранятся только соль и PBKDF2-хеш.
-* 🧾 **Диагностика**: ротируемые логи, отчёт об ошибке в ZIP с системной
-  информацией и маскированием приватных данных.
-* 📶 **Безопасный Wi-Fi Direct**: проверка активного Wi-Fi, машина состояний,
-  сериализованные операции и безопасный режим по умолчанию.
+Tempo Karaoke is built for karaoke nights at home, in a venue, or at an off-site event.
+
+The real value here isn't just file playback. It's **a catalogue that's a pleasure to browse, search that answers instantly, and a queue everyone can manage together**. No more crowding around a single monitor or passing the mouse back and forth:
+* Video plays on your main monitor, TV, or projector — including a detached-window mode.
+* Guests and the host search for songs and control playback from their own phones, right in the browser.
+
+> ℹ️ **Note**: This repository ships the player and its supporting services only. No media library is included — the app indexes any local video files you already have.
 
 ---
 
-## 🏗 Архитектура приложения
+## ✨ Key Features
+
+* 🎬 **Video playback**: `.mkv`, `.mp4` and other formats through the LibVLC engine, with hardware decoding and embedded subtitles/lyrics.
+* 📁 **Local media library**:
+  * Scans any folders you point it at.
+  * Fast SQLite cache (`media.db`) keyed on file `mtime` and size, so later launches start instantly.
+  * Automatic metadata extraction (resolution, duration, artwork).
+* 🔍 **Smart search as you type**:
+  * Answers in under a frame, thanks to the in-memory index.
+  * Strips titles of technical noise, tags, and quality markers.
+  * Two-way transliteration (RU ↔ EN) plus automatic fixes for the wrong keyboard layout.
+  * Tolerant of typos (fuzzy matching), ranked by relevance.
+  * Duplicates and alternate versions of the same song are grouped into a single card automatically.
+* 📋 **Queue and playlists**:
+  * The queue survives app restarts.
+  * Drag-and-drop reordering and a smooth transition to the next track.
+  * Named lists, plus playlist import and export in **M3U/M3U8** format.
+* 🖥 **Display modes**:
+  * Full-screen mode.
+  * Detach the video stream into its own window for a second monitor, projector, or TV, while the controls stay on the main screen.
+* 📱 **Web remote on your phone**:
+  * Built-in HTTP/WebSocket server: connect by scanning a QR code, with nothing to install.
+  * Works over your local Wi-Fi network or through Wi-Fi Direct (a direct connection with no router).
+  * Separate roles:
+    * **Guest**: search the catalogue, see what's coming up, and request tracks.
+    * **Host**: sign in with a 4-digit PIN for full transport control (play, pause, stop, volume, skip), plus queue moderation and reordering.
+    * Requester names are shown next to each queued track.
+* 🔐 **Persistent PIN**: in Settings you can replace the random host and administrator PINs with permanent ones. Only the salt and the PBKDF2 hash are stored.
+* 🧾 **Diagnostics**: rotating logs, and a ZIP error report with system information and private data masked.
+* 📶 **Safe Wi-Fi Direct**: active Wi-Fi checks, an explicit state machine, serialized operations, and a safe-by-default mode.
+
+---
+
+## 🏗 Application Architecture
 
     WinUI 3 (Windows App SDK, .NET)
-    ├── UI: Каталог, умный поиск, очередь, полноэкранный и открепленный режимы
-    ├── Core: Сканер папок, нормализатор имен, поисковый индекс в памяти
-    ├── Storage: SQLite (кэш медиатеки, плейлисты, история, сессии)
-    ├── Remote: Встроенный веб-сервер пульта (WebSockets / HTTP)
+    ├── UI: Catalogue, smart search, queue, full-screen and detached modes
+    ├── Core: Folder scanner, title normalizer, in-memory search index
+    ├── Storage: SQLite (media cache, playlists, history, sessions)
+    ├── Remote: Built-in web remote server (WebSockets / HTTP)
     └── Playback: LibVLCSharp.WinUI -> libvlc
 
-### Хранение данных
+### Data storage
 
-Пользовательские данные сохраняются в папке приложения (`%LocalAppData%\TempoKaraoke` для portable-версии или `LocalState` для пакета MSIX):
-* `media.db` — SQLite-база со свойствами проиндексированных файлов и путями к обложкам.
-* `settings.json` — настройки приложения (тема, пути к медиатеке, логика пульта).
-* `queue.json` — сохраненная очередь с привязкой к отправителям.
-* `playlists.json` — пользовательские плейлисты.
-* `remote-clients.json` — кэш авторизованных устройств.
-* `logs/` — ротируемые журналы приложения и помощника Wi-Fi Direct.
-* `Reports/` — ZIP-отчёты об ошибках, созданные пользователем.
-* `settings.json` также содержит блок `Security` с солью и хешем постоянных PIN
-  (сам PIN не сохраняется).
+User data lives in the app's data folder (`%LocalAppData%\TempoKaraoke` for the portable build, or `LocalState` for the MSIX package):
+* `media.db` — SQLite database holding indexed file properties and artwork paths.
+* `settings.json` — app settings (theme, media library paths, remote behaviour).
+* `queue.json` — the saved queue, with tracks attributed to whoever requested them.
+* `playlists.json` — user playlists.
+* `remote-clients.json` — cache of authorized devices.
+* `logs/` — rotating application logs, plus logs from the Wi-Fi Direct helper.
+* `Reports/` — ZIP error reports created by the user.
+* `settings.json` also contains a `Security` block with the salt and hash of the persistent PINs
+  (the PIN itself is never stored).
 
 ---
 
-## 🚀 Сборка и запуск
+## 🚀 Building and Running
 
-### Требования к окружению
-* Windows 10 (сборка 19041+) или Windows 11
+### Requirements
+* Windows 10 (build 19041+) or Windows 11
 * .NET SDK 10
-* Отдельная установка VLC не нужна: `libvlc` приходит NuGet-пакетом `VideoLAN.LibVLC.Windows`
-* Visual Studio с компонентами Windows App SDK / WinUI 3 или WinApp CLI
+* No separate VLC installation is needed: `libvlc` comes in with the `VideoLAN.LibVLC.Windows` NuGet package
+* Visual Studio with the Windows App SDK / WinUI 3 components, or the WinApp CLI
 
-### Запуск через WinApp CLI
+### Running through the WinApp CLI
     winapp run src/TempoKaraoke --arch x64
 
-### Сборка решения и запуск тестов
+### Building the solution and running tests
     dotnet build TempoKaraoke.slnx -c Debug
     dotnet test tests/TempoKaraoke.Tests/TempoKaraoke.Tests.csproj
 
-### Публикация Release-сборки
+### Publishing a Release build
     dotnet publish src/TempoKaraoke -c Release -p:Platform=x64 -p:RuntimeIdentifier=win-x64
 
-### Скрипты упаковки
-* `.\scripts\build-installer.ps1` — сборка классического установщика через Inno Setup
-* `.\scripts\make-cert.ps1` — генерация локального сертификата разработки
-* `.\scripts\build-msix.ps1 -Mode sideload` — формирование подписанного пакета MSIX
-* `.\scripts\install-msix.cmd` — быстрая установка MSIX-пакета на рабочий ПК
+### Packaging scripts
+* `.\scripts\build-installer.ps1` — build the classic installer with Inno Setup
+* `.\scripts\make-cert.ps1` — generate a local development certificate
+* `.\scripts\build-msix.ps1 -Mode sideload` — produce a signed MSIX package
+* `.\scripts\install-msix.cmd` — install the MSIX package on your machine in one step
 
-Подробности процесса описаны в [`docs/PACKAGING.md`](docs/PACKAGING.md).
-
----
-
-## 🛠 Первоначальная настройка
-
-1. **Добавление папок**: откройте раздел **«Библиотека видео»** или перейдите в **«Параметры»**, нажмите **«Добавить папку»** и укажите директории с вашими видеофайлами. Сканер автоматически сформирует каталог и сохранит кэш.
-2. **Включение пульта**: перейдите в раздел **«Web remote»**. На экране появится QR-код и локальный адрес сервера.
-3. **Подключение устройств**: подключите телефон к той же Wi-Fi сети (или к сети Wi-Fi Direct ПК) и отсканируйте код.
+The full process is described in [`docs/en/PACKAGING.md`](docs/en/PACKAGING.md).
 
 ---
 
-## 🌍 Локализация (i18n)
+## 🛠 Initial Setup
 
-Интерфейс программы и веб-пульта поддерживает мультиязычность. Единый источник
-переводов — папка `localization/` с `manifest.json` и плоскими JSON-каталогами:
+1. **Add folders**: open **Video library**, or go to **Settings**, click **Add folder**, and pick the directories holding your video files. The scanner builds the catalogue and caches it for you.
+2. **Turn on the remote**: open **Web remote**. A QR code and the local server address appear on screen.
+3. **Connect devices**: join the phone to the same Wi-Fi network (or to the PC's Wi-Fi Direct network) and scan the code.
+
+---
+
+## 🌍 Localization (i18n)
+
+Both the desktop interface and the web remote are multilingual. Translations come from a
+single source: the `localization/` folder, with `manifest.json` and flat JSON catalogues:
 
 ```text
-localization/manifest.json   ← единственный список поддерживаемых языков
-localization/en-US.json      ← базовая и fallback-локаль
+localization/manifest.json   ← the only list of supported languages
+localization/en-US.json      ← base and fallback locale
 localization/ru-RU.json
 ```
 
-Из них генерируются desktop-ресурсы `Strings/<tag>/Resources.resw` и веб-файлы
+These generate the desktop resources `Strings/<tag>/Resources.resw` and the web files
 `public/locales/<tag>.json`:
 
 ```powershell
 node scripts/localization/generate.mjs
 ```
 
-Новый язык добавляется созданием файла и одной записи в `manifest.json` — без
-правки C#-кода и селектора языка. При первом запуске приложение выбирает язык
-Windows (если он есть в манифесте), ручной выбор сохраняется в `settings.json`.
-Недостающие ключи автоматически берутся из `en-US`. Веб-пульт использует те же
-теги и динамически заполняет селектор из `/locale-manifest.json`.
+Adding a language takes one new file and one entry in `manifest.json` — no changes to C# code
+or to the language selector. On first launch the app picks the Windows language (if the manifest
+lists it); a manual choice is saved to `settings.json`. Missing keys fall back to `en-US`
+automatically. The web remote uses the same tags and populates its selector dynamically from
+`/locale-manifest.json`.
 
-Подробности — [`LOCALIZATION_GUIDE.md`](LOCALIZATION_GUIDE.md).
-
----
-
-## 📝 Диагностика, логи и отчёты
-
-* Логи: `%LocalAppData%\TempoKaraoke\logs\` (portable) или `LocalState\logs\`
-  (MSIX). Основной лог ротируется по 5 МБ, хранится 5 файлов.
-* В лог попадают версия, ОС, архитектура, язык, состояние Wi-Fi-адаптера и
-  подключения, шаги Wi-Fi Direct, исключения с `HRESULT` и идентификаторы
-  операций.
-* Падения (`AppDomain`, `TaskScheduler`, WinUI) пишутся всегда, даже при
-  выключенном обычном логировании.
-* **Параметры → Диагностика → Отчёт об ошибке** собирает ZIP с логами,
-  системной информацией, санитизированными настройками и состоянием
-  локализации. Пути к медиафайлам, PIN, SSID и MAC-адреса маскируются.
-* В отчёт не включается мини-дамп; при BSOD используйте системный
-  `%SystemRoot%\Minidump`.
-
-Подробности — [`docs/DIAGNOSTICS.md`](docs/DIAGNOSTICS.md).
+For details, see [`docs/en/LOCALIZATION.md`](docs/en/LOCALIZATION.md).
 
 ---
 
-## 🔒 Безопасность пульта
+## 📝 Diagnostics, Logs and Reports
 
-* PIN ведущего и администратора по умолчанию случайный на каждую сессию.
-* В **Параметрах → Безопасность** можно включить постоянный PIN (4–8 цифр).
-  Хранятся только соль и PBKDF2-SHA256-хеш (100 000 итераций), не сам PIN.
-* После 5 неудачных попыток роль блокируется на 5 минут; в лог попадает только
-  факт ошибки, роль и номер попытки.
+* Logs: `%LocalAppData%\TempoKaraoke\logs\` (portable) or `LocalState\logs\`
+  (MSIX). The main log rotates at 5 MB and keeps 5 files.
+* Entries record the version, OS, architecture, language, Wi-Fi adapter and connection
+  state, Wi-Fi Direct steps, exceptions with `HRESULT`, and operation identifiers.
+* Crashes (`AppDomain`, `TaskScheduler`, WinUI) are always logged, even when regular
+  logging is switched off.
+* **Settings → Diagnostics → Error report** assembles a ZIP with logs, system
+  information, sanitized settings, and localization state. Media file paths, PINs,
+  SSIDs, and MAC addresses are masked.
+* The report contains no mini dump; after a BSOD, use the system
+  `%SystemRoot%\Minidump` folder.
 
-Подробности — [`docs/PIN-SECURITY.md`](docs/PIN-SECURITY.md).
-
----
-
-## 📶 Wi-Fi Direct и риск BSOD
-
-Wi-Fi Direct запускается в отдельном процессе-помощнике. Перед стартом
-приложение проверяет адаптер и активное Wi-Fi-подключение, сериализует все
-операции и ведёт явную машину состояний. **Безопасный режим** (включён по
-умолчанию) блокирует Wi-Fi Direct, пока ПК подключён к Wi-Fi; при выключенном
-режиме показывается предупреждение о риске конфликта драйвера.
-
-Сбои уровня ядра (`IRQL_NOT_LESS_OR_EQUAL`, `0xA`) приложением не устраняются:
-если они продолжаются, обновите драйвер Wi-Fi, BIOS/UEFI и Windows. Полное
-описание, ограничения и чек-лист — [`docs/WIFI-DIRECT.md`](docs/WIFI-DIRECT.md).
+For details, see [`docs/en/DIAGNOSTICS.md`](docs/en/DIAGNOSTICS.md).
 
 ---
 
-## 🤝 Участие в разработке (Contributing)
+## 🔒 Remote Security
 
-Пулл-реквесты приветствуются! Если вы хотите исправить баг, предложить оптимизацию алгоритма поиска или добавить фичу:
+* The host and administrator PINs are random by default and regenerated for every session.
+* Under **Settings → Security** you can switch to a persistent PIN (4–8 digits).
+  Only the salt and the PBKDF2-SHA256 hash are stored (100,000 iterations) — never the PIN itself.
+* After 5 failed attempts the role is locked for 5 minutes; the log records only the
+  fact of the failure, the role, and the attempt number.
 
-1. Сделайте **Fork** проекта.
-2. Создайте свою feature-ветку:
+For details, see [`docs/en/PIN-SECURITY.md`](docs/en/PIN-SECURITY.md).
+
+---
+
+## 📶 Wi-Fi Direct and the BSOD Risk
+
+Wi-Fi Direct runs in a separate helper process. Before starting it, the app checks the
+adapter and the active Wi-Fi connection, serializes all operations, and follows an
+explicit state machine. **Safe mode** (on by default) blocks Wi-Fi Direct while the PC
+is connected to Wi-Fi; with safe mode off, the app warns about the risk of a driver
+conflict.
+
+Kernel-level faults (`IRQL_NOT_LESS_OR_EQUAL`, `0xA`) cannot be fixed by the app:
+if they keep occurring, update your Wi-Fi driver, BIOS/UEFI, and Windows. For the full
+description, limitations, and checklist, see [`docs/en/WIFI-DIRECT.md`](docs/en/WIFI-DIRECT.md).
+
+---
+
+## 🤝 Contributing
+
+Pull requests are welcome! If you want to fix a bug, suggest a search algorithm improvement, or add a feature:
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for build/test commands, code style and the release process.
+
+1. **Fork** the project.
+2. Create a feature branch:
        git checkout -b feature/awesome-feature
-3. Зафиксируйте изменения:
-       git commit -m "Add: краткое описание изменений"
-4. Отправьте ветку в удаленный репозиторий:
+3. Commit your changes:
+       git commit -m "Add: brief description of changes"
+4. Push the branch to your fork:
        git push origin feature/awesome-feature
-5. Откройте **Pull Request**.
+5. Open a **Pull Request**.
 
 ---
 
-## 📄 Лицензия
+## 📄 License
 
-Проект распространяется под лицензией [MIT](LICENSE). Компоненты воспроизведения используют библиотеки проекта VideoLAN в соответствии с условиями лицензии LGPL-2.1.
+The project is distributed under the [MIT](LICENSE) license. Playback components use the VideoLAN project libraries in accordance with the terms of the LGPL-2.1 license.
