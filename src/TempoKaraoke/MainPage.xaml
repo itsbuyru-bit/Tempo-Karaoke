@@ -540,20 +540,45 @@
                     Visibility="Collapsed" />
             </NavigationView.MenuItems>
             <NavigationView.FooterMenuItems>
-                <NavigationViewItem x:Name="SettingsNavItem" Tag="settings" x:Uid="Ui_Settings" loc:Localization.Key="Ui_Settings.Content">
+                <NavigationViewItem
+                    x:Name="SettingsNavItem"
+                    Tag="settings"
+                    AutomationProperties.AutomationId="SettingsNavItem"
+                    HorizontalContentAlignment="Stretch">
                     <NavigationViewItem.Icon>
                         <SymbolIcon Symbol="Setting" />
                     </NavigationViewItem.Icon>
-                    <NavigationViewItem.InfoBadge>
-                        <InfoBadge
-                            x:Name="SettingsUpdateBadge"
-                            AutomationProperties.AutomationId="SettingsUpdateBadge"
-                            Style="{StaticResource InformationalDotInfoBadgeStyle}"
-                            Visibility="Collapsed"
-                            loc:Localization.AutomationNameKey="Update_Badge_AutomationName.AutomationName"
-                            loc:Localization.ToolTipKey="Update_Badge_ToolTip.ToolTip" />
-                    </NavigationViewItem.InfoBadge>
-
+                    <NavigationViewItem.Content>
+                        <Grid
+                            HorizontalAlignment="Stretch"
+                            ColumnSpacing="8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock
+                                x:Name="SettingsNavText"
+                                VerticalAlignment="Center"
+                                loc:Localization.Key="Ui_Settings_123.Text" />
+                            <Border
+                                x:Name="SettingsUpdatePlaque"
+                                Grid.Column="1"
+                                Padding="6,2"
+                                VerticalAlignment="Center"
+                                Background="{ThemeResource AccentFillColorDefaultBrush}"
+                                CornerRadius="10"
+                                Tapped="SettingsUpdatePlaque_Tapped"
+                                Visibility="Collapsed"
+                                loc:Localization.AutomationNameKey="Update_BadgePlaque_AutomationName.AutomationName"
+                                loc:Localization.ToolTipKey="Update_BadgePlaque_ToolTip.ToolTip">
+                                <TextBlock
+                                    x:Name="SettingsUpdatePlaqueText"
+                                    FontSize="11"
+                                    Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
+                                    Style="{StaticResource CaptionTextBlockStyle}" />
+                            </Border>
+                        </Grid>
+                    </NavigationViewItem.Content>
                 </NavigationViewItem>
                 <NavigationViewItem x:Name="AboutNavItem" Tag="about" x:Uid="Navigation_About" loc:Localization.Key="Navigation_About.Content">
                     <NavigationViewItem.Icon>

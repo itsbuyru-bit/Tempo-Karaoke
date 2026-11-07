@@ -625,6 +625,10 @@
   <data name="Ui_WifiSafeModeToggle.OnContent" xml:space="preserve"><value>On</value></data>
   <data name="Ui_YouHaveNoPlaylists.Text" xml:space="preserve"><value>You have no playlists</value></data>
   <data name="Update_Available" xml:space="preserve"><value>New version available: v{0} (current: v{1})</value></data>
+  <data name="Update_BadgeNew" xml:space="preserve"><value>New</value></data>
+  <data name="Update_BadgePlaque_AutomationName.AutomationName" xml:space="preserve"><value>Update available — open the Updates section</value></data>
+  <data name="Update_BadgePlaque_ToolTip.ToolTip" xml:space="preserve"><value>Update available. Open the Updates section</value></data>
+  <data name="Update_BadgeUpdate" xml:space="preserve"><value>Update</value></data>
   <data name="Update_Badge_AutomationName.AutomationName" xml:space="preserve"><value>Update available</value></data>
   <data name="Update_Badge_ToolTip.ToolTip" xml:space="preserve"><value>Update available</value></data>
   <data name="Update_Checking" xml:space="preserve"><value>Checking for updates...</value></data>
@@ -638,10 +642,13 @@
   <data name="Update_Installing" xml:space="preserve"><value>Starting the installer…</value></data>
   <data name="Update_NetworkError" xml:space="preserve"><value>Failed to check for updates. Check your internet connection.</value></data>
   <data name="Update_NotConfigured" xml:space="preserve"><value>Update channel is not configured.</value></data>
-  <data name="Update_ToastBody.Text" xml:space="preserve"><value>Version {0} is ready to install</value></data>
-  <data name="Update_ToastInstall.Content" xml:space="preserve"><value>Install</value></data>
-  <data name="Update_ToastLater.Content" xml:space="preserve"><value>Later</value></data>
-  <data name="Update_ToastTitle.Text" xml:space="preserve"><value>New update available</value></data>
+  <data name="Update_ToastAttribution" xml:space="preserve"><value>Published {0}</value></data>
+  <data name="Update_ToastBody" xml:space="preserve"><value>Installed {0}. What's new: {1} • {2}</value></data>
+  <data name="Update_ToastBodyNoNotes" xml:space="preserve"><value>Installed {0} • {1}</value></data>
+  <data name="Update_ToastChangelog" xml:space="preserve"><value>What's new</value></data>
+  <data name="Update_ToastInstall" xml:space="preserve"><value>Install</value></data>
+  <data name="Update_ToastLater" xml:space="preserve"><value>Later</value></data>
+  <data name="Update_ToastTitle" xml:space="preserve"><value>TempoKaraoke update available</value></data>
   <data name="Update_UpToDate" xml:space="preserve"><value>You have the latest version installed (v{0})</value></data>
   <data name="Wifi_DiagnosticsTemplate" xml:space="preserve"><value>Adapter: {0} ({1})
 Connection: {2}

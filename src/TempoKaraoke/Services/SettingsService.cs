@@ -242,15 +242,38 @@ public static class SettingsService
     public static string PendingUpdateVersion
     {
         get => Data.PendingUpdateVersion;
-        set => Update(data => data.PendingUpdateVersion = value ?? string.Empty);
+        set
+        {
+            var next = value ?? string.Empty;
+            if (string.Equals(Data.PendingUpdateVersion, next, StringComparison.Ordinal))
+            {
+                return;
+            }
+
+            Update(data => data.PendingUpdateVersion = next);
+            UpdateStateChanged?.Invoke();
+        }
     }
 
     /// <summary>Версия, которую пользователь отложил: бейдж скрыт до следующего релиза.</summary>
     public static string DismissedUpdateVersion
     {
         get => Data.DismissedUpdateVersion;
-        set => Update(data => data.DismissedUpdateVersion = value ?? string.Empty);
+        set
+        {
+            var next = value ?? string.Empty;
+            if (string.Equals(Data.DismissedUpdateVersion, next, StringComparison.Ordinal))
+            {
+                return;
+            }
+
+            Update(data => data.DismissedUpdateVersion = next);
+            UpdateStateChanged?.Invoke();
+        }
     }
+
+    /// <summary>Состояние доступного обновления изменилось (бейдж/тост).</summary>
+    public static event Action? UpdateStateChanged;
 
     /// <summary>Показывать ли бейдж «есть обновление» для установленной версии.</summary>
     public static bool ShouldShowUpdateBadge(string installedVersion) =>

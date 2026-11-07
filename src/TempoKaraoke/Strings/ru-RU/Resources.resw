@@ -625,6 +625,10 @@
   <data name="Ui_WifiSafeModeToggle.OnContent" xml:space="preserve"><value>Вкл.</value></data>
   <data name="Ui_YouHaveNoPlaylists.Text" xml:space="preserve"><value>У вас нет списков воспроизведения</value></data>
   <data name="Update_Available" xml:space="preserve"><value>Доступна новая версия: v{0} (текущая: v{1})</value></data>
+  <data name="Update_BadgeNew" xml:space="preserve"><value>Новое</value></data>
+  <data name="Update_BadgePlaque_AutomationName.AutomationName" xml:space="preserve"><value>Доступно обновление — открыть раздел обновлений</value></data>
+  <data name="Update_BadgePlaque_ToolTip.ToolTip" xml:space="preserve"><value>Доступно обновление. Открыть раздел «Обновления»</value></data>
+  <data name="Update_BadgeUpdate" xml:space="preserve"><value>Обновление</value></data>
   <data name="Update_Badge_AutomationName.AutomationName" xml:space="preserve"><value>Доступно обновление</value></data>
   <data name="Update_Badge_ToolTip.ToolTip" xml:space="preserve"><value>Доступно обновление</value></data>
   <data name="Update_Checking" xml:space="preserve"><value>Проверка обновлений...</value></data>
@@ -638,10 +642,13 @@
   <data name="Update_Installing" xml:space="preserve"><value>Запускаю установщик…</value></data>
   <data name="Update_NetworkError" xml:space="preserve"><value>Не удалось проверить обновления. Проверьте подключение к интернету.</value></data>
   <data name="Update_NotConfigured" xml:space="preserve"><value>Канал обновлений не настроен.</value></data>
-  <data name="Update_ToastBody.Text" xml:space="preserve"><value>Версия {0} готова к установке</value></data>
-  <data name="Update_ToastInstall.Content" xml:space="preserve"><value>Установить</value></data>
-  <data name="Update_ToastLater.Content" xml:space="preserve"><value>Позже</value></data>
-  <data name="Update_ToastTitle.Text" xml:space="preserve"><value>Доступно новое обновление</value></data>
+  <data name="Update_ToastAttribution" xml:space="preserve"><value>Опубликовано {0}</value></data>
+  <data name="Update_ToastBody" xml:space="preserve"><value>Установлена {0}. Что нового: {1} • {2}</value></data>
+  <data name="Update_ToastBodyNoNotes" xml:space="preserve"><value>Установлена {0} • {1}</value></data>
+  <data name="Update_ToastChangelog" xml:space="preserve"><value>Что нового</value></data>
+  <data name="Update_ToastInstall" xml:space="preserve"><value>Установить</value></data>
+  <data name="Update_ToastLater" xml:space="preserve"><value>Позже</value></data>
+  <data name="Update_ToastTitle" xml:space="preserve"><value>Доступно обновление TempoKaraoke</value></data>
   <data name="Update_UpToDate" xml:space="preserve"><value>У вас установлена актуальная версия (v{0})</value></data>
   <data name="Wifi_DiagnosticsTemplate" xml:space="preserve"><value>Адаптер: {0} ({1})
 Подключение: {2}

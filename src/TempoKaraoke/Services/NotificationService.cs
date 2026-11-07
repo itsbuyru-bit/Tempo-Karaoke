@@ -7,14 +7,14 @@ namespace TempoKaraoke.Services;
 /// <summary>
 /// Системные уведомления (Windows App SDK). Если платформа не поддерживает
 /// AppNotification (или регистрация не удалась), методы возвращают false —
-/// вызывающая сторона остаётся с бейджем в приложении.
+/// вызывающая сторона остаётся с плашкой в приложении.
 /// </summary>
 public static class NotificationService
 {
     private static bool _initialized;
     private static bool _supported;
 
-    /// <summary>Пользователь нажал кнопку в уведомлении: "install" или "later".</summary>
+    /// <summary>Пользователь нажал кнопку/тело уведомления: install, postpone или open_update_page.</summary>
     public static event Action<string>? UpdateActionInvoked;
 
     public static bool IsSupported
@@ -36,11 +36,22 @@ public static class NotificationService
         _initialized = true;
         try
         {
+            if (!AppNotificationManager.IsSupported())
+            {
+                _supported = false;
+                return false;
+            }
+
             AppNotificationManager.Default.NotificationInvoked += (_, args) =>
             {
                 try
                 {
-                    UpdateActionInvoked?.Invoke(ParseAction(args.Argument));
+                    var action = UpdateActivationArguments.ParseAction(args.Argument);
+                    LogService.Info($"[update] notification activated argument='{args.Argument}' action='{action}'");
+                    if (!string.IsNullOrWhiteSpace(action))
+                    {
+                        UpdateActionInvoked?.Invoke(action);
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -60,13 +71,10 @@ public static class NotificationService
         return _supported;
     }
 
-    /// <summary>Показывает уведомление о доступном обновлении с кнопками.</summary>
-    public static bool TryShowUpdate(
-        string title,
-        string body,
-        string installLabel,
-        string laterLabel)
+    /// <summary>Показывает уведомление о доступном обновлении.</summary>
+    public static bool TryShowUpdate(UpdateToastContent content)
     {
+        ArgumentNullException.ThrowIfNull(content);
         if (!TryInitialize())
         {
             return false;
@@ -74,14 +82,19 @@ public static class NotificationService
 
         try
         {
-            var notification = new AppNotificationBuilder()
-                .AddText(title)
-                .AddText(body)
-                .AddButton(new AppNotificationButton(installLabel).AddArgument("action", "install"))
-                .AddButton(new AppNotificationButton(laterLabel).AddArgument("action", "later"))
-                .BuildNotification();
+            // Строки уже разрешены до построения XML; ключи ресурсов сюда не попадают.
+            var xml = UpdateToastBuilder.BuildXml(content);
+            var notification = new AppNotification(xml)
+            {
+                Tag = content.Tag,
+                Group = content.Group,
+                // Повторная проверка заменяет прежний тост, а не добавляет новый.
+                Expiration = DateTimeOffset.Now.AddHours(24),
+            };
 
             AppNotificationManager.Default.Show(notification);
+            LogService.Info(
+                $"[update] toast shown tag={content.Tag} group={content.Group} body='{content.Body}'");
             return true;
         }
         catch (Exception ex)
@@ -89,24 +102,5 @@ public static class NotificationService
             LogService.Warn($"Update notification failed: {ex.Message}");
             return false;
         }
-    }
-
-    private static string ParseAction(string? argument)
-    {
-        if (string.IsNullOrWhiteSpace(argument))
-        {
-            return string.Empty;
-        }
-
-        foreach (var pair in argument.Split('&', StringSplitOptions.RemoveEmptyEntries))
-        {
-            var parts = pair.Split('=', 2);
-            if (parts.Length == 2 && string.Equals(parts[0], "action", StringComparison.OrdinalIgnoreCase))
-            {
-                return parts[1];
-            }
-        }
-
-        return argument;
     }
 }

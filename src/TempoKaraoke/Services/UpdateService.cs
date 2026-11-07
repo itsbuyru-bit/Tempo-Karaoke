@@ -25,7 +25,13 @@ public enum UpdateCheckStatus
     Failed,
 }
 
-public sealed record UpdateInfo(string Version, string InstallerUrl, string ReleaseUrl, long InstallerSize);
+public sealed record UpdateInfo(
+    string Version,
+    string InstallerUrl,
+    string ReleaseUrl,
+    long InstallerSize,
+    string? Changelog = null,
+    DateTimeOffset? PublishedAt = null);
 
 public sealed record UpdateCheckResult(UpdateCheckStatus Status, UpdateInfo? Info = null, string? Error = null)
 {
@@ -105,7 +111,9 @@ public static class UpdateService
                 version.ToString(3),
                 asset.BrowserDownloadUrl!,
                 release.HtmlUrl!,
-                asset.Size);
+                asset.Size,
+                release.Body,
+                release.PublishedAt);
 
             return version.CompareTo(AppInfo.CurrentVersion) > 0
                 ? UpdateCheckResult.Available(info)
@@ -162,6 +170,14 @@ public static class UpdateService
             }
         }
     }
+
+    /// <summary>Путь, куда скачивается установщик конкретной версии.</summary>
+    public static string GetInstallerPath(string version) =>
+        Path.Combine(AppStorage.Folder, "updates", $"{InstallerPrefix}{version}{InstallerExtension}");
+
+    /// <summary>Установщик уже скачан и готов к запуску (для состояния «NEW»).</summary>
+    public static bool IsInstallerDownloaded(string? version) =>
+        !string.IsNullOrWhiteSpace(version) && File.Exists(GetInstallerPath(version));
 
     /// <summary>Скачивает установщик обновления и возвращает путь к нему.</summary>
     public static async Task<string> DownloadAsync(
@@ -314,6 +330,12 @@ internal sealed class GitHubRelease
 
     [JsonPropertyName("html_url")]
     public string? HtmlUrl { get; set; }
+
+    [JsonPropertyName("body")]
+    public string? Body { get; set; }
+
+    [JsonPropertyName("published_at")]
+    public DateTimeOffset? PublishedAt { get; set; }
 
     [JsonPropertyName("assets")]
     public GitHubReleaseAsset[]? Assets { get; set; }

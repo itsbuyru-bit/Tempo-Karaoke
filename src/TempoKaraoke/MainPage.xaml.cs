@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
@@ -256,6 +257,8 @@ public sealed partial class MainPage : Page, IRemoteHost, INotifyPropertyChanged
         Unloaded += OnPageUnloaded;
         NetworkInformation.NetworkStatusChanged += OnNetworkStatusChanged;
         NotificationService.UpdateActionInvoked += OnUpdateNotificationAction;
+        SettingsService.UpdateStateChanged += OnUpdateStateChanged;
+        App.UpdateActionRequested += OnUpdateActionRequested;
         MediaItem.TextResolver = LocalizationService.Get;
         InitializeSettings();
         NavView.PaneOpened += (_, _) => UpdateHeader();
@@ -3143,6 +3146,7 @@ public sealed partial class MainPage : Page, IRemoteHost, INotifyPropertyChanged
         RestoreEqualizer();
         _remoteIdleTimer.Start();
         App.Window.Closed += (_, _) => _ = HotspotService.StopAsync();
+        App.Window.Activated += OnWindowActivated;
         WiFiDirectCoordinator.StateChanged += OnWiFiDirectStateChanged;
         UpdateWifiDirectStateUi();
         _ = LoadPreviewAsync();
@@ -3150,6 +3154,7 @@ public sealed partial class MainPage : Page, IRemoteHost, INotifyPropertyChanged
         {
             _ = CheckForUpdatesAsync(userInitiated: false);
         }
+        UpdateBadgeVisibility();
 
         StartupTrace.Mark("MainPage loaded");
 
@@ -3162,6 +3167,13 @@ public sealed partial class MainPage : Page, IRemoteHost, INotifyPropertyChanged
                 InitializeAfterFirstRender();
                 StartupTrace.Mark("UI interactive");
                 StartupTrace.DumpTimeline();
+
+                // Холодный старт из тоста: страница уже готова к навигации.
+                var pending = App.TakePendingUpdateAction();
+                if (pending is not null)
+                {
+                    _ = HandleUpdateActionAsync(pending);
+                }
             });
     }
 
@@ -3189,6 +3201,13 @@ public sealed partial class MainPage : Page, IRemoteHost, INotifyPropertyChanged
         SavePlaybackPosition(force: true);
         NetworkInformation.NetworkStatusChanged -= OnNetworkStatusChanged;
         WiFiDirectCoordinator.StateChanged -= OnWiFiDirectStateChanged;
+        NotificationService.UpdateActionInvoked -= OnUpdateNotificationAction;
+        SettingsService.UpdateStateChanged -= OnUpdateStateChanged;
+        App.UpdateActionRequested -= OnUpdateActionRequested;
+        if (App.Window is not null)
+        {
+            App.Window.Activated -= OnWindowActivated;
+        }
         VideoView.Initialized -= OnVideoViewInitialized;
         _playerWindow?.Close();
         await _player.DetachAsync();
@@ -7440,6 +7459,8 @@ public sealed partial class MainPage : Page, IRemoteHost, INotifyPropertyChanged
             });
             var installer = await UpdateService.DownloadAsync(_pendingUpdate, progress);
 
+            // Установщик уже на диске: плашка меняется на NEW.
+            UpdateBadgeVisibility();
             _updateState = UpdateUiState.Installing;
             RefreshUpdateStatusText();
             if (UpdateService.LaunchInstaller(installer))
@@ -7575,7 +7596,7 @@ public sealed partial class MainPage : Page, IRemoteHost, INotifyPropertyChanged
                 _updateState = UpdateUiState.UpdateAvailable;
                 SettingsService.PendingUpdateVersion = result.Info.Version;
                 UpdateBadgeVisibility();
-                ShowUpdateNotification(result.Info.Version);
+                ShowUpdateNotification(result.Info);
                 break;
 
             case UpdateCheckStatus.UpToDate:
@@ -9305,34 +9326,75 @@ public sealed partial class MainPage : Page, IRemoteHost, INotifyPropertyChanged
         }
     }
 
-    // ── Бейдж и уведомление об обновлении ───────────────────────────────────
+    // ── Плашка и уведомление об обновлении ──────────────────────────────────
 
-    /// <summary>Бейдж на «О приложении» — единый индикатор доступного обновления.</summary>
+    private string _updateBadgeState = string.Empty;
+    private bool _handlingUpdateAction;
+
+    /// <summary>Плашка у «Параметры»: UPDATE пока доступно, NEW когда установщик скачан.</summary>
     private void UpdateBadgeVisibility()
     {
-        SettingsUpdateBadge.Visibility = SettingsService.ShouldShowUpdateBadge(AppInfo.DisplayVersion)
-            ? Visibility.Visible
-            : Visibility.Collapsed;
-    }
-
-    /// <summary>Системное уведомление справа снизу; при недоступности остаётся бейдж.</summary>
-    private void ShowUpdateNotification(string version)
-    {
-        if (!SettingsService.ShouldShowUpdateBadge(AppInfo.DisplayVersion))
+        if (SettingsUpdatePlaque is null)
         {
             return;
         }
 
-        var shown = NotificationService.TryShowUpdate(
-            LocalizationService.Get("Update_ToastTitle"),
-            LocalizationService.Format("Update_ToastBody", version),
-            LocalizationService.Get("Update_ToastInstall.Content"),
-            LocalizationService.Get("Update_ToastLater.Content"));
+        if (!SettingsService.ShouldShowUpdateBadge(AppInfo.DisplayVersion))
+        {
+            if (_updateBadgeState.Length > 0)
+            {
+                _updateBadgeState = string.Empty;
+                LogService.Info("[update] badge hidden");
+            }
 
-        LogService.Info($"[update] notification shown={shown} version={version}");
+            SettingsUpdatePlaque.Visibility = Visibility.Collapsed;
+            return;
+        }
+
+        var version = SettingsService.PendingUpdateVersion;
+        var ready = UpdateService.IsInstallerDownloaded(version);
+        var state = ready ? "new" : "update";
+
+        SettingsUpdatePlaqueText.Text = ready
+            ? UpdateToastLocalization.Get("Update_BadgeNew", "Новое", "New")
+            : UpdateToastLocalization.Get("Update_BadgeUpdate", "Обновление", "Update");
+        SettingsUpdatePlaque.Visibility = Visibility.Visible;
+
+        if (!string.Equals(_updateBadgeState, state, StringComparison.Ordinal))
+        {
+            _updateBadgeState = state;
+            LogService.Info($"[update] badge state={state} version='{version}'");
+        }
     }
 
-    /// <summary>«Напомнить позже»: убирает бейдж до следующего релиза.</summary>
+    private void OnUpdateStateChanged()
+    {
+        // Сервис может измениться из фонового потока — плашка только в UI-потоке.
+        DispatcherQueue.TryEnqueue(UpdateBadgeVisibility);
+    }
+
+    private void OnWindowActivated(object sender, Microsoft.UI.Xaml.WindowActivatedEventArgs args)
+    {
+        if (args.WindowActivationState != WindowActivationState.Deactivated)
+        {
+            UpdateBadgeVisibility();
+        }
+    }
+
+    private void OnUpdateActionRequested(string action)
+    {
+        // App кладёт действие в PendingUpdateAction; забираем ровно один раз.
+        var pending = App.TakePendingUpdateAction();
+        _ = HandleUpdateActionAsync(pending ?? action);
+    }
+
+    private void SettingsUpdatePlaque_Tapped(object sender, TappedRoutedEventArgs e)
+    {
+        e.Handled = true;
+        OpenUpdateSettings();
+    }
+
+    /// <summary>«Напомнить позже»: убирает плашку до следующего релиза.</summary>
     private void UpdateLater_Click(object sender, RoutedEventArgs e)
     {
         var version = _pendingUpdate?.Version ?? SettingsService.PendingUpdateVersion;
@@ -9343,20 +9405,141 @@ public sealed partial class MainPage : Page, IRemoteHost, INotifyPropertyChanged
         RefreshUpdateStatusText();
     }
 
-    /// <summary>Кнопки в системном уведомлении: установить или отложить.</summary>
+    /// <summary>Единая обработка тоста: install / postpone / open_update_page.</summary>
+    private async Task HandleUpdateActionAsync(string action)
+    {
+        if (_handlingUpdateAction)
+        {
+            return;
+        }
+
+        _handlingUpdateAction = true;
+        try
+        {
+            LogService.Info($"[update] handling action='{action}'");
+            switch (action)
+            {
+                case UpdateActivationArguments.Install:
+                    App.Window?.Activate();
+                    if (_pendingUpdate is null)
+                    {
+                        await CheckForUpdatesAsync(userInitiated: true);
+                    }
+
+                    if (_pendingUpdate is not null)
+                    {
+                        InstallUpdate_Click(this, new RoutedEventArgs());
+                    }
+
+                    break;
+
+                case UpdateActivationArguments.Postpone:
+                    UpdateLater_Click(this, new RoutedEventArgs());
+                    break;
+
+                default:
+                    OpenUpdateSettings();
+                    break;
+            }
+        }
+        finally
+        {
+            _handlingUpdateAction = false;
+        }
+    }
+
+    /// <summary>Открывает «Параметры › Обновления» из тоста или плашки.</summary>
+    private void OpenUpdateSettings()
+    {
+        try
+        {
+            NavView.SelectedItem = SettingsNavItem;
+            App.Window?.Activate();
+            ShowSettings();
+            OpenSettingsSection("updates");
+            LogService.Info("[update] navigated to Settings > Updates");
+        }
+        catch (Exception ex)
+        {
+            LogService.Warn($"[update] navigation failed: {ex.Message}");
+        }
+    }
+
+    /// <summary>Системное уведомление справа снизу; при недоступности остаётся плашка.</summary>
+    private void ShowUpdateNotification(UpdateInfo info)
+    {
+        if (!SettingsService.ShouldShowUpdateBadge(AppInfo.DisplayVersion))
+        {
+            return;
+        }
+
+        var highlights = UpdateToastBuilder.ExtractHighlights(info.Changelog);
+        var size = UpdateToastBuilder.FormatSize(info.InstallerSize);
+        var versionLine = $"{AppInfo.DisplayVersion} → {info.Version}";
+        var body = highlights.Count > 0
+            ? UpdateToastLocalization.Format(
+                "Update_ToastBody",
+                "Установлена {0}. Что нового: {1} • {2}",
+                "Installed {0}. What's new: {1} • {2}",
+                versionLine,
+                string.Join(" • ", highlights),
+                size)
+            : UpdateToastLocalization.Format(
+                "Update_ToastBodyNoNotes",
+                "Установлена {0} • {1}",
+                "Installed {0} • {1}",
+                versionLine,
+                size);
+
+        var attribution = info.PublishedAt is { } published
+            ? UpdateToastLocalization.Format(
+                "Update_ToastAttribution",
+                "Опубликовано {0}",
+                "Published {0}",
+                published.ToLocalTime().ToString("d", CultureInfo.CurrentCulture))
+            : null;
+
+        var content = new UpdateToastContent(
+            UpdateToastLocalization.Get(
+                "Update_ToastTitle",
+                "Доступно обновление TempoKaraoke",
+                "TempoKaraoke update available"),
+            body,
+            attribution,
+            UpdateToastLocalization.Get("Update_ToastInstall", "Установить", "Install"),
+            UpdateToastLocalization.Get("Update_ToastLater", "Позже", "Later"),
+            UpdateToastLocalization.Get("Update_ToastChangelog", "Что нового", "What's new"),
+            UpdateToastBuilder.OpenUpdatePageArgument,
+            ResolveAppLogoUri(),
+            DateTimeOffset.Now);
+
+        var shown = NotificationService.TryShowUpdate(content);
+        LogService.Info($"[update] notification shown={shown} version={info.Version}");
+    }
+
+    /// <summary>URI логотипа приложения для appLogoOverride.</summary>
+    private static string? ResolveAppLogoUri()
+    {
+        try
+        {
+            var path = Path.Combine(AppContext.BaseDirectory, "Assets", "AppIcon-192.png");
+            if (File.Exists(path))
+            {
+                return new Uri(path).AbsoluteUri;
+            }
+        }
+        catch (Exception ex)
+        {
+            LogService.Warn($"[update] app logo lookup failed: {ex.Message}");
+        }
+
+        return "ms-appx:///Assets/AppIcon-192.png";
+    }
+
+    /// <summary>Кнопки/тело системного уведомления.</summary>
     private void OnUpdateNotificationAction(string action)
     {
-        DispatcherQueue.TryEnqueue(() =>
-        {
-            if (string.Equals(action, "install", StringComparison.OrdinalIgnoreCase))
-            {
-                InstallUpdate_Click(this, new RoutedEventArgs());
-            }
-            else if (string.Equals(action, "later", StringComparison.OrdinalIgnoreCase))
-            {
-                UpdateLater_Click(this, new RoutedEventArgs());
-            }
-        });
+        DispatcherQueue.TryEnqueue(() => _ = HandleUpdateActionAsync(action));
     }
 
     // ── Диагностика ─────────────────────────────────────────────────────────

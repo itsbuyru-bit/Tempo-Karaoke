@@ -7,6 +7,8 @@ using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
+using Microsoft.Windows.AppLifecycle;
+using TempoKaraoke.Services;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -18,7 +20,14 @@ namespace TempoKaraoke;
 /// </summary>
 public partial class App : Application
 {
+    private const string SingleInstanceKey = "TempoKaraoke.Main";
+
     private static Mutex? _singleInstanceMutex;
+    private static AppInstance? _mainInstance;
+    private static string? _pendingUpdateAction;
+
+    /// <summary>Тост/редирект просит выполнить действие с обновлением.</summary>
+    public static event Action<string>? UpdateActionRequested;
 
     /// <summary>
     /// The main application window. Use <c>App.Window</c> from any class that needs
@@ -47,25 +56,9 @@ public partial class App : Application
     public App()
     {
         // Второй процесс не должен параллельно писать media.db/playlists.json/очередь.
-        // Вместо этого активируем окно уже запущенного экземпляра.
-        try
-        {
-            _singleInstanceMutex = new Mutex(
-                initiallyOwned: true,
-                @"Local\TempoKaraoke.SingleInstance",
-                out var createdNew);
-            if (!createdNew)
-            {
-                ActivateExistingWindow();
-                Environment.Exit(0);
-            }
-        }
-        catch (Exception ex)
-        {
-            // Ограниченные окружения могут запретить именованный mutex.
-            // Лучше запуститься, чем упасть до создания окна.
-            Services.LogService.Warn($"Single-instance mutex unavailable: {ex.Message}");
-        }
+        // AppLifecycle передаёт аргументы активации (например, клик по тосту)
+        // уже запущенному экземпляру; при недоступности — прежний Mutex.
+        SetupSingleInstance();
 
         InitializeComponent();
 
@@ -104,6 +97,143 @@ public partial class App : Application
         DispatcherQueue = Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
         Window.Activate();
         Services.StartupTrace.Mark("Window activated");
+
+        // Холодный старт из тоста: MainPage ещё не загружена, поэтому действие
+        // сохраняется в PendingUpdateAction и применяется после первого кадра.
+        try
+        {
+            RouteActivation(AppInstance.GetCurrent().GetActivatedEventArgs());
+        }
+        catch (Exception ex)
+        {
+            Services.LogService.Warn($"Cannot read activation arguments: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// Закладывает действие обновления в очередь и будит MainPage. Если страница
+    /// ещё не подписана, действие останется в <see cref="TakePendingUpdateAction"/>.
+    /// </summary>
+    public static void QueueUpdateAction(string action)
+    {
+        if (string.IsNullOrWhiteSpace(action))
+        {
+            return;
+        }
+
+        _pendingUpdateAction = action;
+        DispatcherQueue?.TryEnqueue(() => UpdateActionRequested?.Invoke(action));
+    }
+
+    /// <summary>Забирает действие ровно один раз (защита от двойной обработки).</summary>
+    public static string? TakePendingUpdateAction()
+    {
+        var action = _pendingUpdateAction;
+        _pendingUpdateAction = null;
+        return action;
+    }
+
+    private static void SetupSingleInstance()
+    {
+        try
+        {
+            _mainInstance = AppInstance.FindOrRegisterForKey(SingleInstanceKey);
+            if (!_mainInstance.IsCurrent)
+            {
+                // Второй процесс передаёт аргументы первому и завершается.
+                var activation = AppInstance.GetCurrent().GetActivatedEventArgs();
+                _mainInstance.RedirectActivationToAsync(activation).AsTask().GetAwaiter().GetResult();
+                Environment.Exit(0);
+            }
+
+            _mainInstance.Activated += OnRedirectedActivation;
+            return;
+        }
+        catch (Exception ex)
+        {
+            // Ограниченные окружения могут не поддерживать AppLifecycle.
+            Services.LogService.Warn($"AppLifecycle single-instance unavailable: {ex.Message}");
+        }
+
+        try
+        {
+            _singleInstanceMutex = new Mutex(
+                initiallyOwned: true,
+                @"Local\TempoKaraoke.SingleInstance",
+                out var createdNew);
+            if (!createdNew)
+            {
+                ActivateExistingWindow();
+                Environment.Exit(0);
+            }
+        }
+        catch (Exception ex)
+        {
+            Services.LogService.Warn($"Single-instance mutex unavailable: {ex.Message}");
+        }
+    }
+
+    private static void OnRedirectedActivation(object? sender, AppActivationArguments args)
+    {
+        RouteActivation(args);
+    }
+
+    /// <summary>Разбирает toast/app-notification активацию и ставит действие в очередь.</summary>
+    private static void RouteActivation(AppActivationArguments args)
+    {
+        try
+        {
+            var argument = GetActivationArgument(args);
+            var action = UpdateActivationArguments.ParseAction(argument);
+            if (action is null)
+            {
+                // Обычный повторный запуск: поднимаем уже открытое окно.
+                if (string.Equals(args.Kind.ToString(), "Launch", StringComparison.OrdinalIgnoreCase))
+                {
+                    DispatcherQueue?.TryEnqueue(() =>
+                    {
+                        try
+                        {
+                            Window?.Activate();
+                            SetForegroundWindow(WindowHandle);
+                        }
+                        catch (Exception ex)
+                        {
+                            Services.LogService.Warn($"Cannot activate the existing window: {ex.Message}");
+                        }
+                    });
+                }
+
+                return;
+            }
+
+            Services.LogService.Info(
+                $"[update] activation kind={args.Kind} argument='{argument}' action='{action}'");
+            QueueUpdateAction(action);
+        }
+        catch (Exception ex)
+        {
+            Services.LogService.Warn($"Activation routing failed: {ex.Message}");
+        }
+    }
+
+    private static string? GetActivationArgument(AppActivationArguments args)
+    {
+        var kind = args.Kind.ToString();
+        if (!string.Equals(kind, "AppNotification", StringComparison.OrdinalIgnoreCase)
+            && !string.Equals(kind, "Toast", StringComparison.OrdinalIgnoreCase))
+        {
+            return null;
+        }
+
+        if (args.Data is Microsoft.Windows.AppNotifications.AppNotificationActivatedEventArgs notification)
+        {
+            return notification.Argument;
+        }
+
+        // Классический ToastNotificationActivatedEventArgs живёт в другой сборке;
+        // читаем Argument рефлексией, чтобы не тянуть UWP-типы в hot path.
+        return args.Data?.GetType().GetProperty("Argument")?.GetValue(args.Data) as string;
     }
 
     private static void ActivateExistingWindow()
