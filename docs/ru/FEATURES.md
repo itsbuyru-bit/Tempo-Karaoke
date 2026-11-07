@@ -1,5 +1,4 @@
 Русский | [English](../en/FEATURES.md)
-Русский | [English](../en/FEATURES.md)
 
 # Tempo Karaoke — полный справочник возможностей
 

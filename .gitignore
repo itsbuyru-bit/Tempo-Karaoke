@@ -36,6 +36,9 @@ crash/
 # Installer output
 artifacts/
 
+# Generated wiki checkout
+wiki-build/
+
 # OS files
 .DS_Store
 Thumbs.db
