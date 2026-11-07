@@ -386,7 +386,23 @@ public sealed partial class PlayerWindow : Window
 
     private void RootGrid_PointerMoved(object sender, PointerRoutedEventArgs e)
     {
-        ShowControls();
+        // The transport strip is a bottom-edge overlay: moving the pointer
+        // anywhere else must not reveal it or make the video look resized.
+        var height = RootGrid.ActualHeight;
+        var y = e.GetCurrentPoint(RootGrid).Position.Y;
+        if (height > 0 && y >= height - 110)
+        {
+            ShowControls();
+        }
+        else if (ControlsBar.Visibility == Visibility.Visible)
+        {
+            HideControls();
+        }
+    }
+
+    private void RootGrid_PointerExited(object sender, PointerRoutedEventArgs e)
+    {
+        HideControls();
     }
 
     private void ControlsBar_PointerEntered(object sender, PointerRoutedEventArgs e)
@@ -396,7 +412,7 @@ public sealed partial class PlayerWindow : Window
 
     private void ControlsBar_PointerExited(object sender, PointerRoutedEventArgs e)
     {
-        _hideTimer.Start();
+        HideControls();
     }
 
     private void ShowControls()
@@ -408,12 +424,6 @@ public sealed partial class PlayerWindow : Window
 
     private void HideControls()
     {
-        if (!IsPlaying)
-        {
-            _hideTimer.Stop();
-            return;
-        }
-
         ControlsBar.Visibility = Visibility.Collapsed;
         _hideTimer.Stop();
     }
@@ -565,11 +575,6 @@ public sealed partial class PlayerWindow : Window
         TimeText.Text = $"{FormatTime(PositionMs)} / {FormatTime(LengthMs)}";
         PlayPauseIcon.Symbol = IsPlaying ? Symbol.Pause : Symbol.Play;
         MuteIcon.Symbol = _mediaPlayer.IsMuted ? Symbol.Mute : Symbol.Volume;
-
-        if (!IsPlaying)
-        {
-            ControlsBar.Visibility = Visibility.Visible;
-        }
 
         var volume = _mediaPlayer.Volume * 100;
         if (!_suppressVolume && Math.Abs(VolumeSlider.Value - volume) > 0.5)

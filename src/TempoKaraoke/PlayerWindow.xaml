@@ -11,7 +11,8 @@
         x:Name="RootGrid"
         Background="Black"
         KeyboardAcceleratorPlacementMode="Hidden"
-        PointerMoved="RootGrid_PointerMoved">
+        PointerMoved="RootGrid_PointerMoved"
+        PointerExited="RootGrid_PointerExited">
         <Grid.Resources>
             <Style x:Key="PlayerIconButtonStyle" TargetType="Button">
                 <Setter Property="Background" Value="Transparent" />
@@ -40,6 +41,7 @@
 
         <Border
             x:Name="ControlsBar"
+            Canvas.ZIndex="1"
             Grid.Row="0"
             Margin="12"
             Padding="14,8"

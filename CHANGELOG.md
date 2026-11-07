@@ -9,6 +9,17 @@ components (`major.minor.patch.revision`).
 Detailed user-facing release notes for each release live in
 `docs/releases/<tag>.md` and are published together with the GitHub Release.
 
+## [1.10.3.5] — 2026-11-08
+
+Full details: [`docs/releases/v1.10.3.5.md`](docs/releases/v1.10.3.5.md).
+
+### Changed
+
+- The detached player controls are a real overlay above the video, so showing
+  or hiding them never changes the video size.
+- The overlay appears only in the bottom pointer strip and hides immediately
+  when the pointer leaves it. Phone-remote commands no longer reveal it.
+
 ## [1.10.3.4] — 2026-11-08
 
 Full details: [`docs/releases/v1.10.3.4.md`](docs/releases/v1.10.3.4.md).
