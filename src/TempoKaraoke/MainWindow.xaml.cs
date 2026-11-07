@@ -1,10 +1,12 @@
 using System;
+using Microsoft.UI;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using TempoKaraoke.Models;
 using TempoKaraoke.Services;
 using Windows.Graphics;
+using Windows.UI;
 
 namespace TempoKaraoke;
 
@@ -28,6 +30,9 @@ public sealed partial class MainWindow : Window
 
         ExtendsContentIntoTitleBar = true;
         AppWindow.SetIcon("Assets/AppIcon.ico");
+        // Кнопки «свернуть/развернуть/закрыть» рисует система поверх нашего
+        // заголовка; без явных цветов в светлой теме они остаются белыми.
+        ApplyTitleBarTheme(ResolveTheme(SettingsService.Theme));
 
         ApplyPlacement(SettingsService.GetWindowPlacement(), StartupTrace.ResetWindowRequested);
         if (StartupTrace.ResetWindowRequested)
@@ -64,6 +69,52 @@ public sealed partial class MainWindow : Window
         StartupTrace.Mark("Navigate -> MainPage");
         RootFrame.Navigate(typeof(MainPage));
     }
+
+    /// <summary>Перекрашивает системные кнопки окна под выбранную тему.</summary>
+    public void ApplyTitleBarTheme(ElementTheme theme)
+    {
+        if (!AppWindowTitleBar.IsCustomizationSupported())
+        {
+            return;
+        }
+
+        var isDark = theme == ElementTheme.Dark ||
+            (theme == ElementTheme.Default && Application.Current.RequestedTheme == ApplicationTheme.Dark);
+
+        var foreground = isDark ? Colors.White : Colors.Black;
+        var inactiveForeground = isDark
+            ? Color.FromArgb(255, 160, 160, 160)
+            : Color.FromArgb(255, 96, 96, 96);
+        var hoverBackground = isDark
+            ? Color.FromArgb(24, 255, 255, 255)
+            : Color.FromArgb(24, 0, 0, 0);
+        var pressedBackground = isDark
+            ? Color.FromArgb(40, 255, 255, 255)
+            : Color.FromArgb(40, 0, 0, 0);
+
+        var bar = AppWindow.TitleBar;
+        bar.BackgroundColor = Colors.Transparent;
+        bar.InactiveBackgroundColor = Colors.Transparent;
+        bar.ForegroundColor = foreground;
+        bar.InactiveForegroundColor = inactiveForeground;
+        bar.ButtonBackgroundColor = Colors.Transparent;
+        bar.ButtonInactiveBackgroundColor = Colors.Transparent;
+        bar.ButtonForegroundColor = foreground;
+        bar.ButtonInactiveForegroundColor = inactiveForeground;
+        bar.ButtonHoverBackgroundColor = hoverBackground;
+        bar.ButtonHoverForegroundColor = foreground;
+        bar.ButtonPressedBackgroundColor = pressedBackground;
+        bar.ButtonPressedForegroundColor = foreground;
+
+        LogService.Info($"[window] title bar theme={(isDark ? "dark" : "light")}");
+    }
+
+    private static ElementTheme ResolveTheme(string theme) => theme switch
+    {
+        "light" => ElementTheme.Light,
+        "dark" => ElementTheme.Dark,
+        _ => ElementTheme.Default,
+    };
 
     /// <summary>Сбрасывает сохранённое положение и центрирует окно с размером по умолчанию.</summary>
     public void ResetPlacement()

@@ -2895,6 +2895,12 @@ public sealed partial class MainPage : Page, IRemoteHost, INotifyPropertyChanged
             root.RequestedTheme = elementTheme;
         }
 
+        // Системные кнопки окна рисуются отдельно от XAML — передаём тему явно.
+        if (App.Window is MainWindow window)
+        {
+            window.ApplyTitleBarTheme(elementTheme);
+        }
+
         // Кисти статуса обновлений взяты из темы — перекрашиваем после смены.
         RefreshUpdateStatusText();
     }
