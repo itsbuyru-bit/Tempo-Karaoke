@@ -54,15 +54,7 @@
         </div>
       </div>
 
-      <div class="demo-shell" id="demo"
-           data-queue-label="Queue"
-           data-queued-label="Queued"
-           data-empty-label="Queue is empty"
-           data-play-label="Play"
-           data-pause-label="Pause"
-           data-playing-label="Playing"
-           data-paused-label="Paused"
-           data-nothing-label="Nothing playing">
+      <div class="demo-shell" id="demo">
         <div class="demo-head">
           <span class="demo-title">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg>
@@ -70,30 +62,10 @@
           </span>
           <span class="live-pill"><span class="dot"></span>Live demo</span>
         </div>
-        <div class="phone">
-          <div class="screen">
-            <div class="screen-top">
-              <span class="screen-brand"><img src="assets/appicon.png" alt="">Tempo Karaoke</span>
-              <span class="role-pill">Guest</span>
-            </div>
-            <label class="demo-search">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
-              <input id="demoSearch" type="search" autocomplete="off" placeholder="Search song or artist" aria-label="Search song or artist">
-            </label>
-            <div class="demo-results" id="demoResults"></div>
-            <div class="demo-queue">
-              <div class="queue-head"><span>Queue</span><span class="queue-count" id="demoQueueCount" aria-live="polite">0</span></div>
-              <ul id="demoQueue" aria-live="polite"></ul>
-              <div class="queue-empty" id="demoQueueEmpty">Queue is empty</div>
-              <div class="demo-now">
-                <span class="eq" id="demoEq"><i></i><i></i><i></i><i></i></span>
-                <div class="now-copy"><strong id="demoNowTitle">Nothing playing</strong><span id="demoNowState">Paused</span></div>
-                <button class="demo-play" id="demoPlay" type="button">Play</button>
-              </div>
-            </div>
-          </div>
+        <div class="demo-frame">
+          <iframe src="demo/index.html?lang=en-US" title="Interactive mobile remote" loading="lazy"></iframe>
         </div>
-        <p class="demo-hint">This is a real interactive preview — type to filter, press <strong>Queue</strong>, then <strong>Play</strong>.</p>
+        <p class="demo-hint">This is the actual remote page from the app, running with a demo library. Search, queue and press play.</p>
       </div>
     </section>
 
@@ -101,6 +73,32 @@
       <div class="stat"><b>4,656</b><span>songs indexed in seconds in the demo library</span></div>
       <div class="stat"><b>0</b><span>apps to install on guest phones</span></div>
       <div class="stat"><b>1</b><span>QR code from laptop to TV</span></div>
+    </section>
+
+    <section class="container app-shots" aria-label="Inside the app">
+      <div class="section-head">
+        <span class="section-kicker">Inside the app</span>
+        <h2>Built for a real karaoke night.</h2>
+        <p>Four views from the Windows app: the library, the queue, the phone remote and the settings that connect them.</p>
+      </div>
+      <div class="shots-grid">
+        <figure class="shot">
+          <img src="assets/screenshots/library.png" alt="Tempo Karaoke video library with song cards" loading="lazy" width="1938" height="1800">
+          <figcaption><strong>Video library</strong> Thousands of songs, grouped by artist and version.</figcaption>
+        </figure>
+        <figure class="shot">
+          <img src="assets/screenshots/queue.png" alt="Tempo Karaoke playback queue with songs and requester names" loading="lazy" width="1938" height="1800">
+          <figcaption><strong>Playback queue</strong> A queue that survives restarts and remembers who asked.</figcaption>
+        </figure>
+        <figure class="shot">
+          <img src="assets/screenshots/connection.png" alt="Tempo Karaoke remote control connection settings" loading="lazy" width="1938" height="1800">
+          <figcaption><strong>Web remote</strong> Start the server over Wi-Fi or Wi-Fi Direct.</figcaption>
+        </figure>
+        <figure class="shot">
+          <img src="assets/screenshots/settings.png" alt="Tempo Karaoke settings overview" loading="lazy" width="1938" height="1800">
+          <figcaption><strong>Settings</strong> Library, playback, remote, diagnostics and updates.</figcaption>
+        </figure>
+      </div>
     </section>
 
     <section id="features" class="container">
@@ -194,6 +192,5 @@
       </div>
     </div>
   </footer>
-  <script src="app.js"></script>
 </body>
 </html>

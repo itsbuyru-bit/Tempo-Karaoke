@@ -54,15 +54,7 @@
         </div>
       </div>
 
-      <div class="demo-shell" id="demo"
-           data-queue-label="В очередь"
-           data-queued-label="В очереди"
-           data-empty-label="Очередь пуста"
-           data-play-label="Играть"
-           data-pause-label="Пауза"
-           data-playing-label="Играет"
-           data-paused-label="Пауза"
-           data-nothing-label="Ничего не играет">
+      <div class="demo-shell" id="demo">
         <div class="demo-head">
           <span class="demo-title">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg>
@@ -70,30 +62,10 @@
           </span>
           <span class="live-pill"><span class="dot"></span>Живое демо</span>
         </div>
-        <div class="phone">
-          <div class="screen">
-            <div class="screen-top">
-              <span class="screen-brand"><img src="assets/appicon.png" alt="">Tempo Karaoke</span>
-              <span class="role-pill">Гость</span>
-            </div>
-            <label class="demo-search">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
-              <input id="demoSearch" type="search" autocomplete="off" placeholder="Песня или исполнитель" aria-label="Песня или исполнитель">
-            </label>
-            <div class="demo-results" id="demoResults"></div>
-            <div class="demo-queue">
-              <div class="queue-head"><span>Очередь</span><span class="queue-count" id="demoQueueCount" aria-live="polite">0</span></div>
-              <ul id="demoQueue" aria-live="polite"></ul>
-              <div class="queue-empty" id="demoQueueEmpty">Очередь пуста</div>
-              <div class="demo-now">
-                <span class="eq" id="demoEq"><i></i><i></i><i></i><i></i></span>
-                <div class="now-copy"><strong id="demoNowTitle">Ничего не играет</strong><span id="demoNowState">Пауза</span></div>
-                <button class="demo-play" id="demoPlay" type="button">Играть</button>
-              </div>
-            </div>
-          </div>
+        <div class="demo-frame">
+          <iframe src="demo/index.html?lang=ru-RU" title="Интерактивный пульт" loading="lazy"></iframe>
         </div>
-        <p class="demo-hint">Это настоящий интерактивный пример — введите запрос, нажмите <strong>В очередь</strong>, затем <strong>Играть</strong>.</p>
+        <p class="demo-hint">Это настоящая страница пульта из приложения с демо-библиотекой. Ищите, добавляйте в очередь и нажимайте play.</p>
       </div>
     </section>
 
@@ -101,6 +73,32 @@
       <div class="stat"><b>4 656</b><span>песен индексируются за секунды в демо-библиотеке</span></div>
       <div class="stat"><b>0</b><span>приложений нужно ставить гостям</span></div>
       <div class="stat"><b>1</b><span>QR-код от ноутбука к телевизору</span></div>
+    </section>
+
+    <section class="container app-shots" aria-label="Внутри приложения">
+      <div class="section-head">
+        <span class="section-kicker">Внутри приложения</span>
+        <h2>Сделано для настоящего караоке-вечера.</h2>
+        <p>Четыре экрана Windows-приложения: медиатека, очередь, веб-пульт и настройки, которые их связывают.</p>
+      </div>
+      <div class="shots-grid">
+        <figure class="shot">
+          <img src="assets/screenshots/library.png" alt="Медиатека Tempo Karaoke с карточками песен" loading="lazy" width="1938" height="1800">
+          <figcaption><strong>Медиатека</strong> Тысячи песен, сгруппированные по исполнителю и версии.</figcaption>
+        </figure>
+        <figure class="shot">
+          <img src="assets/screenshots/queue.png" alt="Очередь воспроизведения Tempo Karaoke с песнями и именами" loading="lazy" width="1938" height="1800">
+          <figcaption><strong>Очередь воспроизведения</strong> Сохраняется между запусками и помнит, кто заказал песню.</figcaption>
+        </figure>
+        <figure class="shot">
+          <img src="assets/screenshots/connection.png" alt="Настройки подключения веб-пульта Tempo Karaoke" loading="lazy" width="1938" height="1800">
+          <figcaption><strong>Веб-пульт</strong> Запуск сервера по Wi-Fi или Wi-Fi Direct.</figcaption>
+        </figure>
+        <figure class="shot">
+          <img src="assets/screenshots/settings.png" alt="Общие настройки Tempo Karaoke" loading="lazy" width="1938" height="1800">
+          <figcaption><strong>Настройки</strong> Медиатека, воспроизведение, пульт, диагностика и обновления.</figcaption>
+        </figure>
+      </div>
     </section>
 
     <section id="features" class="container">
@@ -194,6 +192,5 @@
       </div>
     </div>
   </footer>
-  <script src="app.js"></script>
 </body>
 </html>
