@@ -11,6 +11,9 @@ namespace TempoKaraoke.Models;
 /// </summary>
 public sealed class MediaItem : INotifyPropertyChanged
 {
+    /// <summary>Подстановка локализованных строк из приложения (Core не знает ресурсов).</summary>
+    public static Func<string, string?>? TextResolver { get; set; }
+
     private readonly string _displayTitle;
     private long _durationMs;
     private int _width;
@@ -196,11 +199,20 @@ public sealed class MediaItem : INotifyPropertyChanged
             }
 
             var english = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "en";
-            var requester = english && string.Equals(_queuedBy, "Компьютер", StringComparison.OrdinalIgnoreCase)
-                ? "Computer"
+            var addedBy = TextResolver?.Invoke("Queue_AddedBy") ?? (english ? "added by" : "добавил");
+            var requester = string.Equals(_queuedBy, "Компьютер", StringComparison.OrdinalIgnoreCase)
+                ? TextResolver?.Invoke("Queue_Computer") ?? (english ? "PC" : "Компьютер")
                 : _queuedBy;
-            return $"{Subtitle} · {(english ? "added by" : "добавил:")} {requester}";
+            return $"{Subtitle} · {addedBy}: {requester}";
         }
+    }
+
+    /// <summary>Пересчитывает локализованные подписи после смены языка.</summary>
+    public void RefreshLocalizedText()
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Subtitle)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(QueueSubtitle)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SizeText)));
     }
 
     public void SetQueuedBy(string? value)

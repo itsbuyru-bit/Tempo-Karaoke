@@ -206,6 +206,7 @@ public sealed partial class MainPage : Page, IRemoteHost
         Unloaded += OnPageUnloaded;
         NetworkInformation.NetworkStatusChanged += OnNetworkStatusChanged;
         NotificationService.UpdateActionInvoked += OnUpdateNotificationAction;
+        MediaItem.TextResolver = LocalizationService.Get;
         InitializeSettings();
         NavView.PaneOpened += (_, _) => UpdateHeader();
         NavView.PaneClosed += (_, _) => UpdateHeader();
@@ -738,6 +739,33 @@ public sealed partial class MainPage : Page, IRemoteHost
         QueueList.Focus(FocusState.Programmatic);
         LocalizeQueueControls();
         ApplyLanguageDeferred(QueueView);
+    }
+
+    /// <summary>Пересчитывает локализованные подписи треков после смены языка.</summary>
+    /// <summary>Обновляет текст статуса обновлений после смены языка.</summary>
+    private void RefreshUpdateStatusText()
+    {
+        if (!UpdateService.IsSupported || UpdateStatusText is null)
+        {
+            return;
+        }
+
+        UpdateStatusText.Text = _pendingUpdate is null
+            ? LocalizationService.Format("Update_UpToDate", AppInfo.DisplayVersion)
+            : LocalizationService.Format("Update_Available", _pendingUpdate.Version, AppInfo.DisplayVersion);
+    }
+
+    private void RefreshLocalizedMediaText()
+    {
+        foreach (var item in Queue)
+        {
+            item.RefreshLocalizedText();
+        }
+
+        foreach (var item in PlaylistItems)
+        {
+            item.RefreshLocalizedText();
+        }
     }
 
     private void LocalizeQueueControls()
@@ -1862,7 +1890,7 @@ public sealed partial class MainPage : Page, IRemoteHost
         {
             row.Background = entered || item?.IsAlternateRow != true
                 ? new SolidColorBrush(Windows.UI.Color.FromArgb(0, 0, 0, 0))
-                : ThemeBrush("LayerFillColorDefaultBrush");
+                : ThemedBrush(row, "QueueAlternateRowBrush");
         }
 
         if (root.FindName("PlaylistItemDelete") is Button delete)
@@ -1924,7 +1952,7 @@ public sealed partial class MainPage : Page, IRemoteHost
                 FindElementByName(container, "PlaylistItemRow") is Grid row)
             {
                 row.Background = item.IsAlternateRow && !item.IsHovered
-                    ? ThemeBrush("LayerFillColorDefaultBrush")
+                    ? ThemedBrush(row, "QueueAlternateRowBrush")
                     : new SolidColorBrush(Windows.UI.Color.FromArgb(0, 0, 0, 0));
             }
         }
@@ -1938,7 +1966,7 @@ public sealed partial class MainPage : Page, IRemoteHost
         if (FindElementByName(args.ItemContainer, "PlaylistItemRow") is Grid row)
         {
             row.Background = item?.IsAlternateRow == true && item.IsHovered == false
-                ? ThemeBrush("LayerFillColorDefaultBrush")
+                ? ThemedBrush(row, "QueueAlternateRowBrush")
                 : new SolidColorBrush(Windows.UI.Color.FromArgb(0, 0, 0, 0));
         }
 
@@ -2010,6 +2038,59 @@ public sealed partial class MainPage : Page, IRemoteHost
             ShowTrackContextMenu(row, item, e.GetPosition(row), isQueue: true);
             e.Handled = true;
         }
+    }
+
+    /// <summary>ПКМ по карточке видео: те же действия, что и в меню «···».</summary>
+    private void MediaCard_ContextRequested(UIElement sender, ContextRequestedEventArgs args)
+    {
+        if (sender is not FrameworkElement card || card.DataContext is not MediaGroup group)
+        {
+            return;
+        }
+
+        if (!args.TryGetPosition(card, out var position))
+        {
+            position = new Point(0, 0);
+        }
+
+        ShowLibraryItemContextMenu(card, group.Best, position);
+        args.Handled = true;
+    }
+
+    private void ShowLibraryItemContextMenu(FrameworkElement target, MediaItem item, Point position)
+    {
+        var flyout = new MenuFlyout();
+        flyout.Items.Add(CreateMenuItem("ContextMenu_Play.Text", "", () => PlayNow(item)));
+        flyout.Items.Add(CreateMenuItem("Menu_PlayNext.Text", "", () => EnqueueItemNext(item)));
+        flyout.Items.Add(CreateMenuItem("ContextMenu_Queue.Text", "", () => AddItemToQueueFromMenu(item)));
+
+        var addTo = new MenuFlyoutSubItem
+        {
+            Text = LocalizationService.Get("ContextMenu_AddTo.Text"),
+            Icon = CreateMenuIcon(""),
+        };
+        addTo.Items.Add(CreateMenuItem("ContextMenu_NewPlaylist.Text", "", () => _ = CreatePlaylistWithItemAsync(item)));
+        foreach (var playlist in Playlists.ToList())
+        {
+            var targetPlaylist = playlist;
+            addTo.Items.Add(CreateMenuItem(targetPlaylist.Name, "", () => AddItemToPlaylist(targetPlaylist, item), localize: false));
+        }
+
+        flyout.Items.Add(addTo);
+
+        var favorite = LibraryActivityStore.IsFavorite(item.Path);
+        flyout.Items.Add(CreateMenuItem(
+            favorite ? "ContextMenu_RemoveFavorite" : "ContextMenu_AddFavorite",
+            "",
+            () =>
+            {
+                LibraryActivityStore.ToggleFavorite(item.Path);
+                RefreshHomeSection();
+            }));
+        flyout.Items.Add(new MenuFlyoutSeparator());
+        flyout.Items.Add(CreateMenuItem("ContextMenu_Properties.Text", "", () => _ = ShowPropertiesAsync(item)));
+
+        flyout.ShowAt(target, position);
     }
 
     private void ShowTrackContextMenu(
@@ -2625,6 +2706,12 @@ public sealed partial class MainPage : Page, IRemoteHost
         var wasInitializing = _isInitializingSettings;
         _isInitializingSettings = true;
         LanguageComboBox.Items.Clear();
+        LanguageComboBox.Items.Add(new ComboBoxItem
+        {
+            Content = LocalizationService.Get("Settings_UseSystemLanguage"),
+            Tag = "system",
+        });
+
         foreach (var language in LocalizationService.Languages)
         {
             LanguageComboBox.Items.Add(new ComboBoxItem
@@ -2647,9 +2734,9 @@ public sealed partial class MainPage : Page, IRemoteHost
 
         var wasInitializing = _isInitializingSettings;
         _isInitializingSettings = true;
-        LanguageComboBox.SelectedItem = LanguageComboBox.Items
-            .OfType<ComboBoxItem>()
-            .FirstOrDefault(item => string.Equals(item.Tag as string, tag, StringComparison.OrdinalIgnoreCase));
+        LanguageComboBox.SelectedItem = !SettingsService.LanguageConfigured
+            ? LanguageComboBox.Items.OfType<ComboBoxItem>().FirstOrDefault(item => string.Equals(item.Tag as string, "system", StringComparison.OrdinalIgnoreCase))
+            : LanguageComboBox.Items.OfType<ComboBoxItem>().FirstOrDefault(item => string.Equals(item.Tag as string, tag, StringComparison.OrdinalIgnoreCase));
         _isInitializingSettings = wasInitializing;
     }
 
@@ -2858,14 +2945,24 @@ public sealed partial class MainPage : Page, IRemoteHost
 
         try
         {
-            LocalizationService.SetLanguage(language);
+            if (string.Equals(language, "system", StringComparison.OrdinalIgnoreCase))
+            {
+                LocalizationService.UseSystemLanguage();
+            }
+            else
+            {
+                LocalizationService.SetLanguage(language);
+            }
+
             LocalizeQueueControls();
+            RefreshLocalizedMediaText();
             PopulateFolders();
             ApplyFilter();
             UpdateQueueCount();
             UpdateWifiDirectStateUi();
             AboutVersionText.Text = LocalizationService.Format("About_Version", AppInfo.DisplayVersion);
             BuildSettingsCatalog();
+            RefreshUpdateStatusText();
         }
         catch (Exception ex)
         {
@@ -4936,7 +5033,7 @@ public sealed partial class MainPage : Page, IRemoteHost
         }
     }
 
-    private static void SetQuickSearchPlayHover(Button button, bool hover)
+    private void SetQuickSearchPlayHover(Button button, bool hover)
     {
         if (FindElementByName(button, "VideoIcon") is UIElement video)
         {
@@ -5785,7 +5882,7 @@ public sealed partial class MainPage : Page, IRemoteHost
         {
             row.Background = entered || item?.IsAlternateRow != true
                 ? new SolidColorBrush(Windows.UI.Color.FromArgb(0, 0, 0, 0))
-                : ThemeBrush("LayerFillColorDefaultBrush");
+                : ThemedBrush(row, "QueueAlternateRowBrush");
         }
 
         if (root.FindName("QueueItemDelete") is Button delete)
@@ -5840,7 +5937,7 @@ public sealed partial class MainPage : Page, IRemoteHost
         if (FindElementByName(args.ItemContainer, "QueueRow") is Grid row)
         {
             row.Background = item?.IsAlternateRow == true && item.IsHovered == false
-                ? ThemeBrush("LayerFillColorDefaultBrush")
+                ? ThemedBrush(row, "QueueAlternateRowBrush")
                 : new SolidColorBrush(Windows.UI.Color.FromArgb(0, 0, 0, 0));
         }
 
@@ -6490,43 +6587,6 @@ public sealed partial class MainPage : Page, IRemoteHost
         }
     }
 
-    private async void AddUrlToQueue_Click(object sender, RoutedEventArgs e)
-    {
-        var input = new TextBox
-        {
-            PlaceholderText = "https://example.com/video.mkv",
-            Width = 420,
-        };
-
-        var dialog = new ContentDialog
-        {
-            Title = LocalizationService.Get("Url_Title"),
-            Content = input,
-            PrimaryButtonText = LocalizationService.Get("Common_Add"),
-            CloseButtonText = LocalizationService.Get("Common_Cancel"),
-            DefaultButton = ContentDialogButton.Primary,
-            XamlRoot = XamlRoot,
-        };
-
-        if (await ShowDialogAsync(dialog) != ContentDialogResult.Primary)
-        {
-            return;
-        }
-
-        var url = input.Text.Trim();
-        if (Uri.TryCreate(url, UriKind.Absolute, out var uri) &&
-            (uri.Scheme == Uri.UriSchemeHttp ||
-             uri.Scheme == Uri.UriSchemeHttps ||
-             uri.Scheme == "rtsp"))
-        {
-            AddToQueue(MediaItem.FromUrl(url));
-        }
-        else
-        {
-            BarSubtitle.Text = LocalizationService.Get("Url_Invalid");
-        }
-    }
-
     private void AddToQueue(MediaItem item, string? requesterId = null, string? requesterName = null)
     {
         var entry = item.CreateQueueCopy();
@@ -6991,6 +7051,8 @@ public sealed partial class MainPage : Page, IRemoteHost
         }
 
         var enabled = PersistentPinToggle.IsOn;
+        HostPinCard.IsEnabled = enabled;
+        AdminPinCard.IsEnabled = enabled;
         HostPinBox.IsEnabled = enabled;
         HostPinConfirmBox.IsEnabled = enabled;
         AdminPinBox.IsEnabled = enabled;
@@ -7418,7 +7480,7 @@ public sealed partial class MainPage : Page, IRemoteHost
 
     private void OpenReportsFolder_Click(object sender, RoutedEventArgs e)
     {
-        OpenFolder(ReportService.ReportsDirectory, "Не удалось открыть папку отчётов.");
+        OpenFolder(ReportService.ReportsDirectory, LocalizationService.Get("Diagnostics_OpenFolderFailed"));
     }
 
     private static void OpenFolder(string directory, string errorContext)
@@ -7458,7 +7520,7 @@ public sealed partial class MainPage : Page, IRemoteHost
 
             if (await dialog.ShowAsync() == ContentDialogResult.Primary)
             {
-                OpenFolder(ReportService.ReportsDirectory, "Не удалось открыть папку отчётов.");
+                OpenFolder(ReportService.ReportsDirectory, LocalizationService.Get("Diagnostics_OpenFolderFailed"));
             }
         }
         catch (Exception ex)
@@ -7699,14 +7761,16 @@ public sealed partial class MainPage : Page, IRemoteHost
 
     private void UpdateShuffleVisual()
     {
-        if (ShuffleButton is null || ShuffleIcon is null || ShuffleSlash is null)
+        if (ShuffleButton is null || ShuffleIcon is null || ShuffleIconActive is null || ShuffleSlash is null)
         {
             return;
         }
 
+        // Цвета заданы в XAML через ThemeResource: они разрешаются по фактической
+        // теме элемента, поэтому иконка видна и в светлой, и в тёмной теме.
+        ShuffleIcon.Visibility = _shuffle ? Visibility.Collapsed : Visibility.Visible;
+        ShuffleIconActive.Visibility = _shuffle ? Visibility.Visible : Visibility.Collapsed;
         ShuffleSlash.Visibility = _shuffle ? Visibility.Collapsed : Visibility.Visible;
-        ShuffleIcon.Foreground = ThemeBrush(
-            _shuffle ? "AccentTextFillColorPrimaryBrush" : "TextFillColorSecondaryBrush");
         ToolTipService.SetToolTip(
             ShuffleButton,
             LocalizationService.Get(_shuffle ? "Player_ShuffleOn" : "Player_ShuffleOff"));
@@ -7714,16 +7778,18 @@ public sealed partial class MainPage : Page, IRemoteHost
 
     private void UpdateRepeatVisual()
     {
-        if (RepeatButton is null || RepeatIcon is null || RepeatSlash is null)
+        if (RepeatButton is null || RepeatIcon is null || RepeatIconActive is null || RepeatSlash is null)
         {
             return;
         }
 
         var active = _repeatMode != RepeatMode.None;
-        RepeatIcon.Glyph = _repeatMode == RepeatMode.One ? "\uE8ED" : "\uE8EE";
+        var glyph = _repeatMode == RepeatMode.One ? "\uE8ED" : "\uE8EE";
+        RepeatIcon.Glyph = glyph;
+        RepeatIconActive.Glyph = glyph;
+        RepeatIcon.Visibility = active ? Visibility.Collapsed : Visibility.Visible;
+        RepeatIconActive.Visibility = active ? Visibility.Visible : Visibility.Collapsed;
         RepeatSlash.Visibility = active ? Visibility.Collapsed : Visibility.Visible;
-        RepeatIcon.Foreground = ThemeBrush(
-            active ? "AccentTextFillColorPrimaryBrush" : "TextFillColorSecondaryBrush");
         var key = _repeatMode switch
         {
             RepeatMode.All => "Player_RepeatAll",
@@ -7778,7 +7844,11 @@ public sealed partial class MainPage : Page, IRemoteHost
 
     private async Task ShowEqualizerDialogAsync()
     {
-        var dialog = new EqualizerDialog(_player) { XamlRoot = XamlRoot };
+        var dialog = new EqualizerDialog(_player)
+        {
+            XamlRoot = XamlRoot,
+            RequestedTheme = RootLayout.ActualTheme,
+        };
         await dialog.ShowAsync();
     }
 
@@ -8022,8 +8092,55 @@ public sealed partial class MainPage : Page, IRemoteHost
         MiniPlayerCard.Background = new SolidColorBrush(Windows.UI.Color.FromArgb(0, 0, 0, 0));
     }
 
-    private static Brush ThemeBrush(string key)
+    /// <summary>
+    /// Кисть из словарей темы приложения с учётом фактической темы элемента:
+    /// Application.Resources без этого возвращает вариант темы приложения, а не окна.
+    /// </summary>
+    private static Brush ThemedBrush(FrameworkElement element, string key)
     {
+        var dictionaryKey = element.ActualTheme switch
+        {
+            ElementTheme.Light => "Light",
+            ElementTheme.Dark => "Dark",
+            _ => "Default",
+        };
+
+        if (Application.Current.Resources.ThemeDictionaries.TryGetValue(dictionaryKey, out var dictionary) &&
+            dictionary is ResourceDictionary resources &&
+            resources.TryGetValue(key, out var value) &&
+            value is Brush brush)
+        {
+            return brush;
+        }
+
+        return new SolidColorBrush(Windows.UI.Color.FromArgb(0, 0, 0, 0));
+    }
+
+    /// <summary>
+    /// Кисть WinUI по ключу с учётом фактической темы окна. Application.Resources
+    /// отдаёт вариант темы приложения, поэтому цвета берём у пробных элементов,
+    /// которые живут в дереве страницы и разрешают ThemeResource корректно.
+    /// </summary>
+    private Brush ThemeBrush(string key)
+    {
+        Brush? themed = key switch
+        {
+            "TextFillColorPrimaryBrush" => PrimaryTextProbe?.Foreground,
+            "TextFillColorSecondaryBrush" => SecondaryTextProbe?.Foreground,
+            "AccentTextFillColorPrimaryBrush" => AccentTextProbe?.Foreground,
+            "LayerFillColorDefaultBrush" => LayerFillProbe?.Background,
+            "CardBackgroundFillColorDefaultBrush" => CardFillProbe?.Background,
+            "CardBackgroundFillColorSecondaryBrush" => CardFillSecondaryProbe?.Background,
+            "SubtleFillColorSecondaryBrush" => SubtleFillProbe?.Background,
+            "SystemFillColorSuccessBrush" => SuccessFillProbe?.Background,
+            _ => null,
+        };
+
+        if (themed is not null)
+        {
+            return themed;
+        }
+
         if (Application.Current.Resources.TryGetValue(key, out var value) && value is Brush brush)
         {
             return brush;
@@ -8256,7 +8373,7 @@ public sealed partial class MainPage : Page, IRemoteHost
                 FindElementByName(container, "QueueRow") is Grid row)
             {
                 row.Background = item.IsAlternateRow && !item.IsHovered
-                    ? ThemeBrush("LayerFillColorDefaultBrush")
+                    ? ThemedBrush(row, "QueueAlternateRowBrush")
                     : new SolidColorBrush(Windows.UI.Color.FromArgb(0, 0, 0, 0));
             }
         }
@@ -8855,6 +8972,9 @@ public sealed partial class MainPage : Page, IRemoteHost
 
     private async Task<ContentDialogResult> ShowDialogAsync(ContentDialog dialog)
     {
+        // Диалог должен открываться в той же теме, что и окно: иначе при светлой
+        // теме приложения «Свойства» и другие окна показываются тёмными.
+        dialog.RequestedTheme = RootLayout.ActualTheme;
         await _dialogLock.WaitAsync();
         try
         {
@@ -8917,7 +9037,6 @@ public sealed partial class MainPage : Page, IRemoteHost
         _settingsSectionPanels["libraries"] = SectionLibraries;
         _settingsSectionPanels["playback"] = SectionPlayback;
         _settingsSectionPanels["remote"] = SectionRemote;
-        _settingsSectionPanels["security"] = SectionSecurity;
         _settingsSectionPanels["diagnostics"] = SectionDiagnostics;
         _settingsSectionPanels["updates"] = SectionUpdates;
 
@@ -9065,27 +9184,53 @@ public sealed partial class MainPage : Page, IRemoteHost
     /// <summary>Ленивая сводка: тайминги запуска, система/дисплеи, целостность.</summary>
     private void RefreshDiagnosticsSummary()
     {
+        StartupTimingSummary.Text = StartupTrace.BuildSummaryText();
         StartupTimingsText.Text = StartupTrace.BuildTimelineText();
         SystemInfoText.Text = BuildSystemInfoText();
         ConfigIntegrityText.Text = BuildConfigIntegrityText();
     }
 
+    /// <summary>Копирует полный лог запуска в буфер обмена.</summary>
+    private void CopyStartupTiming_Click(object sender, RoutedEventArgs e)
+    {
+        var text = StartupTimingsText?.Text;
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            return;
+        }
+
+        try
+        {
+            var package = new DataPackage();
+            package.SetText(text);
+            Clipboard.SetContent(package);
+            Clipboard.Flush();
+            BarSubtitle.Text = LocalizationService.Get("Diagnostics_TimingCopied");
+        }
+        catch (Exception ex)
+        {
+            LogService.Warn($"Copy startup timing failed: {ex.Message}");
+        }
+    }
+
     private static string BuildSystemInfoText()
     {
         var builder = new StringBuilder();
-        builder.AppendLine($"Tempo Karaoke {AppInfo.DisplayVersion} · {(AppInfo.IsPackaged ? "MSIX" : "portable")}");
-        builder.AppendLine($"{System.Runtime.InteropServices.RuntimeInformation.OSDescription} · {System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture}");
+        builder.AppendLine($"{LocalizationService.Get("Diagnostics_LabelVersion")}: {AppInfo.DisplayVersion}");
+        builder.AppendLine($"{LocalizationService.Get("Diagnostics_LabelMode")}: {(AppInfo.IsPackaged ? "MSIX" : "portable")}");
+        builder.AppendLine($"{LocalizationService.Get("Diagnostics_LabelOs")}: {System.Runtime.InteropServices.RuntimeInformation.OSDescription} · {System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture}");
 
-        foreach (var display in WindowPlacementService.GetDisplays())
+        var displays = WindowPlacementService.GetDisplays();
+        builder.AppendLine($"{LocalizationService.Get("Diagnostics_LabelDisplays")}: {displays.Count}");
+        foreach (var display in displays)
         {
-            builder.AppendLine(
-                $"{(display.IsPrimary ? "*" : "-")} {display.DisplayId}: {display.WorkArea.Width}x{display.WorkArea.Height} @{display.Scale:0.##}");
+            builder.AppendLine($"  {(display.IsPrimary ? "*" : "-")} {display.DisplayId} · {display.WorkArea.Width}×{display.WorkArea.Height} @{display.Scale:0.##}");
         }
 
         if (App.Window is MainWindow window)
         {
             var appWindow = window.AppWindow;
-            builder.Append($"Window: {appWindow.Position.X},{appWindow.Position.Y} {appWindow.Size.Width}x{appWindow.Size.Height}");
+            builder.Append($"{LocalizationService.Get("Diagnostics_LabelWindow")}: {appWindow.Position.X},{appWindow.Position.Y} {appWindow.Size.Width}×{appWindow.Size.Height}");
         }
 
         return builder.ToString().TrimEnd();
@@ -9103,8 +9248,8 @@ public sealed partial class MainPage : Page, IRemoteHost
 
         if (catalog is not null)
         {
-            var languages = Directory.GetFiles(catalog, "*.json").Length - 1;
-            builder.Append($"Языков в каталоге: {Math.Max(languages, 0)}");
+            var languages = Math.Max(Directory.GetFiles(catalog, "*.json").Length - 1, 0);
+            builder.Append($"{LocalizationService.Get("Diagnostics_LabelLanguages")}: {languages}");
         }
 
         return builder.ToString().TrimEnd();
@@ -9114,18 +9259,20 @@ public sealed partial class MainPage : Page, IRemoteHost
     {
         if (string.IsNullOrWhiteSpace(path) || !File.Exists(path))
         {
-            return "не найден";
+            return LocalizationService.Get("Diagnostics_FileMissing");
         }
 
         try
         {
             var info = new FileInfo(path);
-            return $"есть, {info.Length} Б, изменён {info.LastWriteTime:dd.MM.yyyy HH:mm}";
+            return LocalizationService.Format(
+                "Diagnostics_FileState",
+                LocalizationService.Format("Diagnostics_SizeKb", info.Length / 1024.0),
+                info.LastWriteTime.ToString("dd.MM.yyyy HH:mm"));
         }
         catch
         {
-            return "есть";
+            return LocalizationService.Get("Diagnostics_FileMissing");
         }
-    }
-}
+    }}
 

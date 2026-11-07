@@ -1177,14 +1177,6 @@
                                                         Glyph="&#xE838;" />
                                                 </MenuFlyoutItem.Icon>
                                             </MenuFlyoutItem>
-                                            <MenuFlyoutItem
- Click="AddUrlToQueue_Click" x:Uid="Ui_AddByURL" loc:Localization.Key="Ui_AddByURL.Text">
-                                                <MenuFlyoutItem.Icon>
-                                                    <FontIcon
-                                                        FontFamily="{ThemeResource SymbolThemeFontFamily}"
-                                                        Glyph="&#xE71B;" />
-                                                </MenuFlyoutItem.Icon>
-                                            </MenuFlyoutItem>
                                         </MenuFlyout>
                                     </SplitButton.Flyout>
                                 </SplitButton>
@@ -1858,10 +1850,18 @@
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center"
                         Spacing="12">
-                        <FontIcon
-                            FontSize="48"
-                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                            Glyph="&#xE8D6;" />
+                        <Border
+                            Width="112"
+                            Height="112"
+                            HorizontalAlignment="Center"
+                            BorderThickness="6"
+                            BorderBrush="{StaticResource EmptyStateGradient}"
+                            CornerRadius="24">
+                            <FontIcon
+                                FontSize="48"
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                Glyph="&#xE8D6;" />
+                        </Border>
                         <TextBlock
  HorizontalAlignment="Center" Style="{StaticResource TitleTextBlockStyle}" TextAlignment="Center" x:Uid="Ui_NoVideosInThisPlaylistYet" loc:Localization.Key="Ui_NoVideosInThisPlaylistYet.Text" />
                         <TextBlock
@@ -2123,8 +2123,8 @@
                                                 MinWidth="0"
                                                 Padding="10,8"
                                                 VerticalContentAlignment="Center"
-                                                Background="{ThemeResource ControlFillColorDefaultBrush}"
-                                                BorderBrush="{ThemeResource ControlElevationBorderBrush}"
+                                                Background="{ThemeResource TextControlBackground}"
+                                                BorderBrush="{ThemeResource TextControlBorderBrush}"
                                                 BorderThickness="1"
                                                 CornerRadius="4"
                                                 FontSize="13"
@@ -2315,15 +2315,7 @@
                                         </Grid.ColumnDefinitions>
                                         <StackPanel Spacing="6">
                                             <TextBox
- FontWeight="SemiBold" GotFocus="RemoteClientName_GotFocus" KeyDown="RemoteClientName_KeyDown" LostFocus="RemoteClientName_LostFocus" Tag="{Binding}" Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" x:Uid="Ui_DeviceName" loc:Localization.Key="Ui_DeviceName.PlaceholderText" loc:Localization.AutomationNameKey="Ui_DeviceName_AutomationName.AutomationName">
-                                                <TextBox.Resources>
-                                                    <StaticResource x:Key="TextControlBackground" ResourceKey="ControlFillColorSecondaryBrush" />
-                                                    <StaticResource x:Key="TextControlBackgroundPointerOver" ResourceKey="ControlFillColorSecondaryBrush" />
-                                                    <StaticResource x:Key="TextControlBackgroundFocused" ResourceKey="ControlFillColorInputActiveBrush" />
-                                                    <StaticResource x:Key="TextControlBorderBrush" ResourceKey="ControlStrokeColorDefaultBrush" />
-                                                    <StaticResource x:Key="TextControlBorderBrushFocused" ResourceKey="AccentFillColorDefaultBrush" />
-                                                </TextBox.Resources>
-                                            </TextBox>
+ FontWeight="SemiBold" GotFocus="RemoteClientName_GotFocus" KeyDown="RemoteClientName_KeyDown" LostFocus="RemoteClientName_LostFocus" Tag="{Binding}" Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" x:Uid="Ui_DeviceName" loc:Localization.Key="Ui_DeviceName.PlaceholderText" loc:Localization.AutomationNameKey="Ui_DeviceName_AutomationName.AutomationName" />
                                             <StackPanel Orientation="Horizontal" Spacing="6">
                                                 <Ellipse
                                                     Width="8"
@@ -2394,7 +2386,7 @@
 
                 <TextBlock
                     MaxWidth="1064"
-                    Margin="36,24,36,0"
+                    Margin="36,24,36,20"
                     HorizontalAlignment="Left"
                     AutomationProperties.HeadingLevel="Level1"
                     Style="{StaticResource TitleTextBlockStyle}"
@@ -2409,15 +2401,15 @@
                     VerticalScrollMode="Auto">
                     <StackPanel
                         MaxWidth="820"
-                        HorizontalAlignment="Left"
+                        HorizontalAlignment="Stretch"
                         Spacing="16">
-                        <Border
-                            Padding="24"
-                            Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                            BorderThickness="1"
-                            CornerRadius="12">
-                            <StackPanel Spacing="12">
+                    <Border
+                        Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                        BorderThickness="1"
+                        CornerRadius="12">
+                        <StackPanel>
+                            <StackPanel Padding="24" Spacing="12">
                                 <StackPanel Orientation="Horizontal" Spacing="14">
                                     <Border
                                         Width="56"
@@ -2446,15 +2438,10 @@
                                     x:Uid="About_Description"
                                     loc:Localization.Key="About_Description.Text" />
                             </StackPanel>
-                        </Border>
 
-                        <Border
-                            Padding="24"
-                            Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                            BorderThickness="1"
-                            CornerRadius="12">
-                            <StackPanel Spacing="8">
+                            <Border Height="1" Margin="24,0" Background="{ThemeResource DividerStrokeColorDefaultBrush}" />
+
+                            <StackPanel Padding="24" Spacing="8">
                                 <TextBlock
                                     Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                     Style="{StaticResource CaptionTextBlockStyle}"
@@ -2470,40 +2457,26 @@
                                     x:Uid="About_AuthorRole"
                                     loc:Localization.Key="About_AuthorRole.Text" />
                             </StackPanel>
-                        </Border>
 
-                        <Border
-                            Padding="24"
-                            Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                            BorderThickness="1"
-                            CornerRadius="12">
-                            <StackPanel Spacing="8">
+                            <Border Height="1" Margin="24,0" Background="{ThemeResource DividerStrokeColorDefaultBrush}" />
+
+                            <StackPanel Padding="24" Spacing="8">
                                 <StackPanel Orientation="Horizontal" Spacing="8">
-                                    <FontIcon
-                                        FontSize="16"
-                                        Glyph="&#xE8F1;" />
+                                    <FontIcon FontSize="16" Glyph="&#xE8F1;" />
                                     <TextBlock
                                         Style="{StaticResource BodyStrongTextBlockStyle}"
                                         x:Uid="About_GitTitle"
                                         loc:Localization.Key="About_GitTitle.Text" />
                                 </StackPanel>
-                                <TextBlock
-                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                    Style="{StaticResource CaptionTextBlockStyle}"
-                                    TextWrapping="Wrap"
-                                    x:Uid="About_GitSoon"
-                                    loc:Localization.Key="About_GitSoon.Text" />
+                                <HyperlinkButton
+                                    NavigateUri="https://github.com/itsbuyru-bit/Tempo-Karaoke"
+                                    x:Uid="About_GitLink"
+                                    loc:Localization.Key="About_GitLink.Content" />
                             </StackPanel>
-                        </Border>
 
-                        <Border
-                            Padding="24"
-                            Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                            BorderThickness="1"
-                            CornerRadius="12">
-                            <StackPanel Spacing="8">
+                            <Border Height="1" Margin="24,0" Background="{ThemeResource DividerStrokeColorDefaultBrush}" />
+
+                            <StackPanel Padding="24" Spacing="8">
                                 <TextBlock
                                     Style="{StaticResource BodyStrongTextBlockStyle}"
                                     x:Uid="About_DonateTitle"
@@ -2520,9 +2493,11 @@
                                     x:Uid="About_DonateLink"
                                     loc:Localization.Key="About_DonateLink.Content" />
                             </StackPanel>
-                        </Border>
-                        
-</StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    
+                </StackPanel>
                 </ScrollView>
             </Grid>
 
@@ -2976,96 +2951,133 @@
                         <ToggleSwitch
  x:Name="WifiSafeModeToggle" MinWidth="0" Toggled="WifiSafeModeToggle_Toggled" loc:Localization.AutomationNameKey="Ui_WifiSafeMode.Header" />
                     </toolkit:SettingsCard>
-                        </StackPanel>
-
-                        <StackPanel
-                            x:Name="SectionSecurity"
-                            Spacing="{StaticResource SettingsCardSpacing}"
-                            Visibility="Collapsed">
+                        
 <toolkit:SettingsCard
- x:Uid="Ui_AccessPins" loc:Localization.Key="Ui_AccessPins.Description" loc:Localization.SecondaryKey="Ui_AccessPins.Header">
-                        <toolkit:SettingsCard.HeaderIcon>
-                            <FontIcon Glyph="&#xE72E;" />
-                        </toolkit:SettingsCard.HeaderIcon>
-                        <ToggleSwitch
- x:Name="PersistentPinToggle" MinWidth="0" Toggled="PersistentPinToggle_Toggled" x:Uid="Ui_PersistentPin" loc:Localization.Key="Ui_PersistentPin.OffContent" loc:Localization.SecondaryKey="Ui_PersistentPin.OnContent" loc:Localization.AutomationNameKey="Ui_AccessPins.Header" />
-                    </toolkit:SettingsCard>
+ x:Uid="Ui_PersistentPin" loc:Localization.Key="Ui_PersistentPin.Description" loc:Localization.SecondaryKey="Ui_PersistentPin.Header">
+                    <toolkit:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xE72E;" />
+                    </toolkit:SettingsCard.HeaderIcon>
+                    <ToggleSwitch
+ x:Name="PersistentPinToggle" MinWidth="0" Toggled="PersistentPinToggle_Toggled" loc:Localization.Key="Ui_PinToggle.OffContent" loc:Localization.SecondaryKey="Ui_PinToggle.OnContent" loc:Localization.AutomationNameKey="Ui_PersistentPin.Header" />
+                </toolkit:SettingsCard>
 
-                    <toolkit:SettingsCard
- x:Uid="Ui_HostPin" loc:Localization.Key="Ui_HostPin.Description" loc:Localization.SecondaryKey="Ui_HostPin.Header">
-                        <toolkit:SettingsCard.HeaderIcon>
-                            <FontIcon Glyph="&#xE7EF;" />
-                        </toolkit:SettingsCard.HeaderIcon>
-                        <StackPanel
-                            VerticalAlignment="Center"
-                            Orientation="Horizontal"
-                            Spacing="8">
-                            <PasswordBox
+                <toolkit:SettingsCard
+ x:Name="HostPinCard" x:Uid="Ui_HostPin" loc:Localization.Key="Ui_HostPin.Description" loc:Localization.SecondaryKey="Ui_HostPin.Header">
+                    <toolkit:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xE7EF;" />
+                    </toolkit:SettingsCard.HeaderIcon>
+                    <StackPanel
+                        VerticalAlignment="Center"
+                        Orientation="Horizontal"
+                        Spacing="8">
+                        <PasswordBox
  x:Name="HostPinBox" Width="160" MaxLength="8" PasswordRevealMode="Hidden" loc:Localization.Key="Ui_HostPin_Placeholder.PlaceholderText" loc:Localization.AutomationNameKey="Ui_HostPin.Header" />
-                            <PasswordBox
+                        <PasswordBox
  x:Name="HostPinConfirmBox" Width="160" MaxLength="8" PasswordRevealMode="Hidden" loc:Localization.Key="Ui_HostPinConfirm_Placeholder.PlaceholderText" loc:Localization.AutomationNameKey="Ui_HostPinConfirm.Header" />
-                        </StackPanel>
-                    </toolkit:SettingsCard>
+                    </StackPanel>
+                </toolkit:SettingsCard>
 
-                    <toolkit:SettingsCard
- x:Uid="Ui_AdminPin" loc:Localization.Key="Ui_AdminPin.Description" loc:Localization.SecondaryKey="Ui_AdminPin.Header">
-                        <toolkit:SettingsCard.HeaderIcon>
-                            <FontIcon Glyph="&#xE7EF;" />
-                        </toolkit:SettingsCard.HeaderIcon>
+                <toolkit:SettingsCard
+ x:Name="AdminPinCard" x:Uid="Ui_AdminPin" loc:Localization.Key="Ui_AdminPin.Description" loc:Localization.SecondaryKey="Ui_AdminPin.Header">
+                    <toolkit:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xE7EF;" />
+                    </toolkit:SettingsCard.HeaderIcon>
+                    <StackPanel
+                        VerticalAlignment="Center"
+                        Orientation="Horizontal"
+                        Spacing="8">
+                        <PasswordBox
+ x:Name="AdminPinBox" Width="160" MaxLength="8" PasswordRevealMode="Hidden" loc:Localization.Key="Ui_AdminPin_Placeholder.PlaceholderText" loc:Localization.AutomationNameKey="Ui_AdminPin.Header" />
+                        <PasswordBox
+ x:Name="AdminPinConfirmBox" Width="160" MaxLength="8" PasswordRevealMode="Hidden" loc:Localization.Key="Ui_AdminPinConfirm_Placeholder.PlaceholderText" loc:Localization.AutomationNameKey="Ui_AdminPinConfirm.Header" />
+                    </StackPanel>
+                </toolkit:SettingsCard>
+
+                <toolkit:SettingsCard
+ x:Uid="Ui_PinActions" loc:Localization.Key="Ui_PinActions.Description" loc:Localization.SecondaryKey="Ui_PinActions.Header">
+                    <toolkit:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xE8FB;" />
+                    </toolkit:SettingsCard.HeaderIcon>
+                    <StackPanel
+                        VerticalAlignment="Center"
+                        Spacing="8">
                         <StackPanel
-                            VerticalAlignment="Center"
                             Orientation="Horizontal"
                             Spacing="8">
-                            <PasswordBox
- x:Name="AdminPinBox" Width="160" MaxLength="8" PasswordRevealMode="Hidden" loc:Localization.Key="Ui_AdminPin_Placeholder.PlaceholderText" loc:Localization.AutomationNameKey="Ui_AdminPin.Header" />
-                            <PasswordBox
- x:Name="AdminPinConfirmBox" Width="160" MaxLength="8" PasswordRevealMode="Hidden" loc:Localization.Key="Ui_AdminPinConfirm_Placeholder.PlaceholderText" loc:Localization.AutomationNameKey="Ui_AdminPinConfirm.Header" />
-                        </StackPanel>
-                    </toolkit:SettingsCard>
-
-                    <toolkit:SettingsCard
- x:Uid="Ui_PinActions" loc:Localization.Key="Ui_PinActions.Description" loc:Localization.SecondaryKey="Ui_PinActions.Header">
-                        <toolkit:SettingsCard.HeaderIcon>
-                            <FontIcon Glyph="&#xE8FB;" />
-                        </toolkit:SettingsCard.HeaderIcon>
-                        <StackPanel
-                            VerticalAlignment="Center"
-                            Spacing="8">
-                            <StackPanel
-                                Orientation="Horizontal"
-                                Spacing="8">
-                                <Button
+                            <Button
  x:Name="SavePinsButton" Click="SavePins_Click" Style="{StaticResource AccentButtonStyle}" x:Uid="Ui_SavePins" loc:Localization.Key="Ui_SavePins.Content" />
-                                <Button
+                            <Button
  x:Name="ResetPinsButton" Click="ResetPins_Click" x:Uid="Ui_ResetPins" loc:Localization.Key="Ui_ResetPins.Content" />
-                            </StackPanel>
-                            <TextBlock
-                                x:Name="PinSettingsStatus"
-                                MaxWidth="520"
-                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                Style="{StaticResource CaptionTextBlockStyle}"
-                                TextWrapping="Wrap"
-                                Visibility="Collapsed" />
                         </StackPanel>
-                    </toolkit:SettingsCard>
-                        </StackPanel>
+                        <TextBlock
+                            x:Name="PinSettingsStatus"
+                            MaxWidth="520"
+                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                            Style="{StaticResource CaptionTextBlockStyle}"
+                            TextWrapping="Wrap"
+                            Visibility="Collapsed" />
+                    </StackPanel>
+                </toolkit:SettingsCard>
+</StackPanel>
+
+                        
 
                         <StackPanel
                             x:Name="SectionDiagnostics"
                             Spacing="{StaticResource SettingsCardSpacing}"
                             Visibility="Collapsed">
-                        <toolkit:SettingsCard
- x:Uid="Diagnostics_Startup" loc:Localization.Key="Diagnostics_Startup.Description" loc:Localization.SecondaryKey="Diagnostics_Startup.Header">
-                            <toolkit:SettingsCard.HeaderIcon>
-                                <FontIcon Glyph="&#xE823;" />
-                            </toolkit:SettingsCard.HeaderIcon>
-                            <TextBlock
-                                x:Name="StartupTimingsText"
-                                MaxWidth="520"
-                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                Style="{StaticResource CaptionTextBlockStyle}"
-                                TextWrapping="Wrap" />
-                        </toolkit:SettingsCard>
+                        <Expander
+                            x:Name="StartupTimingExpander"
+                            HorizontalAlignment="Stretch"
+                            HorizontalContentAlignment="Stretch"
+                            IsExpanded="False">
+                            <Expander.Header>
+                                <Grid ColumnSpacing="12">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <FontIcon
+                                        Grid.Column="0"
+                                        VerticalAlignment="Center"
+                                        FontSize="16"
+                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                        Glyph="&#xE823;" />
+                                    <StackPanel Grid.Column="1" Spacing="2">
+                                        <TextBlock
+                                            Style="{StaticResource BodyStrongTextBlockStyle}"
+                                            loc:Localization.Key="Diagnostics_Startup.Header" />
+                                        <TextBlock
+                                            x:Name="StartupTimingSummary"
+                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                            Style="{StaticResource CaptionTextBlockStyle}"
+                                            TextTrimming="CharacterEllipsis"
+                                            TextWrapping="NoWrap" />
+                                    </StackPanel>
+                                    <Button
+                                        Grid.Column="2"
+                                        Click="CopyStartupTiming_Click"
+                                        Style="{StaticResource IconButtonStyle}"
+                                        loc:Localization.AutomationNameKey="Diagnostics_CopyTiming_AutomationName.AutomationName"
+                                        loc:Localization.ToolTipKey="Diagnostics_CopyTiming_ToolTip.ToolTip">
+                                        <FontIcon FontSize="16" Glyph="&#xE8C8;" />
+                                    </Button>
+                                </Grid>
+                            </Expander.Header>
+                            <ScrollView
+                                MaxHeight="240"
+                                HorizontalScrollBarVisibility="Auto"
+                                HorizontalScrollMode="Enabled">
+                                <TextBlock
+                                    x:Name="StartupTimingsText"
+                                    FontFamily="Consolas"
+                                    FontSize="12"
+                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                    IsTextSelectionEnabled="True"
+                                    TextWrapping="NoWrap" />
+                            </ScrollView>
+                        </Expander>
 
                         <toolkit:SettingsCard
  x:Uid="Diagnostics_System" loc:Localization.Key="Diagnostics_System.Description" loc:Localization.SecondaryKey="Diagnostics_System.Header">
@@ -3471,11 +3483,23 @@
                         <Button
  x:Name="ShuffleButton" Click="Shuffle_Click" Style="{StaticResource IconButtonStyle}" loc:Localization.AutomationNameKey="Ui_Shuffle_AutomationName.AutomationName" loc:Localization.ToolTipKey="Ui_Shuffle_ToolTip.ToolTip">
                             <Grid Width="18" Height="18">
-                                <FontIcon x:Name="ShuffleIcon" FontSize="18" Glyph="&#xE8B1;" />
+                                <FontIcon
+                                    x:Name="ShuffleIcon"
+                                    FontSize="18"
+                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                    Glyph="&#xE8B1;"
+                                    Opacity="0.75" />
+                                <FontIcon
+                                    x:Name="ShuffleIconActive"
+                                    FontSize="18"
+                                    Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
+                                    Glyph="&#xE8B1;"
+                                    Visibility="Collapsed" />
                                 <Line
                                     x:Name="ShuffleSlash"
                                     Stroke="{ThemeResource TextFillColorSecondaryBrush}"
                                     StrokeThickness="1.5"
+                                    Opacity="0.75"
                                     Visibility="Collapsed"
                                     X1="2"
                                     X2="16"
@@ -3506,11 +3530,23 @@
                         <Button
  x:Name="RepeatButton" Click="Repeat_Click" Style="{StaticResource IconButtonStyle}" loc:Localization.AutomationNameKey="Ui_RepeatQueue_AutomationName.AutomationName">
                             <Grid Width="18" Height="18">
-                                <FontIcon x:Name="RepeatIcon" FontSize="18" Glyph="&#xE8EE;" />
+                                <FontIcon
+                                    x:Name="RepeatIcon"
+                                    FontSize="18"
+                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                    Glyph="&#xE8EE;"
+                                    Opacity="0.75" />
+                                <FontIcon
+                                    x:Name="RepeatIconActive"
+                                    FontSize="18"
+                                    Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
+                                    Glyph="&#xE8EE;"
+                                    Visibility="Collapsed" />
                                 <Line
                                     x:Name="RepeatSlash"
                                     Stroke="{ThemeResource TextFillColorSecondaryBrush}"
                                     StrokeThickness="1.5"
+                                    Opacity="0.75"
                                     Visibility="Collapsed"
                                     X1="2"
                                     X2="16"
@@ -3895,6 +3931,23 @@
  Click="CountdownCancel_Click" x:Uid="Ui_Cancel_193" loc:Localization.Key="Ui_Cancel_193.Content" />
                 </StackPanel>
             </StackPanel>
+        </Grid>
+        <!--  Пробы кистей: элементы, созданные в коде, берут цвета фактической темы окна  -->
+        <Grid
+            x:Name="ThemeBrushProbe"
+            Width="0"
+            Height="0"
+            Opacity="0"
+            IsHitTestVisible="False"
+            AutomationProperties.AccessibilityView="Raw">
+            <TextBlock x:Name="PrimaryTextProbe" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
+            <TextBlock x:Name="SecondaryTextProbe" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+            <TextBlock x:Name="AccentTextProbe" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" />
+            <Border x:Name="LayerFillProbe" Background="{ThemeResource LayerFillColorDefaultBrush}" />
+            <Border x:Name="CardFillProbe" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" />
+            <Border x:Name="CardFillSecondaryProbe" Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}" />
+            <Border x:Name="SubtleFillProbe" Background="{ThemeResource SubtleFillColorSecondaryBrush}" />
+            <Border x:Name="SuccessFillProbe" Background="{ThemeResource SystemFillColorSuccessBrush}" />
         </Grid>
     </Grid>
 </Page>

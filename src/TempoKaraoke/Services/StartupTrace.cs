@@ -42,6 +42,21 @@ public static class StartupTrace
         }
     }
 
+    /// <summary>Короткая сводка для шапки «Время запуска»: последний этап и время.</summary>
+    public static string BuildSummaryText()
+    {
+        lock (Gate)
+        {
+            if (Marks.Count == 0)
+            {
+                return string.Empty;
+            }
+
+            var last = Marks[^1];
+            return $"{last.Name}: {last.Milliseconds / 1000.0:0.0} s";
+        }
+    }
+
     /// <summary>Сводка таймингов для раздела «Диагностика» (без записи в лог).</summary>
     public static string BuildTimelineText()
     {

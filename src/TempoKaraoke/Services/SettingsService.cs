@@ -144,6 +144,13 @@ public static class SettingsService
 
     public static bool LanguageConfigured => Data.LanguageConfigured;
 
+    /// <summary>Следовать языку Windows: сохранённый выбор очищается.</summary>
+    public static void UseSystemLanguage() => Update(data =>
+    {
+        data.Language = string.Empty;
+        data.LanguageConfigured = false;
+    });
+
     /// <summary>Файл, который играл при закрытии: его позиция восстанавливается на паузе.</summary>
     public static string LastTrackPath
     {

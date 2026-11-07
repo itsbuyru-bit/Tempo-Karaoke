@@ -19,7 +19,6 @@ public static class SettingsCatalog
         new("libraries", "\uE8B7", "Settings_Section_Libraries.Header", "Settings_Section_Libraries.Description"),
         new("playback", "\uE768", "Settings_Section_Playback.Header", "Settings_Section_Playback.Description"),
         new("remote", "\uE8B3", "Settings_Section_Remote.Header", "Settings_Section_Remote.Description"),
-        new("security", "\uE72E", "Settings_Section_Security.Header", "Settings_Section_Security.Description"),
         new("diagnostics", "\uE9D9", "Settings_Section_Diagnostics.Header", "Settings_Section_Diagnostics.Description"),
         new("updates", "\uE895", "Settings_Section_Updates.Header", "Settings_Section_Updates.Description"),
     ];

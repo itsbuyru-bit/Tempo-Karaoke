@@ -150,6 +150,14 @@ public sealed class LocalizationService : DependencyObject
         return Catalog.ResolveTag(language);
     }
 
+    /// <summary>Переключает интерфейс на язык Windows и больше его не запоминает.</summary>
+    public static void UseSystemLanguage()
+    {
+        var resolution = LanguageResolver.Resolve(Catalog, null, ReadSystemLanguages());
+        ApplyLanguage(resolution.Tag, persist: false);
+        SettingsService.UseSystemLanguage();
+    }
+
     public static void SetLanguage(string language, bool save = true)
     {
         var normalized = NormalizeLanguage(language);
