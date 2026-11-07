@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "fallback": "en-US",
+  "languages": [
+    {
+      "tag": "en-US",
+      "nativeName": "English",
+      "englishName": "English"
+    },
+    {
+      "tag": "ru-RU",
+      "nativeName": "Русский",
+      "englishName": "Russian"
+    }
+  ]
+}

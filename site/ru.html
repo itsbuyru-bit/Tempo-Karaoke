@@ -76,34 +76,59 @@
     </section>
 
     <section class="container app-shots" aria-label="Внутри приложения">
-      <div class="shots-head">
-        <div class="section-head">
-          <span class="section-kicker">Внутри приложения</span>
-          <h2>Сделано для настоящего караоке-вечера.</h2>
-          <p>Четыре экрана Windows-приложения: медиатека, очередь, веб-пульт и настройки, которые их связывают.</p>
-        </div>
-        <div class="shots-nav" aria-label="Навигация по скриншотам">
-          <button type="button" class="shot-arrow" data-shots-prev aria-label="Предыдущий скриншот">&#8249;</button>
-          <button type="button" class="shot-arrow" data-shots-next aria-label="Следующий скриншот">&#8250;</button>
-        </div>
+      <div class="section-head">
+        <span class="section-kicker">Внутри приложения</span>
+        <h2>Сделано для настоящего караоке-вечера.</h2>
+        <p>Четыре экрана Windows-приложения: медиатека, очередь, веб-пульт и настройки, которые их связывают.</p>
       </div>
-      <div class="shots-rail" data-shots>
-        <figure class="shot">
-          <img src="assets/screenshots/library.png" alt="Медиатека Tempo Karaoke с карточками песен" loading="lazy" width="1938" height="1800">
-          <figcaption><strong>Медиатека</strong> Тысячи песен, сгруппированные по исполнителю и версии.</figcaption>
-        </figure>
-        <figure class="shot">
-          <img src="assets/screenshots/queue.png" alt="Очередь воспроизведения Tempo Karaoke с песнями и именами" loading="lazy" width="1938" height="1800">
-          <figcaption><strong>Очередь воспроизведения</strong> Сохраняется между запусками и помнит, кто заказал песню.</figcaption>
-        </figure>
-        <figure class="shot">
-          <img src="assets/screenshots/connection.png" alt="Настройки подключения веб-пульта Tempo Karaoke" loading="lazy" width="1938" height="1800">
-          <figcaption><strong>Веб-пульт</strong> Запуск сервера по Wi-Fi или Wi-Fi Direct.</figcaption>
-        </figure>
-        <figure class="shot">
-          <img src="assets/screenshots/settings.png" alt="Общие настройки Tempo Karaoke" loading="lazy" width="1938" height="1800">
-          <figcaption><strong>Настройки</strong> Медиатека, воспроизведение, пульт, диагностика и обновления.</figcaption>
-        </figure>
+
+      <div class="carousel" data-carousel aria-roledescription="carousel" aria-label="Скриншоты Tempo Karaoke">
+        <div class="carousel-inner">
+          <figure class="carousel-item active" aria-roledescription="slide" aria-label="1 из 4">
+            <img src="assets/screenshots/library.png" alt="Медиатека Tempo Karaoke с карточками песен" loading="lazy" width="1938" height="1800">
+            <figcaption class="carousel-caption">
+              <span class="slide-count">01 / 04</span>
+              <strong>Медиатека</strong>
+              <p>Тысячи песен, сгруппированные по исполнителю и версии.</p>
+            </figcaption>
+          </figure>
+          <figure class="carousel-item" aria-roledescription="slide" aria-label="2 из 4" aria-hidden="true">
+            <img src="assets/screenshots/queue.png" alt="Очередь воспроизведения Tempo Karaoke с песнями и именами" loading="lazy" width="1938" height="1800">
+            <figcaption class="carousel-caption">
+              <span class="slide-count">02 / 04</span>
+              <strong>Очередь воспроизведения</strong>
+              <p>Сохраняется между запусками и помнит, кто заказал песню.</p>
+            </figcaption>
+          </figure>
+          <figure class="carousel-item" aria-roledescription="slide" aria-label="3 из 4" aria-hidden="true">
+            <img src="assets/screenshots/connection.png" alt="Настройки подключения веб-пульта Tempo Karaoke" loading="lazy" width="1938" height="1800">
+            <figcaption class="carousel-caption">
+              <span class="slide-count">03 / 04</span>
+              <strong>Веб-пульт</strong>
+              <p>Запуск сервера по Wi-Fi или Wi-Fi Direct.</p>
+            </figcaption>
+          </figure>
+          <figure class="carousel-item" aria-roledescription="slide" aria-label="4 из 4" aria-hidden="true">
+            <img src="assets/screenshots/settings.png" alt="Общие настройки Tempo Karaoke" loading="lazy" width="1938" height="1800">
+            <figcaption class="carousel-caption">
+              <span class="slide-count">04 / 04</span>
+              <strong>Настройки</strong>
+              <p>Медиатека, воспроизведение, пульт, диагностика и обновления.</p>
+            </figcaption>
+          </figure>
+        </div>
+        <button class="carousel-control-prev" type="button" data-carousel-prev aria-label="Предыдущий скриншот">
+          <span aria-hidden="true">&#8249;</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-carousel-next aria-label="Следующий скриншот">
+          <span aria-hidden="true">&#8250;</span>
+        </button>
+        <div class="carousel-indicators">
+          <button type="button" class="active" data-carousel-to="0" aria-label="Скриншот 1" aria-current="true"></button>
+          <button type="button" data-carousel-to="1" aria-label="Скриншот 2"></button>
+          <button type="button" data-carousel-to="2" aria-label="Скриншот 3"></button>
+          <button type="button" data-carousel-to="3" aria-label="Скриншот 4"></button>
+        </div>
       </div>
     </section>
 
@@ -200,17 +225,32 @@
   </footer>
   <script>
     (() => {
-      for (const rail of document.querySelectorAll('[data-shots]')) {
-        const area = rail.closest('.app-shots');
-        const step = () => {
-          const card = rail.querySelector('.shot');
-          return card ? card.getBoundingClientRect().width + 18 : rail.clientWidth * 0.8;
+      for (const root of document.querySelectorAll('[data-carousel]')) {
+        const items = [...root.querySelectorAll('.carousel-item')];
+        const dots = [...root.querySelectorAll('[data-carousel-to]')];
+        let current = 0;
+
+        const show = next => {
+          current = (next + items.length) % items.length;
+          items.forEach((item, index) => {
+            const active = index === current;
+            item.classList.toggle('active', active);
+            item.setAttribute('aria-hidden', String(!active));
+          });
+          dots.forEach((dot, index) => {
+            const active = index === current;
+            dot.classList.toggle('active', active);
+            if (active) dot.setAttribute('aria-current', 'true');
+            else dot.removeAttribute('aria-current');
+          });
         };
-        area.querySelector('[data-shots-prev]')?.addEventListener('click', () => {
-          rail.scrollBy({ left: -step(), behavior: 'smooth' });
-        });
-        area.querySelector('[data-shots-next]')?.addEventListener('click', () => {
-          rail.scrollBy({ left: step(), behavior: 'smooth' });
+
+        root.querySelector('[data-carousel-prev]')?.addEventListener('click', () => show(current - 1));
+        root.querySelector('[data-carousel-next]')?.addEventListener('click', () => show(current + 1));
+        dots.forEach(dot => dot.addEventListener('click', () => show(Number(dot.dataset.carouselTo))));
+        root.addEventListener('keydown', event => {
+          if (event.key === 'ArrowLeft') { event.preventDefault(); show(current - 1); }
+          if (event.key === 'ArrowRight') { event.preventDefault(); show(current + 1); }
         });
       }
     })();
