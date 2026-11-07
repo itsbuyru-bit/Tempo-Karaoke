@@ -324,7 +324,7 @@ h1 .gradient {
 /* Stats */
 .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; padding: 14px 0 26px; }
 .stat { padding: 18px 20px; border: 1px solid var(--line); border-radius: 14px; background: rgba(17,23,34,.62); display: flex; align-items: baseline; gap: 10px; }
-.stat b { font-size: 1.55rem; letter-spacing: -.04em; background: linear-gradient(100deg, #9bd3ff, #e0b6ff); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.stat b { font-size: 1.55rem; white-space: nowrap; letter-spacing: -.04em; background: linear-gradient(100deg, #9bd3ff, #e0b6ff); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .stat span { color: var(--dim); font-size: .78rem; }
 
 /* Features */
