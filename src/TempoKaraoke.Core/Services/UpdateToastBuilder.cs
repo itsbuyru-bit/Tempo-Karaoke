@@ -95,45 +95,103 @@ public static class UpdateToastBuilder
             return highlights;
         }
 
-        foreach (var rawLine in changelog.Split('\n'))
+        var current = new StringBuilder();
+
+        void Flush()
         {
-            var line = rawLine.Trim();
-            if (line.Length == 0 || line.StartsWith('#'))
+            if (current.Length == 0)
             {
-                continue;
+                return;
             }
 
-            if (!ListMarker.IsMatch(line))
+            var text = Clean(current.ToString());
+            current.Clear();
+            if (text.Length == 0 || text.EndsWith(':'))
             {
-                continue;
+                return;
             }
 
-            line = ListMarker.Replace(line, string.Empty);
-            line = MarkdownLink.Replace(line, "$1");
-            line = MarkdownEmphasis.Replace(line, string.Empty);
-            line = Whitespace.Replace(line, " ").Trim();
-            if (line.Length == 0 || line.EndsWith(':'))
+            text = Shorten(text);
+            if (!highlights.Contains(text, StringComparer.Ordinal))
             {
-                continue;
-            }
-
-            if (line.Length > 120)
-            {
-                line = line[..117].TrimEnd() + "…";
-            }
-
-            if (!highlights.Contains(line, StringComparer.Ordinal))
-            {
-                highlights.Add(line);
-            }
-
-            if (highlights.Count >= max)
-            {
-                break;
+                highlights.Add(text);
             }
         }
 
+        foreach (var rawLine in changelog.Split('\n'))
+        {
+            var line = rawLine.Trim();
+            if (line.Length == 0)
+            {
+                continue;
+            }
+
+            var indented = rawLine.Length > rawLine.TrimStart().Length;
+            if (line.StartsWith('#'))
+            {
+                Flush();
+                if (highlights.Count >= max)
+                {
+                    break;
+                }
+
+                continue;
+            }
+
+            if (ListMarker.IsMatch(line))
+            {
+                Flush();
+                if (highlights.Count >= max)
+                {
+                    break;
+                }
+
+                current.Append(ListMarker.Replace(line, string.Empty));
+            }
+            else if (current.Length > 0 && indented)
+            {
+                // Многострочный пункт changelog: склеиваем продолжение.
+                current.Append(' ').Append(line);
+            }
+            else if (current.Length > 0)
+            {
+                // Абзац без отступа завершает список.
+                Flush();
+            }
+        }
+
+        Flush();
+        if (highlights.Count > max)
+        {
+            highlights.RemoveRange(max, highlights.Count - max);
+        }
+
         return highlights;
+    }
+
+    private static string Shorten(string text)
+    {
+        const int limit = 90;
+        if (text.Length <= limit)
+        {
+            return text;
+        }
+
+        // Для тоста достаточно первого предложения пункта changelog.
+        var end = text.IndexOfAny(new[] { '.', '!', '?', ';' });
+        if (end >= 20 && end < limit)
+        {
+            return text[..(end + 1)].Trim();
+        }
+
+        return text[..(limit - 3)].TrimEnd() + "…";
+    }
+
+    private static string Clean(string value)
+    {
+        value = MarkdownLink.Replace(value, "$1");
+        value = MarkdownEmphasis.Replace(value, string.Empty);
+        return Whitespace.Replace(value, " ").Trim();
     }
 
     /// <summary>Human-readable size for the toast body (1 GB / 110 MB / 800 KB).</summary>

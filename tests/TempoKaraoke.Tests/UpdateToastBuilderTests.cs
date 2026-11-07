@@ -96,6 +96,7 @@ public sealed class UpdateToastBuilderTests
             ## Новое
 
             - **Плашка UPDATE/NEW** у пункта «Параметры».
+              Продолжение первого пункта.
             * Исправлен [тост](https://example.com) об обновлении.
             + Добавлено подтверждение установки.
             - Четвёртый пункт не должен попасть в тост.
@@ -106,9 +107,29 @@ public sealed class UpdateToastBuilderTests
         var highlights = UpdateToastBuilder.ExtractHighlights(body);
 
         Assert.Equal(3, highlights.Count);
-        Assert.Equal("Плашка UPDATE/NEW у пункта «Параметры».", highlights[0]);
+        Assert.Equal("Плашка UPDATE/NEW у пункта «Параметры». Продолжение первого пункта.", highlights[0]);
         Assert.Equal("Исправлен тост об обновлении.", highlights[1]);
         Assert.Equal("Добавлено подтверждение установки.", highlights[2]);
+    }
+
+    [Fact]
+    public void ExtractHighlightsJoinsMultilineBulletsAndSkipsTrailingParagraph()
+    {
+        const string body = """
+            ## Новое
+
+            - Первый пункт
+              с продолжением.
+            - Второй пункт.
+
+            Обычный абзац после списка.
+            """;
+
+        var highlights = UpdateToastBuilder.ExtractHighlights(body);
+
+        Assert.Equal(2, highlights.Count);
+        Assert.Equal("Первый пункт с продолжением.", highlights[0]);
+        Assert.Equal("Второй пункт.", highlights[1]);
     }
 
     [Fact]
@@ -119,7 +140,19 @@ public sealed class UpdateToastBuilderTests
 
         Assert.Single(highlights);
         Assert.EndsWith("…", highlights[0]);
-        Assert.True(highlights[0].Length <= 120);
+        Assert.True(highlights[0].Length <= 90);
+    }
+
+    [Fact]
+    public void ExtractHighlightsKeepsFirstSentenceOfLongBullet()
+    {
+        const string body =
+            "- **Информативный тост** об обновлении. Заголовок, переход текущая → новая, 1–3 пункта changelog.";
+
+        var highlights = UpdateToastBuilder.ExtractHighlights(body, max: 1);
+
+        Assert.Single(highlights);
+        Assert.Equal("Информативный тост об обновлении.", highlights[0]);
     }
 
     [Fact]

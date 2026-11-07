@@ -636,7 +636,7 @@
   "Update_NetworkError": "Не удалось проверить обновления. Проверьте подключение к интернету.",
   "Update_NotConfigured": "Канал обновлений не настроен.",
   "Update_ToastAttribution": "Опубликовано {0}",
-  "Update_ToastBody": "Установлена {0}. Что нового: {1} • {2}",
+  "Update_ToastBody": "Установлена {0} • {1}. Что нового: {2}",
   "Update_ToastBodyNoNotes": "Установлена {0} • {1}",
   "Update_ToastChangelog": "Что нового",
   "Update_ToastInstall": "Установить",

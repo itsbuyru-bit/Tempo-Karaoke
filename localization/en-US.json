@@ -636,7 +636,7 @@
   "Update_NetworkError": "Failed to check for updates. Check your internet connection.",
   "Update_NotConfigured": "Update channel is not configured.",
   "Update_ToastAttribution": "Published {0}",
-  "Update_ToastBody": "Installed {0}. What's new: {1} • {2}",
+  "Update_ToastBody": "Installed {0} • {1}. What's new: {2}",
   "Update_ToastBodyNoNotes": "Installed {0} • {1}",
   "Update_ToastChangelog": "What's new",
   "Update_ToastInstall": "Install",

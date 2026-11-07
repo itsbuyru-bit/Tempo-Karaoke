@@ -46,6 +46,7 @@ public static class NotificationService
             {
                 try
                 {
+                    LogService.Info($"[update] notification invoked argument='{args.Argument}'");
                     var action = UpdateActivationArguments.ParseAction(args.Argument);
                     LogService.Info($"[update] notification activated argument='{args.Argument}' action='{action}'");
                     if (!string.IsNullOrWhiteSpace(action))
@@ -60,6 +61,7 @@ public static class NotificationService
             };
 
             AppNotificationManager.Default.Register();
+            LogService.Info("[update] notification manager registered");
             _supported = true;
         }
         catch (Exception ex)

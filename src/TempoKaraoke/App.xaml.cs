@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using Microsoft.UI.Xaml;
@@ -93,6 +94,13 @@ public partial class App : Application
     protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
     {
         Services.StartupTrace.Mark("OnLaunched");
+        Services.LogService.Info($"[update] launch arguments='{args.Arguments}'");
+
+        // Регистрируем уведомления до создания окна: холодный старт из тоста
+        // должен попасть в очередь, даже если страница ещё не загружена.
+        NotificationService.UpdateActionInvoked += QueueUpdateAction;
+        NotificationService.TryInitialize();
+
         Window = new MainWindow();
         DispatcherQueue = Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
         Window.Activate();
@@ -108,7 +116,39 @@ public partial class App : Application
         {
             Services.LogService.Warn($"Cannot read activation arguments: {ex.Message}");
         }
+
+        TryQueueCommandLineActivation(args.Arguments);
     }
+
+    /// <summary>
+    /// Некоторые схемы запуска (portable/unpackaged) передают аргумент тоста
+    /// в командной строке. Берём только явные action=/tempokaraoke: аргументы.
+    /// </summary>
+    private static void TryQueueCommandLineActivation(string? launchArguments)
+    {
+        if (_pendingUpdateAction is not null)
+        {
+            return;
+        }
+
+        var candidate = IsActivationArgument(launchArguments)
+            ? launchArguments
+            : Environment.GetCommandLineArgs()
+                .Skip(1)
+                .FirstOrDefault(IsActivationArgument);
+
+        var action = UpdateActivationArguments.ParseAction(candidate);
+        if (action is not null)
+        {
+            Services.LogService.Info($"[update] command-line activation argument='{candidate}' action='{action}'");
+            QueueUpdateAction(action);
+        }
+    }
+
+    private static bool IsActivationArgument(string? value) =>
+        !string.IsNullOrWhiteSpace(value)
+        && (value.Contains("action=", StringComparison.OrdinalIgnoreCase)
+            || value.StartsWith("tempokaraoke:", StringComparison.OrdinalIgnoreCase));
 
     /// <summary>
     /// Закладывает действие обновления в очередь и будит MainPage. Если страница
@@ -184,6 +224,8 @@ public partial class App : Application
         try
         {
             var argument = GetActivationArgument(args);
+            LogService.Info(
+                $"[update] activation probe kind={args.Kind} data={args.Data?.GetType().Name ?? "null"} argument='{argument}'");
             var action = UpdateActivationArguments.ParseAction(argument);
             if (action is null)
             {

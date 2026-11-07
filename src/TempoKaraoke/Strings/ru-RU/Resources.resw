@@ -643,7 +643,7 @@
   <data name="Update_NetworkError" xml:space="preserve"><value>Не удалось проверить обновления. Проверьте подключение к интернету.</value></data>
   <data name="Update_NotConfigured" xml:space="preserve"><value>Канал обновлений не настроен.</value></data>
   <data name="Update_ToastAttribution" xml:space="preserve"><value>Опубликовано {0}</value></data>
-  <data name="Update_ToastBody" xml:space="preserve"><value>Установлена {0}. Что нового: {1} • {2}</value></data>
+  <data name="Update_ToastBody" xml:space="preserve"><value>Установлена {0} • {1}. Что нового: {2}</value></data>
   <data name="Update_ToastBodyNoNotes" xml:space="preserve"><value>Установлена {0} • {1}</value></data>
   <data name="Update_ToastChangelog" xml:space="preserve"><value>Что нового</value></data>
   <data name="Update_ToastInstall" xml:space="preserve"><value>Установить</value></data>

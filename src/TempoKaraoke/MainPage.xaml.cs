@@ -256,7 +256,6 @@ public sealed partial class MainPage : Page, IRemoteHost, INotifyPropertyChanged
         Loaded += OnPageLoaded;
         Unloaded += OnPageUnloaded;
         NetworkInformation.NetworkStatusChanged += OnNetworkStatusChanged;
-        NotificationService.UpdateActionInvoked += OnUpdateNotificationAction;
         SettingsService.UpdateStateChanged += OnUpdateStateChanged;
         App.UpdateActionRequested += OnUpdateActionRequested;
         MediaItem.TextResolver = LocalizationService.Get;
@@ -3201,7 +3200,6 @@ public sealed partial class MainPage : Page, IRemoteHost, INotifyPropertyChanged
         SavePlaybackPosition(force: true);
         NetworkInformation.NetworkStatusChanged -= OnNetworkStatusChanged;
         WiFiDirectCoordinator.StateChanged -= OnWiFiDirectStateChanged;
-        NotificationService.UpdateActionInvoked -= OnUpdateNotificationAction;
         SettingsService.UpdateStateChanged -= OnUpdateStateChanged;
         App.UpdateActionRequested -= OnUpdateActionRequested;
         if (App.Window is not null)
@@ -9473,17 +9471,17 @@ public sealed partial class MainPage : Page, IRemoteHost, INotifyPropertyChanged
             return;
         }
 
-        var highlights = UpdateToastBuilder.ExtractHighlights(info.Changelog);
+        var highlights = UpdateToastBuilder.ExtractHighlights(info.Changelog, max: 2);
         var size = UpdateToastBuilder.FormatSize(info.InstallerSize);
         var versionLine = $"{AppInfo.DisplayVersion} → {info.Version}";
         var body = highlights.Count > 0
             ? UpdateToastLocalization.Format(
                 "Update_ToastBody",
-                "Установлена {0}. Что нового: {1} • {2}",
-                "Installed {0}. What's new: {1} • {2}",
+                "Установлена {0} • {1}. Что нового: {2}",
+                "Installed {0} • {1}. What's new: {2}",
                 versionLine,
-                string.Join(" • ", highlights),
-                size)
+                size,
+                string.Join(" • ", highlights))
             : UpdateToastLocalization.Format(
                 "Update_ToastBodyNoNotes",
                 "Установлена {0} • {1}",
@@ -9534,12 +9532,6 @@ public sealed partial class MainPage : Page, IRemoteHost, INotifyPropertyChanged
         }
 
         return "ms-appx:///Assets/AppIcon-192.png";
-    }
-
-    /// <summary>Кнопки/тело системного уведомления.</summary>
-    private void OnUpdateNotificationAction(string action)
-    {
-        DispatcherQueue.TryEnqueue(() => _ = HandleUpdateActionAsync(action));
     }
 
     // ── Диагностика ─────────────────────────────────────────────────────────
