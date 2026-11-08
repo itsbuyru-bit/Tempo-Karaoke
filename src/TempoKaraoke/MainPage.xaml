@@ -3064,8 +3064,13 @@
                             VerticalAlignment="Center"
                             Orientation="Horizontal"
                             Spacing="12">
-                            <NumberBox
- x:Name="RemoteAutoStopMinutesBox" Width="120" Maximum="120" Minimum="1" SmallChange="5" SpinButtonPlacementMode="Inline" ValueChanged="RemoteAutoStopMinutesBox_ValueChanged" loc:Localization.AutomationNameKey="Ui_MinutesWithoutPhones_AutomationName.AutomationName" />
+                            <TextBox
+                                x:Name="RemoteAutoStopMinutesBox"
+                                Width="80"
+                                MaxLength="3"
+                                TextChanged="RemoteAutoStopMinutesBox_TextChanged"
+                                LostFocus="RemoteAutoStopMinutesBox_LostFocus"
+                                loc:Localization.AutomationNameKey="Ui_MinutesWithoutPhones_AutomationName.AutomationName" />
                             <TextBlock
  VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" x:Uid="Ui_Min" loc:Localization.Key="Ui_Min.Text" />
                             <ToggleSwitch
@@ -3145,9 +3150,7 @@
                                     Orientation="Horizontal"
                                     Spacing="8">
                                     <PasswordBox
-                                        x:Name="HostPinBox" Width="160" MaxLength="8" PasswordRevealMode="Hidden" loc:Localization.Key="Ui_HostPin_Placeholder.PlaceholderText" loc:Localization.AutomationNameKey="Ui_HostPin.Header" />
-                                    <PasswordBox
-                                        x:Name="HostPinConfirmBox" Width="160" MaxLength="8" PasswordRevealMode="Hidden" loc:Localization.Key="Ui_HostPinConfirm_Placeholder.PlaceholderText" loc:Localization.AutomationNameKey="Ui_HostPinConfirm.Header" />
+                                        x:Name="HostPinBox" Width="200" MaxLength="8" PasswordRevealMode="Hidden" loc:Localization.Key="Ui_HostPin_Placeholder.PlaceholderText" loc:Localization.AutomationNameKey="Ui_HostPin.Header" />
                                 </StackPanel>
                             </Grid>
 
@@ -3174,9 +3177,7 @@
                                     Orientation="Horizontal"
                                     Spacing="8">
                                     <PasswordBox
-                                        x:Name="AdminPinBox" Width="160" MaxLength="8" PasswordRevealMode="Hidden" loc:Localization.Key="Ui_AdminPin_Placeholder.PlaceholderText" loc:Localization.AutomationNameKey="Ui_AdminPin.Header" />
-                                    <PasswordBox
-                                        x:Name="AdminPinConfirmBox" Width="160" MaxLength="8" PasswordRevealMode="Hidden" loc:Localization.Key="Ui_AdminPinConfirm_Placeholder.PlaceholderText" loc:Localization.AutomationNameKey="Ui_AdminPinConfirm.Header" />
+                                        x:Name="AdminPinBox" Width="200" MaxLength="8" PasswordRevealMode="Hidden" loc:Localization.Key="Ui_AdminPin_Placeholder.PlaceholderText" loc:Localization.AutomationNameKey="Ui_AdminPin.Header" />
                                 </StackPanel>
                             </Grid>
 

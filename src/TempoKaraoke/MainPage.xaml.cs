@@ -2949,7 +2949,7 @@ public sealed partial class MainPage : Page, IRemoteHost, INotifyPropertyChanged
         CountdownToggle.IsOn = SettingsService.CountdownEnabled;
         CountdownSecondsBox.Value = SettingsService.CountdownSeconds;
         RemoteAutoStopToggle.IsOn = SettingsService.RemoteAutoStopEnabled;
-        RemoteAutoStopMinutesBox.Value = SettingsService.RemoteAutoStopMinutes;
+        RemoteAutoStopMinutesBox.Text = SettingsService.RemoteAutoStopMinutes.ToString();
         if (WifiSafeModeToggle is not null)
         {
             WifiSafeModeToggle.IsOn = SettingsService.WifiDirectSafeMode;
@@ -7304,14 +7304,34 @@ public sealed partial class MainPage : Page, IRemoteHost, INotifyPropertyChanged
         SettingsService.RemoteAutoStopEnabled = RemoteAutoStopToggle.IsOn;
     }
 
-    private void RemoteAutoStopMinutesBox_ValueChanged(NumberBox sender, NumberBoxValueChangedEventArgs args)
+    private void RemoteAutoStopMinutesBox_TextChanged(object sender, TextChangedEventArgs e)
     {
-        if (_isInitializingSettings || double.IsNaN(sender.Value))
+        if (_isInitializingSettings || sender is not TextBox box)
         {
             return;
         }
 
-        SettingsService.RemoteAutoStopMinutes = (int)sender.Value;
+        if (int.TryParse(box.Text, out var minutes) && minutes is >= 1 and <= 120)
+        {
+            SettingsService.RemoteAutoStopMinutes = minutes;
+        }
+    }
+
+    private void RemoteAutoStopMinutesBox_LostFocus(object sender, RoutedEventArgs e)
+    {
+        if (sender is not TextBox box)
+        {
+            return;
+        }
+
+        if (!int.TryParse(box.Text, out var minutes))
+        {
+            minutes = SettingsService.RemoteAutoStopMinutes;
+        }
+
+        minutes = Math.Clamp(minutes, 1, 120);
+        SettingsService.RemoteAutoStopMinutes = minutes;
+        box.Text = minutes.ToString();
     }
 
     private void PersistentPinToggle_Toggled(object sender, RoutedEventArgs e)
@@ -7329,9 +7349,7 @@ public sealed partial class MainPage : Page, IRemoteHost, INotifyPropertyChanged
         var enabled = PersistentPinToggle.IsOn;
         PinDetailsPanel.Visibility = enabled ? Visibility.Visible : Visibility.Collapsed;
         HostPinBox.IsEnabled = enabled;
-        HostPinConfirmBox.IsEnabled = enabled;
         AdminPinBox.IsEnabled = enabled;
-        AdminPinConfirmBox.IsEnabled = enabled;
 
         var security = SettingsService.GetSecurity();
         if (ResetPinsButton is not null)
@@ -7383,18 +7401,16 @@ public sealed partial class MainPage : Page, IRemoteHost, INotifyPropertyChanged
         if (security.UsePersistentPin)
         {
             var host = HostPinBox.Password.Trim();
-            var hostConfirm = HostPinConfirmBox.Password.Trim();
             var admin = AdminPinBox.Password.Trim();
-            var adminConfirm = AdminPinConfirmBox.Password.Trim();
 
-            var hostResult = ValidatePin(host, hostConfirm, security.HostPin is { IsUsable: true });
+            var hostResult = ValidatePin(host, security.HostPin is { IsUsable: true });
             if (hostResult.ErrorKey is not null)
             {
                 ShowPinStatus(LocalizationService.Get(hostResult.ErrorKey), warning: false);
                 return;
             }
 
-            var adminResult = ValidatePin(admin, adminConfirm, security.AdminPin is { IsUsable: true });
+            var adminResult = ValidatePin(admin, security.AdminPin is { IsUsable: true });
             if (adminResult.ErrorKey is not null)
             {
                 ShowPinStatus(LocalizationService.Get(adminResult.ErrorKey), warning: false);
@@ -7448,29 +7464,18 @@ public sealed partial class MainPage : Page, IRemoteHost, INotifyPropertyChanged
 
     private static (string? ErrorKey, bool KeepExisting) ValidatePin(
         string pin,
-        string confirmation,
         bool hasExistingPin)
     {
-        if (pin.Length == 0 && confirmation.Length == 0)
+        if (pin.Length == 0)
         {
             // Keeping an existing record is allowed; otherwise the role would
             // silently have no persistent PIN.
             return hasExistingPin ? (null, true) : ("Pin_Empty", false);
         }
 
-        if (pin.Length == 0 || confirmation.Length == 0)
-        {
-            return ("Pin_Empty", false);
-        }
-
         if (!PinPolicy.Validate(pin).IsValid)
         {
             return ("Pin_Invalid", false);
-        }
-
-        if (!string.Equals(pin, confirmation, StringComparison.Ordinal))
-        {
-            return ("Pin_Mismatch", false);
         }
 
         return (null, false);
@@ -7502,9 +7507,7 @@ public sealed partial class MainPage : Page, IRemoteHost, INotifyPropertyChanged
     private void ClearPinBoxes()
     {
         HostPinBox.Password = string.Empty;
-        HostPinConfirmBox.Password = string.Empty;
         AdminPinBox.Password = string.Empty;
-        AdminPinConfirmBox.Password = string.Empty;
     }
 
     private void RefreshRemotePinDisplay()

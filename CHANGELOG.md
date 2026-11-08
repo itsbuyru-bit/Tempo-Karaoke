@@ -9,6 +9,17 @@ components (`major.minor.patch.revision`).
 Detailed user-facing release notes for each release live in
 `docs/releases/<tag>.md` and are published together with the GitHub Release.
 
+## [1.10.3.6] — 2026-11-09
+
+Full details: [`docs/releases/v1.10.3.6.md`](docs/releases/v1.10.3.6.md).
+
+### Changed
+
+- One PIN field per role for host and administrator, without duplicate
+  confirmation fields.
+- Plain minutes text input for remote auto-stop, normalised to 1–120 minutes;
+  no spinner arrows and no focus jump while editing a PIN.
+
 ## [1.10.3.5] — 2026-11-08
 
 Full details: [`docs/releases/v1.10.3.5.md`](docs/releases/v1.10.3.5.md).

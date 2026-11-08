@@ -8,7 +8,7 @@
       Версия приложения. Установщик Inno читает её из собранного exe;
       отдельного пакетного манифеста нет.
     -->
-    <Version>1.10.3.5</Version>
+    <Version>1.10.3.6</Version>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon Condition="Exists('Assets\AppIcon.ico')">Assets\AppIcon.ico</ApplicationIcon>
     <Platforms>x86;x64;ARM64</Platforms>
