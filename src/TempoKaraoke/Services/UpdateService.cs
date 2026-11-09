@@ -164,9 +164,115 @@ public static class UpdateService
     public static string GetInstallerPath(string version) =>
         Path.Combine(AppStorage.Folder, "updates", $"{InstallerPrefix}{version}{InstallerExtension}");
 
-    /// <summary>Установщик уже скачан и готов к запуску (для состояния «NEW»).</summary>
-    public static bool IsInstallerDownloaded(string? version) =>
-        !string.IsNullOrWhiteSpace(version) && File.Exists(GetInstallerPath(version));
+    /// <summary>Установщик уже скачан, цел и готов к запуску (для состояния «NEW»).</summary>
+    public static bool IsInstallerDownloaded(string? version, long expectedSize = 0)
+    {
+        if (string.IsNullOrWhiteSpace(version))
+        {
+            return false;
+        }
+
+        var path = GetInstallerPath(version);
+        if (!File.Exists(path))
+        {
+            return false;
+        }
+
+        if (expectedSize <= 0)
+        {
+            return true;
+        }
+
+        try
+        {
+            if (new FileInfo(path).Length == expectedSize)
+            {
+                return true;
+            }
+        }
+        catch
+        {
+            // A locked/incomplete file is not reusable.
+        }
+
+        DeleteInstaller(version);
+        return false;
+    }
+
+    /// <summary>Удаляет скачанный установщик версии, если он существует.</summary>
+    public static void DeleteInstaller(string? version)
+    {
+        if (string.IsNullOrWhiteSpace(version))
+        {
+            return;
+        }
+
+        TryDelete(GetInstallerPath(version));
+        TryDelete(GetInstallerPath(version) + ".part");
+    }
+
+    /// <summary>
+    /// Удаляет старые установщики и недокачанные .part-файлы, сохраняя
+    /// установщик ожидающей версии (и его префикс, если версия трёхкомпонентная).
+    /// </summary>
+    public static void PruneInstallerCache(string? keepVersion)
+    {
+        var directory = Path.Combine(AppStorage.Folder, "updates");
+        if (!Directory.Exists(directory))
+        {
+            return;
+        }
+
+        var keepPrefix = string.IsNullOrWhiteSpace(keepVersion)
+            ? null
+            : $"{InstallerPrefix}{keepVersion}";
+
+        try
+        {
+            foreach (var path in Directory.EnumerateFiles(directory))
+            {
+                var name = Path.GetFileName(path);
+                if (name.EndsWith(".part", StringComparison.OrdinalIgnoreCase))
+                {
+                    TryDelete(path);
+                    continue;
+                }
+
+                if (!name.StartsWith(InstallerPrefix, StringComparison.OrdinalIgnoreCase) ||
+                    !name.EndsWith(InstallerExtension, StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                if (keepPrefix is not null &&
+                    name.StartsWith(keepPrefix, StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                TryDelete(path);
+            }
+        }
+        catch
+        {
+            // Cache cleanup must never break startup or an update.
+        }
+    }
+
+    private static void TryDelete(string path)
+    {
+        try
+        {
+            if (File.Exists(path))
+            {
+                File.Delete(path);
+            }
+        }
+        catch
+        {
+            // The installer may still be running or the file may be locked.
+        }
+    }
 
     /// <summary>Скачивает установщик обновления и возвращает путь к нему.</summary>
     public static async Task<string> DownloadAsync(
@@ -183,34 +289,60 @@ public static class UpdateService
         Directory.CreateDirectory(directory);
 
         var target = Path.Combine(directory, $"{InstallerPrefix}{info.Version}{InstallerExtension}");
-        var partial = target + ".part";
-
-        using var response = await Http
-            .GetAsync(info.InstallerUrl, HttpCompletionOption.ResponseHeadersRead, cancellationToken)
-            .ConfigureAwait(false);
-        response.EnsureSuccessStatusCode();
-
-        var total = response.Content.Headers.ContentLength ?? info.InstallerSize;
-
-        await using (var input = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false))
-        await using (var output = File.Create(partial))
+        if (info.InstallerSize > 0 && IsInstallerDownloaded(info.Version, info.InstallerSize))
         {
-            var buffer = new byte[81920];
-            long copied = 0;
-            int read;
-            while ((read = await input.ReadAsync(buffer, cancellationToken).ConfigureAwait(false)) > 0)
-            {
-                await output.WriteAsync(buffer.AsMemory(0, read), cancellationToken).ConfigureAwait(false);
-                copied += read;
-                if (total > 0)
-                {
-                    progress?.Report(Math.Clamp((double)copied / total, 0, 1));
-                }
-            }
+            return target;
         }
 
-        File.Move(partial, target, overwrite: true);
-        return target;
+        // A size mismatch above removes the bad cached installer; remove any
+        // stale partial file before starting over.
+        TryDelete(target + ".part");
+
+        var partial = target + ".part";
+        var completed = false;
+        try
+        {
+            using var response = await Http
+                .GetAsync(info.InstallerUrl, HttpCompletionOption.ResponseHeadersRead, cancellationToken)
+                .ConfigureAwait(false);
+            response.EnsureSuccessStatusCode();
+
+            var total = response.Content.Headers.ContentLength ?? info.InstallerSize;
+
+            await using (var input = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false))
+            await using (var output = File.Create(partial))
+            {
+                var buffer = new byte[81920];
+                long copied = 0;
+                int read;
+                while ((read = await input.ReadAsync(buffer, cancellationToken).ConfigureAwait(false)) > 0)
+                {
+                    await output.WriteAsync(buffer.AsMemory(0, read), cancellationToken).ConfigureAwait(false);
+                    copied += read;
+                    if (total > 0)
+                    {
+                        progress?.Report(Math.Clamp((double)copied / total, 0, 1));
+                    }
+                }
+            }
+
+            var expected = info.InstallerSize > 0 ? info.InstallerSize : total;
+            if (expected > 0 && new FileInfo(partial).Length != expected)
+            {
+                throw new InvalidDataException("Downloaded installer has an unexpected size.");
+            }
+
+            File.Move(partial, target, overwrite: true);
+            completed = true;
+            return target;
+        }
+        finally
+        {
+            if (!completed)
+            {
+                TryDelete(partial);
+            }
+        }
     }
 
     /// <summary>

@@ -9,6 +9,18 @@ components (`major.minor.patch.revision`).
 Detailed user-facing release notes for each release live in
 `docs/releases/<tag>.md` and are published together with the GitHub Release.
 
+## [1.10.3.7] — 2026-11-09
+
+Full details: [`docs/releases/v1.10.3.7.md`](docs/releases/v1.10.3.7.md).
+
+### Fixed
+
+- Failed update downloads remove their `.part` file before retrying.
+- Cached installers are validated by size against the GitHub asset; corrupt
+  files are discarded.
+- Failed installer launches delete the downloaded file, completed updates clear
+  stale pending state, and old installers are pruned.
+
 ## [1.10.3.6] — 2026-11-09
 
 Full details: [`docs/releases/v1.10.3.6.md`](docs/releases/v1.10.3.6.md).

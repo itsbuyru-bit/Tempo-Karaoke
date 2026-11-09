@@ -264,6 +264,7 @@ public sealed partial class MainPage : Page, IRemoteHost, INotifyPropertyChanged
         App.UpdateActionRequested += OnUpdateActionRequested;
         MediaItem.TextResolver = LocalizationService.Get;
         InitializeSettings();
+        ReconcileUpdateState();
         NavView.PaneOpened += (_, _) =>
         {
             UpdateHeader();
@@ -7625,11 +7626,13 @@ public sealed partial class MainPage : Page, IRemoteHost, INotifyPropertyChanged
                 return;
             }
 
+            UpdateService.DeleteInstaller(_pendingUpdate.Version);
             _updateState = UpdateUiState.InstallFailed;
         }
         catch (Exception ex)
         {
             LogService.Warn($"Не удалось установить обновление: {ex.Message}");
+            UpdateService.DeleteInstaller(_pendingUpdate.Version);
             _updateState = UpdateUiState.InstallFailed;
         }
         finally
@@ -7763,7 +7766,10 @@ public sealed partial class MainPage : Page, IRemoteHost, INotifyPropertyChanged
 
             case UpdateCheckStatus.UpToDate:
                 _pendingUpdate = null;
+                var staleVersion = SettingsService.PendingUpdateVersion;
                 SettingsService.PendingUpdateVersion = string.Empty;
+                UpdateService.DeleteInstaller(staleVersion);
+                UpdateService.PruneInstallerCache(null);
                 UpdateBadgeVisibility();
                 _updateState = userInitiated ? UpdateUiState.UpToDate : UpdateUiState.Idle;
                 break;
@@ -9579,6 +9585,23 @@ public sealed partial class MainPage : Page, IRemoteHost, INotifyPropertyChanged
         }
     }
 
+    private void ReconcileUpdateState()
+    {
+        var pending = SettingsService.PendingUpdateVersion;
+        if (!string.IsNullOrWhiteSpace(pending) &&
+            Version.TryParse(pending, out var pendingVersion) &&
+            pendingVersion <= AppInfo.CurrentVersion)
+        {
+            // The installer already produced a version at least as new as the
+            // pending one. Clear the stale badge and remove its downloaded file.
+            SettingsService.PendingUpdateVersion = string.Empty;
+            UpdateService.DeleteInstaller(pending);
+            pending = string.Empty;
+        }
+
+        UpdateService.PruneInstallerCache(pending);
+    }
+
     // ── Плашка и уведомление об обновлении ──────────────────────────────────
 
     private string _updateBadgeState = string.Empty;
@@ -9610,7 +9633,7 @@ public sealed partial class MainPage : Page, IRemoteHost, INotifyPropertyChanged
         }
 
         var version = SettingsService.PendingUpdateVersion;
-        var ready = UpdateService.IsInstallerDownloaded(version);
+        var ready = UpdateService.IsInstallerDownloaded(version, _pendingUpdate?.InstallerSize ?? 0);
         var state = ready ? "new" : "update";
         var paneOpen = NavView?.IsPaneOpen ?? true;
 
