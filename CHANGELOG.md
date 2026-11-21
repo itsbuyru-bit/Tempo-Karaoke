@@ -9,6 +9,20 @@ components (`major.minor.patch.revision`).
 Detailed user-facing release notes for each release live in
 `docs/releases/<tag>.md` and are published together with the GitHub Release.
 
+## [1.10.4.1] — 2026-11-21
+
+Full details: [`docs/releases/v1.10.4.1.md`](docs/releases/v1.10.4.1.md).
+
+### Added
+
+- Portable installation: no shortcuts/registry/uninstaller, data in `Data` next
+  to the exe, automatic `Karaoke` library, optional import from a regular
+  installation, and in-place portable updates.
+
+### Fixed
+
+- Missing WinUI `.pri`/`.xbf` files caused the 1.10.3.7 startup crash.
+- Search tests no longer race on shared static options in CI.
 ## [1.10.4.0] — 2026-11-21
 
 Full details: [`docs/releases/v1.10.4.0.md`](docs/releases/v1.10.4.0.md).
