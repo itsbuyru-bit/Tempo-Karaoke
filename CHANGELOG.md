@@ -9,6 +9,16 @@ components (`major.minor.patch.revision`).
 Detailed user-facing release notes for each release live in
 `docs/releases/<tag>.md` and are published together with the GitHub Release.
 
+## [1.10.3.8] — 2026-11-21
+
+Full details: [`docs/releases/v1.10.3.8.md`](docs/releases/v1.10.3.8.md).
+
+### Fixed
+
+- The installed app no longer crashes on startup with `0xc000027b` in
+  `Microsoft.UI.Xaml.dll`.
+- Portable publish now includes `TempoKaraoke.pri`, compiled XAML `.xbf` files,
+  and `Assets/AppIcon.ico`.
 ## [1.10.3.7] — 2026-11-09
 
 Full details: [`docs/releases/v1.10.3.7.md`](docs/releases/v1.10.3.7.md).

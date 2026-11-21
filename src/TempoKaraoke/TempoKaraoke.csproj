@@ -8,7 +8,7 @@
       Версия приложения. Установщик Inno читает её из собранного exe;
       отдельного пакетного манифеста нет.
     -->
-    <Version>1.10.3.7</Version>
+    <Version>1.10.3.8</Version>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon Condition="Exists('Assets\AppIcon.ico')">Assets\AppIcon.ico</ApplicationIcon>
     <Platforms>x86;x64;ARM64</Platforms>
@@ -33,7 +33,10 @@
   -->
 
   <ItemGroup>
-    <Content Include="Assets\AppIcon.ico" />
+    <Content Include="Assets\AppIcon.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
     <!-- AppIcon-192.png нужен в рантайме: иконка в шапке (ms-appx:///Assets/...) и /appicon.png веб-пульта (читается из каталога приложения). -->
     <Content Include="Assets\AppIcon-*.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -87,4 +90,21 @@
     -->
     <PublishTrimmed>False</PublishTrimmed>
   </PropertyGroup>
+
+  <!--
+    dotnet publish with a custom PublishDir does not copy the WinUI resource
+    index and compiled XAML into the portable folder. Without TempoKaraoke.pri
+    and the .xbf files MainWindow.InitializeComponent fails with a native
+    stowed exception before the window appears.
+  -->
+  <Target Name="CopyWinUIResourcesToPublish" AfterTargets="Publish">
+    <ItemGroup>
+      <_WinUIXbf Include="$(TargetDir)*.xbf" />
+      <_WinUIResourcePri Include="$(TargetDir)$(AssemblyName).pri" Condition="Exists('$(TargetDir)$(AssemblyName).pri')" />
+    </ItemGroup>
+    <Copy
+      SourceFiles="@(_WinUIXbf);@(_WinUIResourcePri)"
+      DestinationFolder="$(PublishDir)"
+      SkipUnchangedFiles="true" />
+  </Target>
 </Project>
