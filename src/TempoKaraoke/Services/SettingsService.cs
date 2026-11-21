@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using TempoKaraoke.Security;
 using Windows.Storage;
@@ -107,7 +108,59 @@ public static class SettingsService
         }
     }
 
-    public static List<string> VideoRoots => new(Data.VideoRoots);
+    public static List<string> VideoRoots
+    {
+        get
+        {
+            var roots = new List<string>(Data.VideoRoots);
+            if (roots.Count == 0 && AppStorage.IsPortable)
+            {
+                var portableLibrary = PortableLibraryPath;
+                if (portableLibrary is not null)
+                {
+                    roots.Add(portableLibrary);
+                }
+            }
+
+            return roots;
+        }
+    }
+
+    /// <summary>Library shipped next to a portable installation, e.g. F:\TempoKaraoke\Karaoke.</summary>
+    public static string? PortableLibraryPath
+    {
+        get
+        {
+            if (!AppStorage.IsPortable)
+            {
+                return null;
+            }
+
+            var candidates = new[]
+            {
+                Path.Combine(AppContext.BaseDirectory, "Karaoke"),
+                Path.Combine(Path.GetDirectoryName(AppContext.BaseDirectory.TrimEnd(
+                    Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)) ?? string.Empty, "Karaoke"),
+            };
+
+            foreach (var candidate in candidates)
+            {
+                try
+                {
+                    if (Directory.Exists(candidate))
+                    {
+                        return candidate;
+                    }
+                }
+                catch
+                {
+                    // Ignore inaccessible removable-drive paths.
+                }
+            }
+
+            return null;
+        }
+    }
 
     public static void SetVideoRoots(IEnumerable<string> roots)
     {

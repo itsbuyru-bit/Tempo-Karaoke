@@ -80,10 +80,13 @@ Name: "russian"; MessagesFile: "compiler:Languages\Russian.isl"
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [CustomMessages]
+russian.PortableTask=Портативная установка (без ярлыков и деинсталлятора)
 russian.DeleteUserDataPrompt=Удалить также настройки, очередь и кэш библиотеки?%n%1%n%nЕсли оставить (Нет), данные сохранятся для следующей установки.
+english.PortableTask=Portable installation (no shortcuts or uninstaller)
 english.DeleteUserDataPrompt=Also delete settings, playback queue, and library cache?%n%1%n%nIf you choose No, your data will be kept for future installations.
 
 [Tasks]
+Name: "portable"; Description: "{cm:PortableTask}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
@@ -92,8 +95,8 @@ Source: "{#PublishDir}\*"; DestDir: "{app}"; Excludes: "*.pdb,*.lib,settings.jso
 
 [Icons]
 ; AppUserModelID связывает ярлык с уведомлениями приложения.
-Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; AppUserModelID: "CappuccinoDev.TempoKaraoke"
-Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon; AppUserModelID: "CappuccinoDev.TempoKaraoke"
+Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; AppUserModelID: "CappuccinoDev.TempoKaraoke"; Tasks: not portable
+Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon and not portable; AppUserModelID: "CappuccinoDev.TempoKaraoke"
 
 [Run]
 ; Обычная установка: галочка «Запустить» на финальной странице.
@@ -128,6 +131,8 @@ end;
 // --- Маркер области установки ----------------------------------------------
 // Обновление из приложения читает его и ставит новую версию в ту же область.
 procedure CurStepChanged(CurStep: TSetupStep);
+var
+  ResultCode: Integer;
 begin
   if CurStep = ssPostInstall then
   begin
@@ -135,6 +140,23 @@ begin
       SaveStringToFile(ExpandConstant('{app}\install-scope.txt'), 'all', False)
     else
       SaveStringToFile(ExpandConstant('{app}\install-scope.txt'), 'user', False);
+
+    // Portable mode: marker next to exe switches AppStorage to {app}\Data.
+    // No shortcuts are created (see Tasks), and no uninstall entry is kept.
+    if WizardIsTaskSelected('portable') then
+    begin
+      SaveStringToFile(ExpandConstant('{app}\portable.marker'), 'portable', False);
+      Exec(
+        ExpandConstant('{sys}\reg.exe'),
+        'delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Uninstall\{#MyAppId}_is1" /f',
+        '',
+        SW_HIDE,
+        ewWaitUntilTerminated,
+        ResultCode);
+      DeleteFile(ExpandConstant('{app}\unins000.exe'));
+      DeleteFile(ExpandConstant('{app}\unins000.dat'));
+      DeleteFile(ExpandConstant('{app}\unins000.msg'));
+    end;
   end;
 end;
 

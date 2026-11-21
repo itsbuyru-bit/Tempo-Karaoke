@@ -101,6 +101,9 @@ public partial class App : Application
         NotificationService.UpdateActionInvoked += QueueUpdateAction;
         NotificationService.TryInitialize();
 
+        // Portable copy: import settings/queue before any service reads them.
+        PortableMigrationService.PromptIfNeeded();
+
         Window = new MainWindow();
         DispatcherQueue = Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
         Window.Activate();

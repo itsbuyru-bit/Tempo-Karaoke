@@ -14,12 +14,25 @@ public static class AppStorage
 {
     private static readonly Lazy<string> LazyFolder = new(CreateFolder);
 
+    private const string PortableMarker = "portable.marker";
+
     public static string Folder => LazyFolder.Value;
+
+    /// <summary>True when the app runs from a portable folder created by the installer.</summary>
+    public static bool IsPortable =>
+        File.Exists(Path.Combine(AppContext.BaseDirectory, PortableMarker));
 
     public static string PathFor(string fileName) => Path.Combine(Folder, fileName);
 
     private static string CreateFolder()
     {
+        if (IsPortable)
+        {
+            var portable = Path.Combine(AppContext.BaseDirectory, "Data");
+            Directory.CreateDirectory(portable);
+            return portable;
+        }
+
         var local = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
         var candidates = new[]
         {

@@ -9,6 +9,16 @@ components (`major.minor.patch.revision`).
 Detailed user-facing release notes for each release live in
 `docs/releases/<tag>.md` and are published together with the GitHub Release.
 
+## [1.10.4.0] — 2026-11-21
+
+Full details: [`docs/releases/v1.10.4.0.md`](docs/releases/v1.10.4.0.md).
+
+### Added
+
+- Portable installation option: no shortcuts, registry entries, or uninstaller;
+  data is stored in `Data` next to the executable.
+- Automatic `Karaoke` library folder next to the portable app, first-run import
+  of settings/queue/playlists, and in-place portable updates.
 ## [1.10.3.8] — 2026-11-21
 
 Full details: [`docs/releases/v1.10.3.8.md`](docs/releases/v1.10.3.8.md).

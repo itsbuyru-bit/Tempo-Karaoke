@@ -356,9 +356,22 @@ public static class UpdateService
             return false;
         }
 
+        var arguments = "/SILENT /SUPPRESSMSGBOXES /CLOSEAPPLICATIONS /NORESTART";
+        if (AppStorage.IsPortable)
+        {
+            var directory = AppContext.BaseDirectory.TrimEnd(
+                Path.DirectorySeparatorChar,
+                Path.AltDirectorySeparatorChar);
+            arguments += $" /CURRENTUSER /DIR=\"{directory}\" /TASKS=\"portable\"";
+        }
+        else
+        {
+            arguments += GetInstallScopeArgument();
+        }
+
         System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(installerPath)
         {
-            Arguments = "/SILENT /SUPPRESSMSGBOXES /CLOSEAPPLICATIONS /NORESTART" + GetInstallScopeArgument(),
+            Arguments = arguments,
             UseShellExecute = true,
         });
 
